@@ -4,6 +4,10 @@ library(SingleCellExperiment)
 library(scater)
 library(scran)
 
+if (!file.exists("output")) {
+  system("mkdir -p output")
+}
+
 ## Process MOB dataset
 
 counts_raw <- read.delim("./datasets/Rep11_MOB_count_matrix-1.tsv", header = TRUE, row.names = 1)
@@ -24,7 +28,7 @@ seqvals = seq(min(var.out$mean), max(var.out$mean), length.out = 1000)
 peakExp = seqvals[which.max(var.fit$trend(seqvals))]
 hvg.out <- var.out[which(var.out$FDR <= 0.05 & var.out$mean > peakExp),]
 hvg.out <- hvg.out[order(hvg.out$bio, decreasing=TRUE),]
-pdf(file = "HVG_selection.pdf", height = 8, width = 8)
+pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
 plot(var.out$mean, var.out$total, pch=16, cex=0.6, xlab="Mean log-expression",
      ylab="Variance of log-expression")
 curve(var.fit$trend(x), col="dodgerblue", lwd=2, add=TRUE)
@@ -55,7 +59,7 @@ length(HVG)
 # length(HVG)
 # seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
 # peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
-# pdf(file = "HVG_selection4.pdf", height = 8, width = 8)
+# pdf(file = "./output/HVG_selection4.pdf", height = 8, width = 8)
 # plot(dec$mean, dec$total, xlab="Mean log-expression", ylab="Variance")
 # curve(metadata(dec)$trend(x), col="blue", add=TRUE)
 # points(dec$mean[ which(rownames(dec) %in% HVG4 & dec$mean > peakExp)],
