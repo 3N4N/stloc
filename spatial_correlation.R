@@ -104,12 +104,10 @@ if (!file.exists("output/p_val_plots")) {
   system("mkdir output/p_val_plots")
 }
 
-# t = theme(legend.key.width = unit(0.5, "inches")) +
-#     theme(plot.title = element_text(size = 20)) +
-#     theme(axis.title = element_text(size = 15))
 
-plot_wcor = function(df_res) {
-  ggplot(df_res, aes(x = -x, y = y)) +
+plotcors = function(df_res) {
+
+  plot_wcor <- ggplot(df_res, aes(x = -x, y = y)) +
     geom_point(aes(colour = wcor), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
@@ -125,13 +123,14 @@ plot_wcor = function(df_res) {
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
+    theme(legend.key.width = unit(0.5, "inches")) +
+    theme(plot.title = element_text(size = 20)) +
+    theme(axis.title = element_text(size = 15)) +
     theme(legend.title=element_text(size=15)) +
     labs(colour = "Weighted Correlation") +
     NULL
-}
 
-plot_pvals = function(df_res) {
-  ggplot(df_res, aes(x = -x, y = y)) +
+  plot_pvals <- ggplot(df_res, aes(x = -x, y = y)) +
     # geom_point(aes(colour = pvals), size = 5) +
     geom_point(aes(colour = -log10(pvals)), size = 5) +
     theme_minimal() +
@@ -148,9 +147,26 @@ plot_pvals = function(df_res) {
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
+    theme(legend.key.width = unit(0.5, "inches")) +
+    theme(plot.title = element_text(size = 20)) +
+    theme(axis.title = element_text(size = 15)) +
     theme(legend.title=element_text(size=15)) +
     labs(colour = "-log(pval)") +
     NULL
+
+  wcor_leg = as_ggplot(get_legend(plot_wcor))
+  pvals_leg = as_ggplot(get_legend(plot_pvals))
+
+  scater::multiplot(plot_wcor + theme(legend.position = "none")
+                    + theme(plot.margin = margin(10,0,-10,0)),
+                    plot_pvals + theme(legend.position = "none")
+                    + theme(plot.margin = margin(10,0,-10,0)),
+                    wcor_leg, pvals_leg,
+                    layout = matrix(
+                      c(1,1,1,2,2,2,
+                        1,1,1,2,2,2,
+                        1,1,1,2,2,2,
+                        3,3,3,4,4,4), ncol = 6, byrow = TRUE))
 }
 
 for (x in clusterNames) {
@@ -164,11 +180,12 @@ for (x in clusterNames) {
 
   W <- weightMatrix_nD(coords, span = 0.05)
 
-  wcor <- as.matrix(sapply(1:nrow(coords), function(i) corTaylor(pairCount, W[i, ])))
+  wcor <- as.matrix(sapply(1:nrow(coords),
+                           function(i) corTaylor(pairCount, W[i,])))
 
+  message(paste0("Calculating permuted correlation for ", x))
   set.seed(500)
   nitr = 1000
-
   pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
   pwcor <- sapply(1:nitr, function(i) {
     x <- pairCount
@@ -192,9 +209,8 @@ for (x in clusterNames) {
                        pvals = pvals)
 
   pdf(paste0("output/p_val_plots/", x, ".pdf"),
-      height = 4.5, width = 12,onefile=TRUE)
-  print(plot_wcor(df_res))
-  print(plot_pvals(df_res))
+      height = 8, width = 12,onefile=FALSE)
+  plotcors(df_res)
   dev.off()
 
   # break
