@@ -86,6 +86,14 @@ write.table(clusterData[clusterData$gene %in% commonGenes,], file = "./datasets/
 # a08.Mf: Tmsb4x Apoe Sepp1 B2m
 # a25.Neuron14: Dcx Nrep Tubb2b Crmp1 Dlx2 Bcl11b Meis2 Sp9 Cpne4 Synpr Tuba1a Nsg2 Map1b Nrxn3 Tubb5 Eif4a1
 
+clusterData <- read.delim("./datasets/mmc2-2.tsv", header = TRUE)
+clusterNames <- unique(clusterData[,6])
+clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
+clusterGenes <- clusterData[,7]
+clusterGenePair <- list()
+clusterGenePair <- sapply(clusterNames, function(i) {
+      clusterGenePair[[i]] <- clusterData[clusterData[,6]==i, 7]
+})
 
 # genes <- c("Cst3", "B2m", "Ier5", "Cst3", "Cst3", "Tmsb4x", "B2m", "Actb")
 genes <- c("Dcx", "Nrep", "Tubb2b", "Crmp1", "Dlx2", "Bcl11b", "Meis2", "Sp9", "Cpne4", "Synpr", "Tuba1a", "Nsg2", "Map1b", "Nrxn3", "Tubb5", "Eif4a1")
