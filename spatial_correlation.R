@@ -205,7 +205,7 @@ for (x in clusterNames) {
                        wcor = wcor,
                        pvals = pvals)
 
-  pdf(paste0("output/pval_plots/", x, ".pdf"),
+  pdf(paste0("output/p_val_plots/", x, ".pdf"),
       height = 8, width = 12, onefile = FALSE)
   plotcors(df_res)
   dev.off()
