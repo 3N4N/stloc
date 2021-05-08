@@ -20,7 +20,23 @@ weightMatrix_nD = function(x, span = 0.5) {
 
 }
 
-corTaylor <- function(x,w=1) {
+corTaylor <- function(x, w = 1) {
+
+  if(!inherits(x, "matrix")) {
+    stop("Input must be inherit ’matrix’ class.")
+  }
+
+  if (length(w) == 1) {
+    w <- rep(1, ncol(x))
+  }
+
+  x <- apply(x, 1, function(i) w*i)
+  d <- ncol(x)
+
+  return ((1/sqrt(d)) * sd(eigen(cor(x),only.values=TRUE)$values))
+}
+
+maxEigenVal <- function(x, w=1) {
 
   if(!inherits(x,"matrix")) {
     stop("Input must be inherit ’matrix’ class.")
@@ -33,5 +49,6 @@ corTaylor <- function(x,w=1) {
   x <- apply(x, 1, function(i) w*i)
   d <- ncol(x)
 
-  return ((1/sqrt(d))*sd(eigen(cor(x),only.values=TRUE)$values))
+  return (max(eigen(cor(x),only.values=TRUE)$values))
+
 }
