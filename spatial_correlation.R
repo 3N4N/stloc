@@ -97,10 +97,9 @@ clusterGenePair <- sapply(clusterNames, function(i) {
 })
 
 
-if (!file.exists("output/pval_plots")) {
-  system("mkdir output/pval_plots")
+if (!file.exists("output/p_val_plots")) {
+  system("mkdir output/p_val_plots")
 }
-
 
 plotcors = function(df_res) {
 
@@ -128,8 +127,7 @@ plotcors = function(df_res) {
     NULL
 
   plot_pvals <- ggplot(df_res, aes(x = -x, y = y)) +
-    # geom_point(aes(colour = pvals), size = 5) +
-    geom_point(aes(colour = -log10(pvals)), size = 5) +
+    geom_point(aes(colour = -log10(pvals_cor)), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
     theme(axis.text = element_blank()) +
@@ -138,8 +136,8 @@ plotcors = function(df_res) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c(breaks = c(0,max(df_res$pvals)),
-                          limits = c(0,max(df_res$pvals)),
+    scale_color_viridis_c(breaks = c(0,max(df_res$pvals_cor)),
+                          limits = c(0,max(df_res$pvals_cor)),
                           labels = c("Low","High")) +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
@@ -166,6 +164,70 @@ plotcors = function(df_res) {
                         3,3,3,4,4,4), ncol = 6, byrow = TRUE))
 }
 
+ploteigs = function(df_res) {
+
+  plot_meig <- ggplot(df_res, aes(x = -x, y = y)) +
+    geom_point(aes(colour = meig), size = 5) +
+    theme_minimal() +
+    theme(panel.grid = element_blank()) +
+    theme(axis.text = element_blank()) +
+    xlab("") +
+    ylab("") +
+    labs(colour = "") +
+    theme(legend.position = "bottom") +
+    theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+    scale_color_viridis_c(breaks = c(0,max(df_res$meig)),
+                          limits = c(0,max(df_res$meig)),
+                          labels = c("Low","High")) +
+    coord_fixed() +
+    guides(colour = guide_colourbar(title.position = "top",
+                                    title.hjust = 0.5)) +
+    theme(legend.key.width = unit(0.5, "inches")) +
+    theme(plot.title = element_text(size = 20)) +
+    theme(axis.title = element_text(size = 15)) +
+    theme(legend.title = element_text(size = 15)) +
+    labs(colour = "Largest Eigen Value") +
+    NULL
+
+  plot_pvals <- ggplot(df_res, aes(x = -x, y = y)) +
+    # geom_point(aes(colour = pvals), size = 5) +
+    geom_point(aes(colour = -log10(pvals_eig)), size = 5) +
+    theme_minimal() +
+    theme(panel.grid = element_blank()) +
+    theme(axis.text = element_blank()) +
+    xlab("") +
+    ylab("") +
+    labs(colour = "") +
+    theme(legend.position = "bottom") +
+    theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+    scale_color_viridis_c(breaks = c(0,max(df_res$pvals_eig)),
+                          limits = c(0,max(df_res$pvals_eig)),
+                          labels = c("Low","High")) +
+    coord_fixed() +
+    guides(colour = guide_colourbar(title.position = "top",
+                                    title.hjust = 0.5)) +
+    theme(legend.key.width = unit(0.5, "inches")) +
+    theme(plot.title = element_text(size = 20)) +
+    theme(axis.title = element_text(size = 15)) +
+    theme(legend.title = element_text(size = 15)) +
+    labs(colour = "-log(pval)") +
+    NULL
+
+  meig_leg = as_ggplot(get_legend(plot_meig))
+  pvals_leg = as_ggplot(get_legend(plot_pvals))
+
+  scater::multiplot(plot_meig + theme(legend.position = "none")
+                    + theme(plot.margin = margin(10,0,-10,0)),
+                    plot_pvals + theme(legend.position = "none")
+                    + theme(plot.margin = margin(10,0,-10,0)),
+                    meig_leg, pvals_leg,
+                    layout = matrix(
+                      c(1,1,1,2,2,2,
+                        1,1,1,2,2,2,
+                        1,1,1,2,2,2,
+                        3,3,3,4,4,4), ncol = 6, byrow = TRUE))
+}
+
 for (x in clusterNames) {
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
@@ -179,10 +241,13 @@ for (x in clusterNames) {
 
   wcor <- as.matrix(sapply(1:nrow(coords),
                            function(i) corTaylor(pairCount, W[i,])))
+  meig <- as.matrix(sapply(1:nrow(coords),
+                           function(i) maxEigenVal(pairCount, W[i,])))
 
-  message(paste0("Calculating permuted correlation for ", x))
+  message(paste0("Calculating permuted correlation and eigen values for ", x))
   set.seed(500)
   nitr = 1000
+
   pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
   pwcor <- sapply(1:nitr, function(i) {
     x <- pairCount
@@ -194,21 +259,42 @@ for (x in clusterNames) {
     pwcor[i,] = sapply(1:nrow(W), function(j) corTaylor(x, W[j, ]))
   })
 
-  pvals <- matrix(nrow = nrow(coords), ncol = 1)
-  pvals <- as.matrix(sapply(1:nrow(wcor), function(i) {
-    pvals[i,] = sum(pwcor[i,] > wcor[i])/nitr
+  pmeig <- matrix(nrow = nitr, ncol = nrow(coords))
+  pmeig <- sapply(1:nitr, function(i) {
+    x <- pairCount
+    o = sample(1:nrow(coords))
+    x <- t(sapply(1:nrow(pairCount), function(j) {
+        x[j,] = pairCount[j,o]
+    }))
+
+    pmeig[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
+  })
+
+  pvals_cor <- matrix(nrow = nrow(coords), ncol = 1)
+  pvals_cor <- as.matrix(sapply(1:nrow(wcor), function(i) {
+    pvals_cor[i,] = sum(pwcor[i,] > wcor[i])/nitr
   }))
+
+  pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
+  pvals_eig <- as.matrix(sapply(1:nrow(wcor), function(i) {
+    pvals_eig[i,] = sum(pmeig[i,] > meig[i])/nitr
+  }))
+
+  # print("$min(pvals) $max(pvals)")
 
 
   df_res <- data.frame(x = coords[,"x"],
                        y = coords[,"y"],
                        wcor = wcor,
-                       pvals = pvals)
+                       pvals_cor = pvals_cor,
+                       meig = meig,
+                       pvals_eig = pvals_eig)
 
-  pdf(paste0("output/pval_plots/", x, ".pdf"),
-      height = 8, width = 12, onefile = FALSE)
+  pdf(paste0("output/enan/", x, ".pdf"),
+      height = 6, width = 10, onefile = TRUE)
   plotcors(df_res)
+  ploteigs(df_res)
   dev.off()
 
-  # break
+  break
 }
