@@ -14,7 +14,7 @@ if (!file.exists("output")) {
 
 ## Process MOB dataset
 
-counts_raw <- read.delim("./datasets/Rep11_MOB_count_matrix-1.tsv", header = TRUE, row.names = 1)
+counts_raw <- read.delim("./datasets/skin_cancer_dataset/GSE144239_ST_all_counts.txt", header = TRUE, row.names = 1)
 coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
@@ -77,7 +77,7 @@ length(HVG)
 ## Get common genes from MOB's HVG and dataset of marker genes
 
 clusterData <- read.delim("./datasets/mmc2.tsv", header = TRUE)
-clusterGenes <- clusterData[,8]
+clusterGenes <- clusterData[,7]
 clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(HVG, clusterGenes)
 clusterData <- as.data.frame(clusterData)
@@ -178,7 +178,7 @@ for (x in clusterNames) {
   W <- weightMatrix_nD(coords, span = 0.05)
 
   wcor <- as.matrix(sapply(1:nrow(coords),
-                           function(i) corTaylor(pairCount, W[i,])))
+                           function(i) eigenRet(pairCount, W[i,])))
 
   message(paste0("Calculating permuted correlation for ", x))
   set.seed(500)
@@ -191,7 +191,7 @@ for (x in clusterNames) {
         x[j,] = pairCount[j,o]
     }))
 
-    pwcor[i,] = sapply(1:nrow(W), function(j) corTaylor(x, W[j, ]))
+    pwcor[i,] = sapply(1:nrow(W), function(j) eigenRet(x, W[j, ]))
   })
 
   pvals <- matrix(nrow = nrow(coords), ncol = 1)
@@ -199,7 +199,7 @@ for (x in clusterNames) {
     pvals[i,] = sum(pwcor[i,] > wcor[i])/nitr
   }))
   
-  
+  print("$min(pvals) $max(pvals)")
 
 
   df_res <- data.frame(x = coords[,"x"],
@@ -212,5 +212,4 @@ for (x in clusterNames) {
   plotcors(df_res)
   dev.off()
 
-  # break
 }
