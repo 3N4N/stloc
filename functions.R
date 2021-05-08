@@ -35,3 +35,20 @@ corTaylor <- function(x,w=1) {
 
   return ((1/sqrt(d))*sd(eigen(cor(x),only.values=TRUE)$values))
 }
+
+eigenRet <- function(x, w=1) {
+  
+  if(!inherits(x,"matrix")) {
+    stop("Input must be inherit ’matrix’ class.")
+  }
+  
+  if (length(w) == 1) {
+    w <- rep(1, ncol(x))
+  }
+  
+  x <- apply(x, 1, function(i) w*i)
+  d <- ncol(x)
+  
+  return (max(eigen(cor(x),only.values=TRUE)$values))
+  
+}

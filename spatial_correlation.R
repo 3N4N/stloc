@@ -77,7 +77,7 @@ length(HVG)
 ## Get common genes from MOB's HVG and dataset of marker genes
 
 clusterData <- read.delim("./datasets/mmc2.tsv", header = TRUE)
-clusterGenes <- clusterData[,7]
+clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(HVG, clusterGenes)
 clusterData <- as.data.frame(clusterData)
@@ -198,6 +198,8 @@ for (x in clusterNames) {
   pvals <- as.matrix(sapply(1:nrow(wcor), function(i) {
     pvals[i,] = sum(pwcor[i,] > wcor[i])/nitr
   }))
+  
+  
 
 
   df_res <- data.frame(x = coords[,"x"],
