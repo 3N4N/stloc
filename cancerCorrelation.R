@@ -22,42 +22,6 @@ colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 counts <- t(counts_raw)
 
-## Determine highly variable genes
-
-# This process is taken from https://github.com/MarioniLab/scHOT2019
-
-
-# The process below should work with R v4.0.
-# Or at least with R v3.6 with BiocManager v3.10.
-# But I'm confused about how it works.
-
-# sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
-# sce <- logNormCounts(sce)
-# dec <- modelGeneVar(sce)
-# hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
-# top.hvgs <- getTopHVGs(dec, prop = 0.1)
-# top.hvgs2 <- getTopHVGs(dec, n = 304)
-# top.hvgs3 <- getTopHVGs(dec, var.threshold = 0)
-# top.hvgs4 <- getTopHVGs(dec, fdr.threshold = 0.05)
-# HVG = sort(hvg)
-# HVG1 = sort(top.hvgs)
-# HVG2 = sort(top.hvgs2)
-# HVG3 = sort(top.hvgs3)
-# HVG4 = sort(top.hvgs4)
-# length(HVG)
-# seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
-# peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
-# pdf(file = "./output/HVG_selection4.pdf", height = 8, width = 8)
-# plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
-# curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
-# points(dec$mean[ which(rownames(dec) %in% HVG4 & dec$mean > peakExp)],
-#        dec$total[which(rownames(dec) %in% HVG4 & dec$mean > peakExp)],
-#        col = "red", pch = 16)
-# abline(v = peakExp, lty = 2, col = "black")
-# dev.off()
-
-
-## Get common genes from MOB's HVG and dataset of marker genes
 
 clusterData <- read.delim("./datasets/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
