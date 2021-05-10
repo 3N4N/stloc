@@ -22,11 +22,35 @@ colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 counts <- t(counts_raw)
 
+sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
+sce <- logNormCounts(sce)
+dec <- modelGeneVar(sce)
+hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
+top.hvgs <- getTopHVGs(dec, prop = 0.1)
+top.hvgs2 <- getTopHVGs(dec, n = 304)
+top.hvgs3 <- getTopHVGs(dec, var.threshold = 0)
+top.hvgs4 <- getTopHVGs(dec, fdr.threshold = 0.05)
+HVG = sort(hvg)
+HVG1 = sort(top.hvgs)
+HVG2 = sort(top.hvgs2)
+HVG3 = sort(top.hvgs3)
+HVG = sort(top.hvgs4)
+length(HVG)
+seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
+peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
+pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
+plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
+curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
+points(dec$mean[ which(rownames(dec) %in% HVG)],
+       dec$total[which(rownames(dec) %in% HVG)],
+       col = "red", pch = 16)
+abline(v = peakExp, lty = 2, col = "black")
+dev.off()
 
 clusterData <- read.delim("./datasets/skin_cancer_dataset/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
-commonGenes <- intersect(rownames(counts), clusterGenes)
+commonGenes <- intersect(HVG, clusterGenes)
 clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
             file = "./datasets/mmc2-2.tsv", row.names = FALSE, sep = "\t")
@@ -118,6 +142,7 @@ W <- weightMatrix_nD(coords, span = 0.05)
 for (x in clusterNames) {
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
+  if(length(genes) == 1) next
   # print(genes)
 
   pairCount <- as.matrix(rbind(counts[genes,]))
@@ -129,7 +154,7 @@ for (x in clusterNames) {
 
   message(paste0("Calculating permuted correlation for ", x))
   set.seed(500)
-  nitr = 5
+  nitr = 1000
   pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
   pwcor <- sapply(1:nitr, function(i) {
     print(i)
@@ -146,8 +171,6 @@ for (x in clusterNames) {
   pvals <- as.matrix(sapply(1:nrow(wcor), function(i) {
     pvals[i,] = sum(pwcor[i,] > wcor[i])/nitr
   }))
-
-  print("$min(pvals) $max(pvals)")
 
 
   df_res <- data.frame(x = coords[,"x"],
