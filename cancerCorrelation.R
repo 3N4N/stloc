@@ -125,7 +125,7 @@ for (x in clusterNames) {
 
 
   wcor <- as.matrix(sapply(1:nrow(coords),
-                           function(i) eigenRet(pairCount, W[i,])))
+                           function(i) maxEigenVal(pairCount, W[i,])))
 
   message(paste0("Calculating permuted correlation for ", x))
   set.seed(500)
@@ -139,7 +139,7 @@ for (x in clusterNames) {
         x[j,] = pairCount[j,o]
     }))
 
-    pwcor[i,] = sapply(1:nrow(W), function(j) eigenRet(x, W[j, ]))
+    pwcor[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
   })
 
   pvals <- matrix(nrow = nrow(coords), ncol = 1)
