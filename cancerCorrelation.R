@@ -14,25 +14,7 @@ if (!file.exists("output")) {
 
 ## Process MOB dataset
 
-counts_raw <- read.delim("./datasets/skin_cancer_dataset/GSE144239_ST_all_counts.txt", header = TRUE, row.names = 1)
-counts_raw1 = t(counts_raw)
-counts_raw1 = counts_raw1[, -1]
-counts_raw1 = counts_raw1[, -1]
-counts_raw1 = counts_raw1[, -1]
-counts_raw1 = counts_raw1[, -1]
-
-tempvec = c()
-
-for(temp in rownames(counts_raw1)){
-  temp1 = strsplit(temp, "_")
-  temp1 = temp1[[1]][2]
-  print(temp1)
-  tempvec = append(tempvec, temp1, after = length(tempvec))
-}
-
-rownames(counts_raw1) = tempvec
-
-counts_raw = counts_raw1
+counts_raw <- read.delim("./datasets/skin_cancer_dataset/GSE144239_ST_p2_counts.tsv", header = TRUE, row.names = 1)
 
 coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
@@ -98,8 +80,8 @@ clusterGenePair <- sapply(clusterNames, function(i) {
 })
 
 
-if (!file.exists("output/p_val_plots")) {
-  system("mkdir output/p_val_plots")
+if (!file.exists("output/pval_plots")) {
+  system("mkdir output/pval_plots")
 }
 
 
@@ -167,6 +149,8 @@ plotcors = function(df_res) {
                         3,3,3,4,4,4), ncol = 6, byrow = TRUE))
 }
 
+W <- weightMatrix_nD(coords, span = 0.05)
+
 for (x in clusterNames) {
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
@@ -175,8 +159,6 @@ for (x in clusterNames) {
   pairCount <- as.matrix(rbind(counts[genes,]))
   rownames(pairCount) <- genes
 
-
-  W <- weightMatrix_nD(coords, span = 0.05)
 
   wcor <- as.matrix(sapply(1:nrow(coords),
                            function(i) eigenRet(pairCount, W[i,])))
@@ -200,7 +182,7 @@ for (x in clusterNames) {
   pvals <- as.matrix(sapply(1:nrow(wcor), function(i) {
     pvals[i,] = sum(pwcor[i,] > wcor[i])/nitr
   }))
-  
+
   print("$min(pvals) $max(pvals)")
 
 
@@ -209,7 +191,7 @@ for (x in clusterNames) {
                        wcor = wcor,
                        pvals = pvals)
 
-  pdf(paste0("output/p_val_plots/", x, ".pdf"),
+  pdf(paste0("output/pval_plots/", x, ".pdf"),
       height = 8, width = 12, onefile = FALSE)
   plotcors(df_res)
   dev.off()
