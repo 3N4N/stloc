@@ -23,7 +23,7 @@ rownames(coords) <- rownames(counts_raw)
 counts <- t(counts_raw)
 
 
-clusterData <- read.delim("./datasets/reference_markers_for_NMF.tsv", header = TRUE)
+clusterData <- read.delim("./datasets/skin_cancer_dataset/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(rownames(counts), clusterGenes)
