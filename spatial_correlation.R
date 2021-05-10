@@ -97,8 +97,8 @@ clusterGenePair <- sapply(clusterNames, function(i) {
 })
 
 
-if (!file.exists("output/pval_plots")) {
-  system("mkdir output/pval_plots")
+if (!file.exists("output/pval_plots_mob")) {
+  system("mkdir output/pval_plots_mob")
 }
 
 plotcors = function(df_res) {
@@ -290,7 +290,7 @@ for (x in clusterNames) {
                        meig = meig,
                        pvals_eig = pvals_eig)
 
-  pdf(paste0("output/pval_plots/", x, ".pdf"),
+  pdf(paste0("output/pval_plots_mob/", x, ".pdf"),
       height = 6, width = 10, onefile = TRUE)
   plotcors(df_res)
   ploteigs(df_res)
