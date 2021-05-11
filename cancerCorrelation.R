@@ -61,9 +61,13 @@ clusterNames <- unique(clusterData[,7])
 clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
 clusterGenes <- clusterData[,8]
 clusterGenePair <- list()
-clusterGenePair <- sapply(clusterNames, function(i) {
-      clusterGenePair[[i]] <- clusterData[clusterData[,7] == i, 8]
-})
+if (length(clusterNames) == 1) {
+  clusterGenePair[[clusterNames[1]]] <- clusterData[clusterData[,7] == clusterNames[1], 8]
+} else {
+  clusterGenePair <- sapply(clusterNames, function(i) {
+        clusterGenePair[[i]] <- clusterData[clusterData[,7] == i, 8]
+  })
+}
 
 
 if (!file.exists("output/pval_plots_cancer")) {
@@ -135,7 +139,9 @@ for (x in clusterNames) {
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
   if (length(genes) == 1) next
-  # print(genes)
+
+  print(x)
+  print(genes)
 
   pairCount <- as.matrix(rbind(counts[genes,]))
   rownames(pairCount) <- genes
