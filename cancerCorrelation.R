@@ -22,19 +22,13 @@ colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 counts <- t(counts_raw)
 
+### Determine highly variable genes
 sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
 sce <- logNormCounts(sce)
 dec <- modelGeneVar(sce)
 hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
 top.hvgs <- getTopHVGs(dec, prop = 0.1)
-top.hvgs2 <- getTopHVGs(dec, n = 304)
-top.hvgs3 <- getTopHVGs(dec, var.threshold = 0)
-top.hvgs4 <- getTopHVGs(dec, fdr.threshold = 0.05)
 HVG = sort(hvg)
-HVG1 = sort(top.hvgs)
-HVG2 = sort(top.hvgs2)
-HVG3 = sort(top.hvgs3)
-HVG = sort(top.hvgs4)
 length(HVG)
 seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
 peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
@@ -47,6 +41,7 @@ points(dec$mean[ which(rownames(dec) %in% HVG)],
 abline(v = peakExp, lty = 2, col = "black")
 dev.off()
 
+
 clusterData <- read.delim("./datasets/skin_cancer_dataset/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
@@ -55,8 +50,6 @@ clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
             file = "./datasets/mmc2-2.tsv", row.names = FALSE, sep = "\t")
 
-
-## Calculate P-values of multiway weighted correlation of a set of genes
 
 clusterData <- read.delim("./datasets/mmc2-2.tsv", header = TRUE)
 clusterNames <- unique(clusterData[,7])
@@ -191,17 +184,17 @@ ploteigs = function(df_res) {
                         3,3,3,4,4,4), ncol = 6, byrow = TRUE))
 }
 
+
+W <- weightMatrix_nD(coords, span = 0.1)
+
 for (x in clusterNames) {
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
-  # if (length(genes) == 1) next
+  if (length(genes) == 1) next
   # print(genes)
 
   pairCount <- as.matrix(rbind(counts[genes,]))
   rownames(pairCount) <- genes
-
-
-  W <- weightMatrix_nD(coords, span = 0.1)
 
   wcor <- as.matrix(sapply(1:nrow(coords),
                            function(i) corTaylor(pairCount, W[i,])))
@@ -243,8 +236,6 @@ for (x in clusterNames) {
   pvals_eig <- as.matrix(sapply(1:nrow(wcor), function(i) {
     pvals_eig[i,] = sum(pmeig[i,] > meig[i])/nitr
   }))
-
-  # print("$min(pvals) $max(pvals)")
 
 
   df_res <- data.frame(x = coords[,"x"],
