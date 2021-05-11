@@ -47,7 +47,7 @@ clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(hvg, clusterGenes)
 clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
-            file = "./datasets/mmc2-2.tsv", row.names = FALSE, sep = "\t")
+            file = "./datasets/common.tsv", row.names = FALSE, sep = "\t")
 
 
 clusterData <- read.delim("./datasets/common.tsv", header = TRUE)

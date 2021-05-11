@@ -82,7 +82,7 @@ clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(HVG, clusterGenes)
 clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
-            file = "./datasets/mmc2-2.tsv", row.names = FALSE, sep = "\t")
+            file = "./datasets/common.tsv", row.names = FALSE, sep = "\t")
 
 
 ## Calculate P-values of multiway weighted correlation of a set of genes
