@@ -14,7 +14,7 @@ if (!file.exists("output")) {
 
 ## Process Cancer dataset
 
-counts_raw <- read.delim("./datasets/skin_cancer_dataset/GSE144239_ST_P2_S1_counts.tsv", header = TRUE, row.names = 1)
+counts_raw <- read.delim("./datasets/skin_cancer/GSE144239_ST_P2_S1_counts.tsv", header = TRUE, row.names = 1)
 
 coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
@@ -27,31 +27,30 @@ sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
 sce <- logNormCounts(sce)
 dec <- modelGeneVar(sce)
 hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
-top.hvgs <- getTopHVGs(dec, prop = 0.1)
-HVG = sort(hvg)
-length(HVG)
+hvg <- sort(hvg)
+length(hvg)
 seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
 peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
 pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
 plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
 curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
-points(dec$mean[ which(rownames(dec) %in% HVG)],
-       dec$total[which(rownames(dec) %in% HVG)],
+points(dec$mean[ which(rownames(dec) %in% hvg)],
+       dec$total[which(rownames(dec) %in% hvg)],
        col = "red", pch = 16)
 abline(v = peakExp, lty = 2, col = "black")
 dev.off()
 
 
-clusterData <- read.delim("./datasets/skin_cancer_dataset/reference_markers_for_NMF.tsv", header = TRUE)
+clusterData <- read.delim("./datasets/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
-commonGenes <- intersect(HVG, clusterGenes)
+commonGenes <- intersect(hvg, clusterGenes)
 clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
             file = "./datasets/mmc2-2.tsv", row.names = FALSE, sep = "\t")
 
 
-clusterData <- read.delim("./datasets/mmc2-2.tsv", header = TRUE)
+clusterData <- read.delim("./datasets/common.tsv", header = TRUE)
 clusterNames <- unique(clusterData[,7])
 clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
 clusterGenes <- clusterData[,8]

@@ -14,7 +14,7 @@ if (!file.exists("output")) {
 
 ## Process MOB dataset
 
-counts_raw <- read.delim("./datasets/Rep11_MOB_count_matrix-1.tsv", header = TRUE, row.names = 1)
+counts_raw <- read.delim("./datasets/mob/Rep11_MOB_count_matrix-1.tsv", header = TRUE, row.names = 1)
 coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
@@ -76,7 +76,7 @@ length(HVG)
 
 ## Get common genes from MOB's HVG and dataset of marker genes
 
-clusterData <- read.delim("./datasets/mmc2.tsv", header = TRUE)
+clusterData <- read.delim("./datasets/mob/mmc2.tsv", header = TRUE)
 clusterGenes <- clusterData[,7]
 clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(HVG, clusterGenes)
@@ -87,7 +87,7 @@ write.table(clusterData[clusterData$gene %in% commonGenes,],
 
 ## Calculate P-values of multiway weighted correlation of a set of genes
 
-clusterData <- read.delim("./datasets/mmc2-2.tsv", header = TRUE)
+clusterData <- read.delim("./datasets/common.tsv", header = TRUE)
 clusterNames <- unique(clusterData[,6])
 clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
 clusterGenes <- clusterData[,7]
