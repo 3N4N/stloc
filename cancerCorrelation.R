@@ -14,7 +14,7 @@ if (!file.exists("output")) {
 
 ## Process Cancer dataset
 
-counts_raw <- read.delim("./datasets/skin_cancer_dataset/GSE144239_ST_p2_counts.tsv", header = TRUE, row.names = 1)
+counts_raw <- read.delim("./datasets/skin_cancer_dataset/GSE144239_ST_P2_S1_counts.tsv", header = TRUE, row.names = 1)
 
 coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
@@ -74,7 +74,7 @@ if (!file.exists("output/pval_plots_cancer")) {
 
 plotcors = function(df_res) {
 
-  plot_wcor <- ggplot(df_res, aes(x = -x, y = y)) +
+  plot_wcor <- ggplot(df_res, aes(x = x, y = y)) +
     geom_point(aes(colour = wcor), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
@@ -84,9 +84,7 @@ plotcors = function(df_res) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c(breaks = c(0,max(df_res$wcor)),
-                          limits = c(0,max(df_res$wcor)),
-                          labels = c("Low","High")) +
+    scale_color_viridis_c() +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -97,7 +95,7 @@ plotcors = function(df_res) {
     labs(colour = "Weighted Correlation") +
     NULL
 
-  plot_pvals <- ggplot(df_res, aes(x = -x, y = y)) +
+  plot_pvals <- ggplot(df_res, aes(x = x, y = y)) +
     geom_point(aes(colour = -log10(pvals_cor)), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
@@ -107,9 +105,7 @@ plotcors = function(df_res) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c(breaks = c(0,max(df_res$pvals_cor)),
-                          limits = c(0,max(df_res$pvals_cor)),
-                          labels = c("Low","High")) +
+    scale_color_viridis_c() +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -137,7 +133,7 @@ plotcors = function(df_res) {
 
 ploteigs = function(df_res) {
 
-  plot_meig <- ggplot(df_res, aes(x = -x, y = y)) +
+  plot_meig <- ggplot(df_res, aes(x = x, y = y)) +
     geom_point(aes(colour = meig), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
@@ -147,9 +143,7 @@ ploteigs = function(df_res) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c(breaks = c(0,max(df_res$meig)),
-                          limits = c(0,max(df_res$meig)),
-                          labels = c("Low","High")) +
+    scale_color_viridis_c() +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -160,7 +154,7 @@ ploteigs = function(df_res) {
     labs(colour = "Largest Eigen Value") +
     NULL
 
-  plot_pvals <- ggplot(df_res, aes(x = -x, y = y)) +
+  plot_pvals <- ggplot(df_res, aes(x = x, y = y)) +
     # geom_point(aes(colour = pvals), size = 5) +
     geom_point(aes(colour = -log10(pvals_eig)), size = 5) +
     theme_minimal() +
@@ -171,9 +165,7 @@ ploteigs = function(df_res) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c(breaks = c(0,max(df_res$pvals_eig)),
-                          limits = c(0,max(df_res$pvals_eig)),
-                          labels = c("Low","High")) +
+    scale_color_viridis_c() +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -202,7 +194,7 @@ ploteigs = function(df_res) {
 for (x in clusterNames) {
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
-  if (length(genes) == 1) next
+  # if (length(genes) == 1) next
   # print(genes)
 
   pairCount <- as.matrix(rbind(counts[genes,]))
