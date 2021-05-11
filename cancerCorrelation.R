@@ -23,14 +23,18 @@ rownames(coords) <- rownames(counts_raw)
 counts <- t(counts_raw)
 
 ### Determine highly variable genes
+
 sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
 sce <- logNormCounts(sce)
 dec <- modelGeneVar(sce)
+
 hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
 hvg <- sort(hvg)
 length(hvg)
+
 seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
 peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
+
 pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
 plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
 curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
@@ -40,6 +44,8 @@ points(dec$mean[ which(rownames(dec) %in% hvg)],
 abline(v = peakExp, lty = 2, col = "black")
 dev.off()
 
+
+### Select for downstream analysis those marker genes which are also highly variable
 
 clusterData <- read.delim("./datasets/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
@@ -64,10 +70,9 @@ if (!file.exists("output/pval_plots_cancer")) {
   system("mkdir output/pval_plots_cancer")
 }
 
-plotcors = function(df_res) {
-
-  plot_wcor <- ggplot(df_res, aes(x = x, y = y)) +
-    geom_point(aes(colour = wcor), size = 5) +
+plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
+  plot_vals <- ggplot(df_res, aes(x = x, y = -y)) +
+    geom_point(aes(colour = vals), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
     theme(axis.text = element_blank()) +
@@ -84,11 +89,11 @@ plotcors = function(df_res) {
     theme(plot.title = element_text(size = 20)) +
     theme(axis.title = element_text(size = 15)) +
     theme(legend.title = element_text(size = 15)) +
-    labs(colour = "Weighted Correlation") +
+    labs(colour = valLabel) +
     NULL
 
-  plot_pvals <- ggplot(df_res, aes(x = x, y = y)) +
-    geom_point(aes(colour = -log10(pvals_cor)), size = 5) +
+  plot_pvals <- ggplot(df_res, aes(x = x, y = -y)) +
+    geom_point(aes(colour = -log10(pvals)), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
     theme(axis.text = element_blank()) +
@@ -105,77 +110,17 @@ plotcors = function(df_res) {
     theme(plot.title = element_text(size = 20)) +
     theme(axis.title = element_text(size = 15)) +
     theme(legend.title = element_text(size = 15)) +
-    labs(colour = "-log(pval)") +
+    labs(colour = pvalLabel) +
     NULL
 
-  wcor_leg = as_ggplot(get_legend(plot_wcor))
+  vals_leg = as_ggplot(get_legend(plot_vals))
   pvals_leg = as_ggplot(get_legend(plot_pvals))
 
-  scater::multiplot(plot_wcor + theme(legend.position = "none")
+  scater::multiplot(plot_vals + theme(legend.position = "none")
                     + theme(plot.margin = margin(10,0,-10,0)),
                     plot_pvals + theme(legend.position = "none")
                     + theme(plot.margin = margin(10,0,-10,0)),
-                    wcor_leg, pvals_leg,
-                    layout = matrix(
-                      c(1,1,1,2,2,2,
-                        1,1,1,2,2,2,
-                        1,1,1,2,2,2,
-                        3,3,3,4,4,4), ncol = 6, byrow = TRUE))
-}
-
-ploteigs = function(df_res) {
-
-  plot_meig <- ggplot(df_res, aes(x = x, y = y)) +
-    geom_point(aes(colour = meig), size = 5) +
-    theme_minimal() +
-    theme(panel.grid = element_blank()) +
-    theme(axis.text = element_blank()) +
-    xlab("") +
-    ylab("") +
-    labs(colour = "") +
-    theme(legend.position = "bottom") +
-    theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c() +
-    coord_fixed() +
-    guides(colour = guide_colourbar(title.position = "top",
-                                    title.hjust = 0.5)) +
-    theme(legend.key.width = unit(0.5, "inches")) +
-    theme(plot.title = element_text(size = 20)) +
-    theme(axis.title = element_text(size = 15)) +
-    theme(legend.title = element_text(size = 15)) +
-    labs(colour = "Largest Eigen Value") +
-    NULL
-
-  plot_pvals <- ggplot(df_res, aes(x = x, y = y)) +
-    # geom_point(aes(colour = pvals), size = 5) +
-    geom_point(aes(colour = -log10(pvals_eig)), size = 5) +
-    theme_minimal() +
-    theme(panel.grid = element_blank()) +
-    theme(axis.text = element_blank()) +
-    xlab("") +
-    ylab("") +
-    labs(colour = "") +
-    theme(legend.position = "bottom") +
-    theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c() +
-    coord_fixed() +
-    guides(colour = guide_colourbar(title.position = "top",
-                                    title.hjust = 0.5)) +
-    theme(legend.key.width = unit(0.5, "inches")) +
-    theme(plot.title = element_text(size = 20)) +
-    theme(axis.title = element_text(size = 15)) +
-    theme(legend.title = element_text(size = 15)) +
-    labs(colour = "-log(pval)") +
-    NULL
-
-  meig_leg = as_ggplot(get_legend(plot_meig))
-  pvals_leg = as_ggplot(get_legend(plot_pvals))
-
-  scater::multiplot(plot_meig + theme(legend.position = "none")
-                    + theme(plot.margin = margin(10,0,-10,0)),
-                    plot_pvals + theme(legend.position = "none")
-                    + theme(plot.margin = margin(10,0,-10,0)),
-                    meig_leg, pvals_leg,
+                    vals_leg, pvals_leg,
                     layout = matrix(
                       c(1,1,1,2,2,2,
                         1,1,1,2,2,2,
@@ -200,7 +145,8 @@ for (x in clusterNames) {
   meig <- as.matrix(sapply(1:nrow(coords),
                            function(i) maxEigenVal(pairCount, W[i,])))
 
-  message(paste0("Calculating permuted correlation and eigen values for ", x))
+  message(paste0("Conducting permutation tests for ", x))
+
   set.seed(500)
   nitr = 1000
 
@@ -233,7 +179,7 @@ for (x in clusterNames) {
 
   pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
   pvals_eig <- as.matrix(sapply(1:nrow(wcor), function(i) {
-    pvals_eig[i,] = sum(pmeig[i,] > meig[i])/nitr
+    pvals_eig[i,] = sum(pmeig[i,] > meig[i]) / nitr
   }))
 
 
@@ -246,8 +192,8 @@ for (x in clusterNames) {
 
   pdf(paste0("output/pval_plots_cancer/", x, ".pdf"),
       height = 6, width = 10, onefile = TRUE)
-  plotcors(df_res)
-  ploteigs(df_res)
+  plotdf(df_res,df_res$wcor,df_res$pvals_cor,"Weighted Correlation", "-log10(pval)")
+  plotdf(df_res,df_res$meig,df_res$pvals_eig,"Largest Eigenvalue", "-log10(pval)")
   dev.off()
 
   # break
