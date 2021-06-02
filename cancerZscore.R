@@ -85,7 +85,7 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c() +
+    scale_color_viridis_c(option = "plasma", direction = -1) +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -136,6 +136,8 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
 W <- weightMatrix_nD(coords, span = 0.1)
 
 for (x in clusterNames) {
+  if (!(x=="Epithelial" | x=="Fibroblast" | x=="Myeloid")) next
+
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
   if (length(genes) == 1) next
@@ -184,7 +186,7 @@ for (x in clusterNames) {
                        pvals_zsc = pvals_zsc)
 
   pdf(paste0("output/zscore_plots_cancer/", x, ".pdf"),
-      height = 6, width = 10, onefile = TRUE)
+      height = 6, width = 10, onefile = F)
   plotdf(df_res,df_res$zsc,df_res$pvals_zsc,"z-score", "-log10(pval)")
   dev.off()
 
