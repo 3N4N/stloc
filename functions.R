@@ -57,3 +57,15 @@ maxEigenVal <- function(x, w=1) {
   # return (max(eigen(cov_x,only.values=TRUE)$values))
   # return (max(eigen(cor_x,only.values=TRUE)$values))
 }
+
+zScore <- function(x, index, meanOfZenes, sdOfZenes) {
+
+  zscore_for_single_gene = matrix(nrow = nrow(x), ncol = 1);
+  sm = 0
+  for(i in 1:(nrow(x))) {
+    zscore_for_single_gene[i, 1] = (x[i, index] - meanOfZenes[i]) / sdOfZenes[i];
+    sm = sm + zscore_for_single_gene[i, 1]
+  }
+  aggrZscore = sm / sqrt(nrow(x));
+  return (aggrZscore)
+}
