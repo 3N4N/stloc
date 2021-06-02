@@ -75,6 +75,13 @@ if (!file.exists("output/pval_plots_cancer")) {
 }
 
 plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
+
+  for (i in 1:length(vals)) {
+    if (pvals[i] > 0.5) {
+      vals[i] <- NA
+    }
+  }
+
   plot_vals <- ggplot(df_res, aes(x = x, y = -y)) +
     geom_point(aes(colour = vals), size = 5) +
     theme_minimal() +
@@ -85,7 +92,7 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c() +
+    scale_color_viridis_c(na.value = "black") +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -153,7 +160,7 @@ for (x in clusterNames) {
 
   message(paste0("Conducting permutation tests for ", x))
 
-  set.seed(500)
+  # set.seed(500)
   nitr = 1000
 
   pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
