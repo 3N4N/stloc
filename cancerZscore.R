@@ -173,7 +173,7 @@ for (x in clusterNames) {
   })
 
   pvals_zsc <- matrix(nrow = nrow(coords), ncol = 1)
-  pvals_zsc <- as.matrix(sapply(1:nrow(wcor), function(i) {
+  pvals_zsc <- as.matrix(sapply(1:nrow(zsc), function(i) {
     pvals_zsc[i,] = sum(pmzsc[i,] > zsc[i]) / nitr
   }))
 

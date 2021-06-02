@@ -191,7 +191,7 @@ for (x in clusterNames) {
   }))
 
   pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
-  pvals_eig <- as.matrix(sapply(1:nrow(wcor), function(i) {
+  pvals_eig <- as.matrix(sapply(1:nrow(meig), function(i) {
     pvals_eig[i,] = sum(pmeig[i,] > meig[i]) / nitr
   }))
 
