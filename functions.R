@@ -58,6 +58,27 @@ maxEigenVal <- function(x, w=1) {
   # return (max(eigen(cor_x,only.values=TRUE)$values))
 }
 
+maxEigenValReplacingCor <- function(x, w=1) {
+  
+  if(!inherits(x,"matrix")) {
+    stop("Input must be inherit ’matrix’ class.")
+  }
+  
+  if (length(w) == 1) {
+    w <- rep(1, ncol(x))
+  }
+  
+  d <- nrow(x)
+  x <- apply(x, 1, function(i) w*i)
+  # cen_x <- apply(x, 1, function(i) i - ((w*i)/sum(w)))
+  # cov_x <- (t(cen_x)%*%diag(w)%*%cen_x)/sum(w)
+  # cor_x <- cov2cor(cov_x)
+  
+  return (max(eigen(t(x) %*% x,only.values=TRUE)$values))
+  # return (max(eigen(cov_x,only.values=TRUE)$values))
+  # return (max(eigen(cor_x,only.values=TRUE)$values))
+}
+
 zScore <- function(x, index, meanOfZenes, sdOfZenes) {
 
   zscore_for_single_gene = matrix(nrow = nrow(x), ncol = 1);
