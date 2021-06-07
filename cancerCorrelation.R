@@ -153,8 +153,8 @@ for (x in clusterNames) {
   pairCount <- as.matrix(rbind(counts[genes,]))
   rownames(pairCount) <- genes
 
-  wcor <- as.matrix(sapply(1:nrow(coords),
-                           function(i) corTaylor(pairCount, W[i,])))
+  # wcor <- as.matrix(sapply(1:nrow(coords),
+  #                          function(i) corTaylor(pairCount, W[i,])))
   meig <- as.matrix(sapply(1:nrow(coords),
                            function(i) maxEigenVal(pairCount, W[i,])))
 
@@ -163,16 +163,15 @@ for (x in clusterNames) {
   # set.seed(500)
   nitr = 1000
 
-  pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
-  pwcor <- sapply(1:nitr, function(i) {
-    x <- pairCount
-    o = sample(1:nrow(coords))
-    x <- t(sapply(1:nrow(pairCount), function(j) {
-        x[j,] = pairCount[j,o]
-    }))
-
-    pwcor[i,] = sapply(1:nrow(W), function(j) corTaylor(x, W[j, ]))
-  })
+  # pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
+  # pwcor <- sapply(1:nitr, function(i) {
+  #   x <- pairCount
+  #   o = sample(1:nrow(coords))
+  #   x <- t(sapply(1:nrow(pairCount), function(j) {
+  #       x[j,] = pairCount[j,o]
+  #   }))
+  #   pwcor[i,] = sapply(1:nrow(W), function(j) corTaylor(x, W[j, ]))
+  # })
 
   pmeig <- matrix(nrow = nitr, ncol = nrow(coords))
   pmeig <- sapply(1:nitr, function(i) {
@@ -181,31 +180,30 @@ for (x in clusterNames) {
     x <- t(sapply(1:nrow(pairCount), function(j) {
         x[j,] = pairCount[j,o]
     }))
-
     pmeig[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
   })
 
-  pvals_cor <- matrix(nrow = nrow(coords), ncol = 1)
-  pvals_cor <- as.matrix(sapply(1:nrow(wcor), function(i) {
-    pvals_cor[i,] = sum(pwcor[i,] > wcor[i])/nitr
-  }))
+  # pvals_cor <- matrix(nrow = nrow(coords), ncol = 1)
+  # pvals_cor <- as.matrix(sapply(1:nrow(wcor), function(i) {
+  #   pvals_cor[i,] = (sum(pwcor[i,] > wcor[i]) + 1) / (nitr + 1)
+  # }))
 
   pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
   pvals_eig <- as.matrix(sapply(1:nrow(meig), function(i) {
-    pvals_eig[i,] = sum(pmeig[i,] > meig[i]) / nitr
+    pvals_eig[i,] = (sum(pmeig[i,] > meig[i]) + 1) / (nitr + 1)
   }))
 
 
   df_res <- data.frame(x = coords[,"x"],
                        y = coords[,"y"],
-                       wcor = wcor,
-                       pvals_cor = pvals_cor,
+                       # wcor = wcor,
+                       # pvals_cor = pvals_cor,
                        meig = meig,
                        pvals_eig = pvals_eig)
 
   pdf(paste0("output/pval_plots_cancer/", x, ".pdf"),
-      height = 6, width = 10, onefile = TRUE)
-  plotdf(df_res,df_res$wcor,df_res$pvals_cor,"Weighted Correlation", "-log10(pval)")
+      height = 6, width = 10, onefile = F)
+  # plotdf(df_res,df_res$wcor,df_res$pvals_cor,"Weighted Correlation", "-log10(pval)")
   plotdf(df_res,df_res$meig,df_res$pvals_eig,"Largest Eigenvalue", "-log10(pval)")
   dev.off()
 
