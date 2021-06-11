@@ -17,9 +17,25 @@ clusterGenes <- unique(clusterGenes)
 commonGenes <- intersect(rownames(counts), clusterGenes)
 clusterData <- as.data.frame(clusterData)
 
-if (!file.exists("output/plot_expr")) {
-  system("mkdir output/plot_expr")
+write.table(clusterData[clusterData$gene %in% commonGenes,],
+            file = "./datasets/common.tsv", row.names = FALSE, sep = "\t")
+
+clusterData <- read.delim("./datasets/common.tsv", header = TRUE)
+clusterNames <- unique(clusterData[,7])
+clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
+clusterGenes <- clusterData[,8]
+clusterGenePair <- list()
+if (length(clusterNames) == 1) {
+  clusterGenePair[[clusterNames[1]]] <- clusterData[clusterData[,7] == clusterNames[1], 8]
+} else {
+  clusterGenePair <- sapply(clusterNames, function(i) {
+        clusterGenePair[[i]] <- clusterData[clusterData[,7] == i, 8]
+  })
 }
+
+
+
+
 
 plotGeneExpr = function(df_res) {
   plot_expr <- ggplot(df_res, aes(x = x, y = -y)) +
@@ -54,17 +70,25 @@ plotGeneExpr = function(df_res) {
                         3,3,2,2,3,3), ncol = 6, byrow = TRUE))
 
 }
+for (x in clusterNames) {
+  if (!(x=="Epithelial" | x=="Fibroblast" | x=="Myeloid")) next
 
-for (gene in commonGenes) {
-  print(gene)
-  df_res <- data.frame(x = coords[,"x"],
-                       y = coords[,"y"],
-                       expr = counts[gene,])
-  # print(df_res)
-  pdf(paste0("output/plot_expr/", gene, ".pdf"),
-      height = 6, width = 10, onefile = F)
-  plotGeneExpr(df_res)
-  dev.off()
+  if (!file.exists(paste0("output/plot_expr/",x)) ) {
+    system(paste0("mkdir output/plot_expr/",x))
+  }
+  genes <- unlist(c(clusterGenePair[x]))
 
-  # break
+  for (gene in genes) {
+   print(gene)
+    df_res <- data.frame(x = coords[,"x"],
+                        y = coords[,"y"],
+                        expr = counts[gene,])
+    # print(df_res)
+    pdf(paste0("output/plot_expr/",x,"/", gene, ".pdf"),
+        height = 6, width = 10, onefile = F)
+    plotGeneExpr(df_res)
+    dev.off()
+
+  # #   # break
+  }
 }
