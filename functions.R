@@ -20,6 +20,33 @@ weightMatrix_nD = function(x, span = 0.5) {
 
 }
 
+weightMatrix_gaussian  = function(x) {
+
+  ncells = nrow(x)
+  coords = as.matrix(x)
+  d = as.matrix(dist(coords))
+
+  # extract a weights vector per cell
+
+  W_raw = sapply(seq_len(ncells), function(cell) {
+    dvec = d[cell,]
+
+    vals = rep(0, ncells)
+    l=20
+    for(i in 1:length(vals))
+    {
+      vals[i]= exp(-d[cell,i]^2/l^2)
+    }
+    return(vals)
+  }, simplify = FALSE)
+
+  W = do.call(rbind, W_raw)
+
+  return(W)
+
+}
+
+
 corTaylor <- function(x, w = 1) {
 
   if(!inherits(x, "matrix")) {
@@ -56,7 +83,7 @@ maxEigenVal <- function(x, w=1) {
   # return (max(eigen(cor(x),only.values=TRUE)$values))
   # return (max(eigen(cov_x,only.values=TRUE)$values))
   # return (max(eigen(cor_x,only.values=TRUE)$values))
-  return (max(eigen(t(x) %*% x,only.values=TRUE)$values))
+  return (max(eigen(cor(x),only.values=TRUE)$values))
 }
 
 maxEigenValReplacingCor <- function(x, w=1) {
