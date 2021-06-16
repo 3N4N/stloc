@@ -1,4 +1,4 @@
-source("./functions.R")
+source("./checkerFunction.R")
 
 library(SingleCellExperiment)
 library(scater)
@@ -20,44 +20,48 @@ coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
+for (i in 1: ncol(counts_raw)){
+  counts_raw[,i]= counts_raw[,i]/max(counts_raw[,i])
+}
+
 counts <- t(counts_raw)
 
-sdZero <-c()
-for ( i in 1:nrow(counts))
-{
-  # print(sd(counts[i,]))
-  if (sd(counts[i,])==0)
-  {
-    sdZero<-c(sdZero,i)
-    # print('sd 0 found')
-  }
-}
-counts<- counts[-c(sdZero),]
+# sdZero <-c()
+# for ( i in 1:nrow(counts))
+# {
+#   # print(sd(counts[i,]))
+#   if (sd(counts[i,])==0)
+#   {
+#     sdZero<-c(sdZero,i)
+#     # print('sd 0 found')
+#   }
+# }
+# counts<- counts[-c(sdZero),]
 
 
 
 
 ### Determine highly variable genes
 
-sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
-sce <- logNormCounts(sce)
-dec <- modelGeneVar(sce)
+# sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
+# sce <- logNormCounts(sce)
+# dec <- modelGeneVar(sce)
 
-hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
-hvg <- sort(hvg)
-length(hvg)
+# hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
+# hvg <- sort(hvg)
+# length(hvg)
 
-seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
-peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
+# seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
+# peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
 
-pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
-plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
-curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
-points(dec$mean[ which(rownames(dec) %in% hvg)],
-       dec$total[which(rownames(dec) %in% hvg)],
-       col = "red", pch = 16)
-abline(v = peakExp, lty = 2, col = "black")
-dev.off()
+# pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
+# plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
+# curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
+# points(dec$mean[ which(rownames(dec) %in% hvg)],
+#        dec$total[which(rownames(dec) %in% hvg)],
+#        col = "red", pch = 16)
+# abline(v = peakExp, lty = 2, col = "black")
+# dev.off()
 
 
 ### Select for downstream analysis those marker genes which are also highly variable
@@ -163,11 +167,13 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
 W <- weightMatrix_nD(coords, span = 0.3)
 
 for (x in clusterNames) {
-  if(x!= 'Fibroblast'){
+  if(x!= 'Epithelial'){
     next
   }
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
+  genes = sort(genes)
+  genes = genes[1:2]
   if (length(genes) == 1) next
 
   print(x)
@@ -177,6 +183,8 @@ for (x in clusterNames) {
   testMatrix<- as.matrix(rbind(counts[genes,coordinateIndex]))
   colnames(testMatrix)<- cellCoord
   rownames(testMatrix)<- genes
+
+  system('rm  output/outfile.txt')
 
   cat('Gene expression of marker genes ','\n\n',file="output/outfile.txt",sep=" ",append = TRUE)
   write.table(testMatrix,file = "output/outfile.txt", sep = "\t",append=TRUE)
@@ -194,7 +202,7 @@ for (x in clusterNames) {
 
 
   set.seed(500)
-  nitr = 1000
+  nitr = 1
 
   # pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
   # pwcor <- sapply(1:nitr, function(i) {
