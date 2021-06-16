@@ -6,5 +6,6 @@ output/
 *.RData
 datasets/mmc2-1.tsv
 datasets/mmc2-2.tsv
+datasets/common.tsv
 
 .Rhistory
