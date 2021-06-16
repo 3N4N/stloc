@@ -20,7 +20,7 @@ weightMatrix_nD = function(x, span = 0.5) {
 
 }
 
-weightMatrix_gaussian  = function(x) {
+weightMatrix_gaussian  = function(x, l=20) {
 
   ncells = nrow(x)
   coords = as.matrix(x)
@@ -32,7 +32,7 @@ weightMatrix_gaussian  = function(x) {
     dvec = d[cell,]
 
     vals = rep(0, ncells)
-    l=20
+    # l=20
     for(i in 1:length(vals))
     {
       vals[i]= exp(-d[cell,i]^2/l^2)
@@ -80,22 +80,24 @@ maxEigenVal <- function(x, w=1) {
   # cov_x <- (t(cen_x)%*%diag(w)%*%cen_x)/sum(w)
   # cor_x <- cov2cor(cov_x)
 
+  return (max(eigen(t(x) %*% x,only.values=TRUE)$values))
+  # return (max(eigen(x %*% t(x),only.values=TRUE)$values))
   # return (max(eigen(cor(x),only.values=TRUE)$values))
   # return (max(eigen(cov_x,only.values=TRUE)$values))
   # return (max(eigen(cor_x,only.values=TRUE)$values))
-  return (max(eigen(cor(x),only.values=TRUE)$values))
+  # return (max(eigen(cor(x),only.values=TRUE)$values))
 }
 
 maxEigenValReplacingCor <- function(x, w=1) {
-  
+
   if(!inherits(x,"matrix")) {
     stop("Input must be inherit ’matrix’ class.")
   }
-  
+
   if (length(w) == 1) {
     w <- rep(1, ncol(x))
   }
-  
+
   d <- nrow(x)
   x <- apply(x, 1, function(i) w*i)
   # cen_x <- apply(x, 1, function(i) i - ((w*i)/sum(w)))
@@ -103,7 +105,7 @@ maxEigenValReplacingCor <- function(x, w=1) {
   # cor_x <- cov2cor(cov_x)
 
   print(max(eigen(x %*% t(x),only.values=TRUE)$values))
-  
+
   return (max(eigen(x %*% t(x),only.values=TRUE)$values))
   # return (max(eigen(cov_x,only.values=TRUE)$values))
   # return (max(eigen(cor_x,only.values=TRUE)$values))

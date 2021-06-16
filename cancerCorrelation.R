@@ -20,29 +20,34 @@ coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
+
+for (i in 1: ncol(counts_raw)){
+  counts_raw[,i]= counts_raw[,i]/max(counts_raw[,i])
+}
+
 counts <- t(counts_raw)
 
 ### Determine highly variable genes
 
-sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
-sce <- logNormCounts(sce)
-dec <- modelGeneVar(sce)
+# sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
+# sce <- logNormCounts(sce)
+# dec <- modelGeneVar(sce)
 
-hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
-hvg <- sort(hvg)
-length(hvg)
+# hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
+# hvg <- sort(hvg)
+# length(hvg)
 
-seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
-peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
+# seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
+# peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
 
-pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
-plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
-curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
-points(dec$mean[ which(rownames(dec) %in% hvg)],
-       dec$total[which(rownames(dec) %in% hvg)],
-       col = "red", pch = 16)
-abline(v = peakExp, lty = 2, col = "black")
-dev.off()
+# pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
+# plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
+# curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
+# points(dec$mean[ which(rownames(dec) %in% hvg)],
+#        dec$total[which(rownames(dec) %in% hvg)],
+#        col = "red", pch = 16)
+# abline(v = peakExp, lty = 2, col = "black")
+# dev.off()
 
 
 ### Select for downstream analysis those marker genes which are also highly variable
@@ -50,7 +55,8 @@ dev.off()
 clusterData <- read.delim("./datasets/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
-commonGenes <- intersect(hvg, clusterGenes)
+# commonGenes <- intersect(hvg, clusterGenes)
+commonGenes <- intersect(rownames(counts), clusterGenes)
 clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
             file = "./datasets/common.tsv", row.names = FALSE, sep = "\t")
@@ -76,11 +82,11 @@ if (!file.exists("output/pval_plots_cancer")) {
 
 plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
 
-  for (i in 1:length(vals)) {
-    if (pvals[i] > 0.5) {
-      vals[i] <- NA
-    }
-  }
+  # for (i in 1:length(vals)) {
+  #   if (pvals[i] > 0.5) {
+  #     vals[i] <- NA
+  #   }
+  # }
 
   plot_vals <- ggplot(df_res, aes(x = x, y = -y)) +
     geom_point(aes(colour = vals), size = 5) +
@@ -141,10 +147,14 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
 
 
 W <- weightMatrix_nD(coords, span = 0.1)
+# W <- weightMatrix_gaussian(coords, l = 200)
 
 for (x in clusterNames) {
+  if(!(x == "Epithelial" | x == "Fibroblast" | x == "Myeloid")) next
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
+  genes = sort(genes)
+  genes = genes[1:2]
   if (length(genes) == 1) next
 
   print(x)
@@ -153,15 +163,22 @@ for (x in clusterNames) {
   pairCount <- as.matrix(rbind(counts[genes,]))
   rownames(pairCount) <- genes
 
-  # wcor <- as.matrix(sapply(1:nrow(coords),
-  #                          function(i) corTaylor(pairCount, W[i,])))
+  meanOfZenes = c()
+  sdOfZenes = c()
+  for(itr in 1:nrow(pairCount)) {
+    meanOfZenes = append(meanOfZenes, mean(pairCount[itr,]), length(meanOfZenes))
+    sdOfZenes = append(sdOfZenes, sd(pairCount[itr,]), length(sdOfZenes))
+  }
+
+  zscr <- as.matrix(sapply(1:nrow(coords),
+                           function(i) zScore(pairCount, i, meanOfZenes, sdOfZenes)))
   meig <- as.matrix(sapply(1:nrow(coords),
                            function(i) maxEigenVal(pairCount, W[i,])))
 
   message(paste0("Conducting permutation tests for ", x))
 
   # set.seed(500)
-  nitr = 1000
+  # nitr = 1000
 
   # pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
   # pwcor <- sapply(1:nitr, function(i) {
@@ -173,38 +190,35 @@ for (x in clusterNames) {
   #   pwcor[i,] = sapply(1:nrow(W), function(j) corTaylor(x, W[j, ]))
   # })
 
-  pmeig <- matrix(nrow = nitr, ncol = nrow(coords))
-  pmeig <- sapply(1:nitr, function(i) {
-    x <- pairCount
-    o = sample(1:nrow(coords))
-    x <- t(sapply(1:nrow(pairCount), function(j) {
-        x[j,] = pairCount[j,o]
-    }))
-    pmeig[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
-  })
+  # pmeig <- matrix(nrow = nitr, ncol = nrow(coords))
+  # pmeig <- sapply(1:nitr, function(i) {
+  #   x <- pairCount
+  #   o = sample(1:nrow(coords))
+  #   x <- t(sapply(1:nrow(pairCount), function(j) {
+  #       x[j,] = pairCount[j,o]
+  #   }))
+  #   pmeig[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
+  # })
 
   # pvals_cor <- matrix(nrow = nrow(coords), ncol = 1)
   # pvals_cor <- as.matrix(sapply(1:nrow(wcor), function(i) {
   #   pvals_cor[i,] = (sum(pwcor[i,] > wcor[i]) + 1) / (nitr + 1)
   # }))
-
-  pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
-  pvals_eig <- as.matrix(sapply(1:nrow(meig), function(i) {
-    pvals_eig[i,] = (sum(pmeig[i,] > meig[i]) + 1) / (nitr + 1)
-  }))
+  # pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
+  # pvals_eig <- as.matrix(sapply(1:nrow(meig), function(i) {
+  #   pvals_eig[i,] = (sum(pmeig[i,] > meig[i]) + 1) / (nitr + 1)
+  # }))
 
 
   df_res <- data.frame(x = coords[,"x"],
                        y = coords[,"y"],
-                       # wcor = wcor,
-                       # pvals_cor = pvals_cor,
-                       meig = meig,
-                       pvals_eig = pvals_eig)
+                       zscr = zscr,
+                       meig = meig)
 
   pdf(paste0("output/pval_plots_cancer/", x, ".pdf"),
       height = 6, width = 10, onefile = F)
   # plotdf(df_res,df_res$wcor,df_res$pvals_cor,"Weighted Correlation", "-log10(pval)")
-  plotdf(df_res,df_res$meig,df_res$pvals_eig,"Largest Eigenvalue", "-log10(pval)")
+  plotdf(df_res,df_res$zscr,df_res$meig,"Z-score", "Largest Eigenvalue")
   dev.off()
 
   # break
