@@ -98,7 +98,7 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c(na.value = "black") +
+    scale_color_viridis_c(na.value = "black", option = "plasma") +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -110,7 +110,8 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     NULL
 
   plot_pvals <- ggplot(df_res, aes(x = x, y = -y)) +
-    geom_point(aes(colour = -log10(pvals)), size = 5) +
+    geom_point(aes(colour = pvals), size = 5) +
+    # geom_point(aes(colour = -log10(pvals)), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
     theme(axis.text = element_blank()) +
@@ -119,7 +120,7 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     labs(colour = "") +
     theme(legend.position = "bottom") +
     theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-    scale_color_viridis_c() +
+    scale_color_viridis_c(option = "plasma") +
     coord_fixed() +
     guides(colour = guide_colourbar(title.position = "top",
                                     title.hjust = 0.5)) +
@@ -146,15 +147,15 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
 }
 
 
-W <- weightMatrix_nD(coords, span = 0.1)
-# W <- weightMatrix_gaussian(coords, l = 200)
+# W <- weightMatrix_nD(coords, span = 0.3)
+W <- weightMatrix_gaussian(coords, l = 0.5)
 
 for (x in clusterNames) {
   if(!(x == "Epithelial" | x == "Fibroblast" | x == "Myeloid")) next
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
-  genes = sort(genes)
-  genes = genes[1:2]
+  # genes = sort(genes)
+  # genes = genes[1:2]
   if (length(genes) == 1) next
 
   print(x)
