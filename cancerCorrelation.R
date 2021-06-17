@@ -21,8 +21,8 @@ coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 
-for (i in 1: ncol(counts_raw)){
-  counts_raw[,i]= counts_raw[,i]/max(counts_raw[,i])
+for (i in 1: ncol(counts_raw)) {
+  counts_raw[,i] = counts_raw[,i] / max(counts_raw[,i])
 }
 
 counts <- t(counts_raw)
@@ -61,7 +61,6 @@ clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
             file = "./datasets/common.tsv", row.names = FALSE, sep = "\t")
 
-
 clusterData <- read.delim("./datasets/common.tsv", header = TRUE)
 clusterNames <- unique(clusterData[,7])
 clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
@@ -80,16 +79,16 @@ if (!file.exists("output/pval_plots_cancer")) {
   system("mkdir output/pval_plots_cancer")
 }
 
-plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
+plotdf = function(df_res, vals1, vals2, label1, label2) {
 
-  # for (i in 1:length(vals)) {
-  #   if (pvals[i] > 0.5) {
-  #     vals[i] <- NA
+  # for (i in 1:length(vals1)) {
+  #   if (vals2[i] > 0.5) {
+  #     vals1[i] <- NA
   #   }
   # }
 
-  plot_vals <- ggplot(df_res, aes(x = x, y = -y)) +
-    geom_point(aes(colour = vals), size = 5) +
+  plot_vals1 <- ggplot(df_res, aes(x = x, y = -y)) +
+    geom_point(aes(colour = vals1), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
     theme(axis.text = element_blank()) +
@@ -106,12 +105,12 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     theme(plot.title = element_text(size = 20)) +
     theme(axis.title = element_text(size = 15)) +
     theme(legend.title = element_text(size = 15)) +
-    labs(colour = valLabel) +
+    labs(colour = label1) +
     NULL
 
-  plot_pvals <- ggplot(df_res, aes(x = x, y = -y)) +
-    geom_point(aes(colour = pvals), size = 5) +
-    # geom_point(aes(colour = -log10(pvals)), size = 5) +
+  plot_vals2 <- ggplot(df_res, aes(x = x, y = -y)) +
+    geom_point(aes(colour = vals2), size = 5) +
+    # geom_point(aes(colour = -log10(vals2)), size = 5) +
     theme_minimal() +
     theme(panel.grid = element_blank()) +
     theme(axis.text = element_blank()) +
@@ -128,17 +127,17 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
     theme(plot.title = element_text(size = 20)) +
     theme(axis.title = element_text(size = 15)) +
     theme(legend.title = element_text(size = 15)) +
-    labs(colour = pvalLabel) +
+    labs(colour = label2) +
     NULL
 
-  vals_leg = as_ggplot(get_legend(plot_vals))
-  pvals_leg = as_ggplot(get_legend(plot_pvals))
+  vals1_leg = as_ggplot(get_legend(plot_vals1))
+  vals2_leg = as_ggplot(get_legend(plot_vals2))
 
-  scater::multiplot(plot_vals + theme(legend.position = "none")
+  scater::multiplot(plot_vals1 + theme(legend.position = "none")
                     + theme(plot.margin = margin(10,0,-10,0)),
-                    plot_pvals + theme(legend.position = "none")
+                    plot_vals2 + theme(legend.position = "none")
                     + theme(plot.margin = margin(10,0,-10,0)),
-                    vals_leg, pvals_leg,
+                    vals1_leg, vals2_leg,
                     layout = matrix(
                       c(1,1,1,2,2,2,
                         1,1,1,2,2,2,
@@ -151,6 +150,7 @@ plotdf = function(df_res, vals, pvals, valLabel, pvalLabel) {
 W <- weightMatrix_gaussian(coords, l = 0.5)
 
 for (x in clusterNames) {
+
   if(!(x == "Epithelial" | x == "Fibroblast" | x == "Myeloid")) next
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
@@ -176,7 +176,7 @@ for (x in clusterNames) {
   meig <- as.matrix(sapply(1:nrow(coords),
                            function(i) maxEigenVal(pairCount, W[i,])))
 
-  message(paste0("Conducting permutation tests for ", x))
+  # message(paste0("Conducting permutation tests for ", x))
 
   # set.seed(500)
   # nitr = 1000
