@@ -21,9 +21,9 @@ coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 
-for (i in 1: ncol(counts_raw)) {
-  counts_raw[,i] = counts_raw[,i] / max(counts_raw[,i])
-}
+# for (i in 1: ncol(counts_raw)) {
+#   counts_raw[,i] = counts_raw[,i] / max(counts_raw[,i])
+# }
 
 counts <- t(counts_raw)
 
@@ -164,17 +164,23 @@ for (x in clusterNames) {
   pairCount <- as.matrix(rbind(counts[genes,]))
   rownames(pairCount) <- genes
 
+  st = Sys.time()
   meanOfZenes = c()
   sdOfZenes = c()
   for(itr in 1:nrow(pairCount)) {
     meanOfZenes = append(meanOfZenes, mean(pairCount[itr,]), length(meanOfZenes))
     sdOfZenes = append(sdOfZenes, sd(pairCount[itr,]), length(sdOfZenes))
   }
-
   zscr <- as.matrix(sapply(1:nrow(coords),
                            function(i) zScore(pairCount, i, meanOfZenes, sdOfZenes)))
+  et = Sys.time()
+  message("Runtime of Z-score: ", et-st)
+
+  st = Sys.time()
   meig <- as.matrix(sapply(1:nrow(coords),
                            function(i) maxEigenVal(pairCount, W[i,])))
+  et = Sys.time()
+  message("Runtime of eigenvalues: ", et-st)
 
   # message(paste0("Conducting permutation tests for ", x))
 
