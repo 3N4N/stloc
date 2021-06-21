@@ -27,6 +27,10 @@ rownames(coords) <- rownames(counts_raw)
 
 counts <- t(counts_raw)
 
+sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
+sce <- logNormCounts(sce)
+counts = logcounts(sce)
+
 ### Determine highly variable genes
 
 # sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
