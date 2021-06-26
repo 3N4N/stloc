@@ -79,6 +79,12 @@ if (length(clusterNames) == 1) {
 }
 
 
+clusterGenePair[["MyeloidFibroblast"]] = unlist( (  list(clusterGenePair[["Myeloid"]], clusterGenePair[["Fibroblast"]])) )
+clusterGenePair[["EpithelialFibroblast"]] = unlist( (  list(clusterGenePair[["Epithelial"]], clusterGenePair[["Fibroblast"]])) )
+clusterGenePair[["MyeloidEpithelialt"]] = unlist( (  list(clusterGenePair[["Myeloid"]], clusterGenePair[["Epithelial"]])) )
+
+
+
 if (!file.exists("output/pval_plots_cancer")) {
   system("mkdir output/pval_plots_cancer")
 }
@@ -152,10 +158,16 @@ plotdf = function(df_res, vals1, vals2, label1, label2) {
 
 # W <- weightMatrix_nD(coords, span = 0.3)
 W <- weightMatrix_gaussian(coords, l = 0.5)
+clusterNames = append(clusterNames,"EpithelialFibroblast" ,length(clusterNames))
+clusterNames = append(clusterNames,"MyeloidFibroblast" ,length(clusterNames))
+clusterNames = append(clusterNames,"MyeloidEpithelialt" ,length(clusterNames))
+
 
 for (x in clusterNames) {
 
-  if(!(x == "Epithelial" | x == "Fibroblast" | x == "Myeloid")) next
+  if (!(x=="Epithelial" | x=="Fibroblast" | x=="Myeloid" | x=="MyeloidFibroblast" | x=="EpithelialFibroblast" | x=="MyeloidEpithelialt")) next
+  # if (!(x=="EpithelialFibroblast" )) next
+
   genes <- unlist(c(clusterGenePair[x]))
   genes <- sapply(genes, function(i) i <- toString(i))
   # genes = sort(genes)
