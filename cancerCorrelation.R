@@ -21,15 +21,15 @@ coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 
-for (i in 1: ncol(counts_raw)) {
-  counts_raw[,i] = counts_raw[,i] / max(counts_raw[,i])
-}
+# for (i in 1: ncol(counts_raw)) {
+#   counts_raw[,i] = counts_raw[,i] / max(counts_raw[,i])
+# }
 
 counts <- t(counts_raw)
 
-# sce = SingleCellExperiment(assays = list(counts = counts), colData = coords)
-# sce <- logNormCounts(sce)
-# counts = logcounts(sce)
+sce <- SingleCellExperiment(assays = list(counts = counts), colData = coords)
+sce <- logNormCounts(sce)
+counts <- logcounts(sce)
 
 ### Determine highly variable genes
 
