@@ -166,8 +166,8 @@ clusterNames = append(clusterNames,"MyeloidEpithelialt" ,length(clusterNames))
 
 
 for (x in clusterNames) {
-    if (!(x=="Epithelial" | x=="Fibroblast" | x=="Myeloid")) next
-    if (!(x=="Epithelial")) next
+    if (!(x=="Epithelial" | x=="Fibroblast" | x=="Myeloid")) break
+    # if (!(x=="Fibroblast")) next
 
     # if (!(x=="MyeloidFibroblast" | x=="EpithelialFibroblast" | x=="MyeloidEpithelialt")) next
     # if (!(x=="MyeloidFibroblast" )) next
@@ -252,3 +252,35 @@ for (x in clusterNames) {
 
     # break
 }
+
+
+## Find max eigenvalue distribution in permutation testing
+
+genes <- unlist(c(clusterGenePair["Fibroblast"]))
+genes <- sapply(genes, function(i) i <- toString(i))
+if (length(genes) == 1) next
+
+print(x)
+print(genes)
+
+pairCount <- as.matrix(rbind(counts[genes,]))
+rownames(pairCount) <- genes
+
+meig <- maxEigenVal(pairCount, W[507,])
+
+
+message(paste0("Conducting permutation tests for ", x))
+
+set.seed(500)
+nitr = 1000
+
+pmeig <- c()
+pmeig <- sapply(1:nitr, function(i) {
+  print(i)
+  x <- pairCount
+  o = sample(1:nrow(coords))
+  x <- t(sapply(1:nrow(pairCount), function(j) {
+      x[j,] = pairCount[j,o]
+  }))
+  append(pmeig, maxEigenVal(x, W[507,]))
+})
