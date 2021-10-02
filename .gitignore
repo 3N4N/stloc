@@ -9,3 +9,5 @@ datasets/mmc2-2.tsv
 datasets/common.tsv
 
 .Rhistory
+.Rproj.user
+*.Rproj
