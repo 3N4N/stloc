@@ -21,10 +21,6 @@ coords <- apply(coords_raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts_raw)
 
-# for (i in 1: ncol(counts_raw)) {
-#   counts_raw[,i] = counts_raw[,i] / max(counts_raw[,i])
-# }
-
 counts <- t(counts_raw)
 
 sce <- SingleCellExperiment(assays = list(counts = counts), colData = coords)
@@ -81,7 +77,7 @@ if (length(clusterNames) == 1) {
 
 clusterGenePair[["MyeloidFibroblast"]] = unlist((list(clusterGenePair[["Myeloid"]], clusterGenePair[["Fibroblast"]])) )
 clusterGenePair[["EpithelialFibroblast"]] = unlist((list(clusterGenePair[["Epithelial"]], clusterGenePair[["Fibroblast"]])) )
-clusterGenePair[["MyeloidEpithelialt"]] = unlist((list(clusterGenePair[["Myeloid"]], clusterGenePair[["Epithelial"]])) )
+clusterGenePair[["MyeloidEpithelial"]] = unlist((list(clusterGenePair[["Myeloid"]], clusterGenePair[["Epithelial"]])) )
 
 
 
@@ -89,7 +85,17 @@ if (!file.exists("output/pval_plots_cancer")) {
   system("mkdir output/pval_plots_cancer")
 }
 
-plotdf = function(df_res, vals1, vals2, label1, label2) {
+if (!file.exists("output/pval_distribution")) {
+  system("mkdir output/pval_distribution")
+}
+
+if (!file.exists("output/dump")) {
+  system("mkdir output/dump")
+}
+
+
+plotdf = function(df_res, vals1, vals2, vals3, label1, label2, label3) {
+# plotdf = function(df_res, vals1, vals2, label1, label2) {
 
     # for (i in 1:length(vals1)) {
     #   if (vals2[i] > 0.5) {
@@ -119,8 +125,8 @@ plotdf = function(df_res, vals1, vals2, label1, label2) {
         NULL
 
     plot_vals2 <- ggplot(df_res, aes(x = x, y = -y)) +
-        geom_point(aes(colour = vals2), size = 5) +
-        # geom_point(aes(colour = -log10(vals2)), size = 5) +
+        # geom_point(aes(colour = vals2), size = 5) +
+        geom_point(aes(colour = -log10(vals2)), size = 5) +
         theme_minimal() +
         theme(panel.grid = element_blank()) +
         theme(axis.text = element_blank()) +
@@ -140,147 +146,205 @@ plotdf = function(df_res, vals1, vals2, label1, label2) {
         labs(colour = label2) +
         NULL
 
+    plot_vals3 <- ggplot(df_res, aes(x = x, y = -y)) +
+        geom_point(aes(colour = -log10(vals3)), size = 5) +
+        theme_minimal() +
+        theme(panel.grid = element_blank()) +
+        theme(axis.text = element_blank()) +
+        xlab("") +
+        ylab("") +
+        labs(colour = "") +
+        theme(legend.position = "bottom") +
+        theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+        scale_color_viridis_c(option = "plasma") +
+        coord_fixed() +
+        guides(colour = guide_colourbar(title.position = "top",
+                                        title.hjust = 0.5)) +
+        theme(legend.key.width = unit(0.5, "inches")) +
+        theme(plot.title = element_text(size = 20)) +
+        theme(axis.title = element_text(size = 15)) +
+        theme(legend.title = element_text(size = 15)) +
+        labs(colour = label3) +
+        NULL
+
+
     vals1_leg = as_ggplot(get_legend(plot_vals1))
     vals2_leg = as_ggplot(get_legend(plot_vals2))
+    vals3_leg = as_ggplot(get_legend(plot_vals3))
 
-    scater::multiplot(plot_vals1 + theme(legend.position = "none")
-                      + theme(plot.margin = margin(10,0,-10,0)),
-                      plot_vals2 + theme(legend.position = "none")
-                      + theme(plot.margin = margin(10,0,-10,0)),
-                      vals1_leg, vals2_leg,
-                      layout = matrix(c(1,1,1,2,2,2,
-                                        1,1,1,2,2,2,
-                                        1,1,1,2,2,2,
-                                        3,3,3,4,4,4),
-                                      ncol = 6,
-                                      byrow = TRUE))
+    gridExtra::grid.arrange(plot_vals1 + theme(legend.position = "none")
+                            + theme(plot.margin = margin(10,0,-10,0)),
+                            plot_vals2 + theme(legend.position = "none")
+                            + theme(plot.margin = margin(10,0,-10,0)),
+                            plot_vals3 + theme(legend.position = "none")
+                            + theme(plot.margin = margin(10,0,-10,0)),
+                            vals1_leg, vals2_leg, vals3_leg,
+                            layout_matrix = matrix(c(1,1,2,2,3,3,
+                                                     1,1,2,2,3,3,
+                                                     4,4,5,5,6,6),
+                                                   ncol = 6,
+                                                   byrow = TRUE))
+}
+
+ploteig = function(df.eig, vals, loc, label) {
+
+    df.eig$vals[loc] = NA
+
+    plot.vals = ggplot(df.eig, aes(x = x, y = -y)) +
+        geom_point(aes(colour = vals), size = 4) +
+        theme_minimal() +
+        theme(panel.grid = element_blank()) +
+        theme(axis.text = element_blank()) +
+        xlab("") +
+        ylab("") +
+        labs(colour = "") +
+        theme(legend.position = "bottom") +
+        theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+        scale_color_viridis_c(option = "plasma", na.value="red") +
+        coord_fixed() +
+        guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
+        theme(legend.key.width = unit(0.5, "inches")) +
+        theme(plot.title = element_text(size = 20)) +
+        theme(axis.title = element_text(size = 15)) +
+        theme(legend.title = element_text(size = 15)) +
+        labs(colour = label) +
+        NULL
+
+    vals.leg = as_ggplot(get_legend(plot.vals))
+
+    gridExtra::grid.arrange(plot.vals + theme(legend.position = "none")
+                            + theme(plot.margin = margin(10,0,-10,0)),
+                            vals.leg,
+                            layout_matrix = rbind(c(1,1,1),
+                                                  c(1,1,1),
+                                                  c(2,2,2)))
 }
 
 
 # W <- weightMatrix_nD(coords, span = 0.3)
 W <- weightMatrix_gaussian(coords, l = 0.5)
 
-clusterNames = append(clusterNames,"EpithelialFibroblast" ,length(clusterNames))
-clusterNames = append(clusterNames,"MyeloidFibroblast" ,length(clusterNames))
-clusterNames = append(clusterNames,"MyeloidEpithelialt" ,length(clusterNames))
-
-
-for (x in clusterNames) {
-    if (!(x=="Epithelial" | x=="Fibroblast" | x=="Myeloid")) break
-    # if (!(x=="Fibroblast")) next
-
-    # if (!(x=="MyeloidFibroblast" | x=="EpithelialFibroblast" | x=="MyeloidEpithelialt")) next
-    # if (!(x=="MyeloidFibroblast" )) next
-
-    genes <- unlist(c(clusterGenePair[x]))
-    genes <- sapply(genes, function(i) i <- toString(i))
-    # genes = sort(genes)
-    # genes = genes[1:2]
-    if (length(genes) == 1) next
-
-    print(x)
-    print(genes)
-
-    pairCount <- as.matrix(rbind(counts[genes,]))
-    rownames(pairCount) <- genes
-
-    st = Sys.time()
-    zscr <- as.matrix(sapply(1:nrow(coords),
-                             function(i) {
-                                 zscores <- apply(pairCount, 1, scale)
-                                 aggzscores <- sum(zscores[i,])/nrow(pairCount)
-    }))
-    et = Sys.time()
-    message("Runtime of Z-score: ", et-st)
-
-    st = Sys.time()
-    meig <- as.matrix(sapply(1:nrow(coords),
-                             function(i) maxEigenVal(pairCount, W[i,])))
-    et = Sys.time()
-    message("Runtime of eigenvalues: ", et-st)
-
-    # message(paste0("Conducting permutation tests for ", x))
-
-    # set.seed(500)
-    # nitr = 1000
-
-    # pwcor <- matrix(nrow = nitr, ncol = nrow(coords))
-    # pwcor <- sapply(1:nitr, function(i) {
-    #   x <- pairCount
-    #   o = sample(1:nrow(coords))
-    #   x <- t(sapply(1:nrow(pairCount), function(j) {
-    #       x[j,] = pairCount[j,o]
-    #   }))
-    #   pwcor[i,] = sapply(1:nrow(W), function(j) corTaylor(x, W[j, ]))
-    # })
-
-    # pmeig <- matrix(nrow = nitr, ncol = nrow(coords))
-    # pmeig <- sapply(1:nitr, function(i) {
-    #   print(i)
-    #   x <- pairCount
-    #   o = sample(1:nrow(coords))
-    #   x <- t(sapply(1:nrow(pairCount), function(j) {
-    #       x[j,] = pairCount[j,o]
-    #   }))
-    #   pmeig[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
-    # })
-
-    # pvals_cor <- matrix(nrow = nrow(coords), ncol = 1)
-    # pvals_cor <- as.matrix(sapply(1:nrow(wcor), function(i) {
-    #   pvals_cor[i,] = (sum(pwcor[i,] > wcor[i]) + 1) / (nitr + 1)
-    # }))
-    # pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
-    # pvals_eig <- as.matrix(sapply(1:nrow(meig), function(i) {
-    #   pvals_eig[i,] = (sum(pmeig[i,] > meig[i]) + 1) / (nitr + 1)
-    # }))
-
-
-    df_res <- data.frame(x = coords[,"x"],
-                         y = coords[,"y"],
-                         zscr = zscr,
-                         meig = meig)
-                         # meig = meig,
-                         # pval =pvals_eig)
-
-    pdf(paste0("output/pval_plots_cancer/", x, ".pdf"),
-        height = 6, width = 10, onefile = F)
-    plotdf(df_res,df_res$zscr,df_res$meig,"Z-score", "Largest Eigenvalue")
-    # plotdf(df_res,df_res$wcor,df_res$pvals_cor,"Weighted Correlation", "-log10(pval)")
-    # plotdf(df_res,df_res$meig,df_res$pval,"Largest Eigenvalue","-log10(pval)")
-
-    dev.off()
-
-    # break
-}
-
-
-## Find max eigenvalue distribution in permutation testing
-
-genes <- unlist(c(clusterGenePair["Fibroblast"]))
-genes <- sapply(genes, function(i) i <- toString(i))
-if (length(genes) == 1) next
-
-print(x)
-print(genes)
-
-pairCount <- as.matrix(rbind(counts[genes,]))
-rownames(pairCount) <- genes
-
-meig <- maxEigenVal(pairCount, W[507,])
-
-
-message(paste0("Conducting permutation tests for ", x))
+# clusterNames = append(clusterNames,"EpithelialFibroblast" ,length(clusterNames))
+# clusterNames = append(clusterNames,"MyeloidFibroblast" ,length(clusterNames))
+# clusterNames = append(clusterNames,"MyeloidEpithelial" ,length(clusterNames))
 
 set.seed(500)
-nitr = 1000
 
-pmeig <- c()
-pmeig <- sapply(1:nitr, function(i) {
-  print(i)
-  x <- pairCount
-  o = sample(1:nrow(coords))
-  x <- t(sapply(1:nrow(pairCount), function(j) {
-      x[j,] = pairCount[j,o]
-  }))
-  append(pmeig, maxEigenVal(x, W[507,]))
-})
+for (nitr in c(1e3, 1e5)) {
+    for (cluster in clusterNames) {
+        # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
+        if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
+        # if (!(cluster=="Epithelial")) next
+
+        # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
+        # if (!(cluster=="MyeloidEpithelial" )) next
+
+        genes <- unlist(c(clusterGenePair[cluster]))
+        genes <- sapply(genes, function(i) i <- toString(i))
+        if (length(genes) == 1) next
+
+        print(cluster)
+        print(genes)
+
+        pairCount <- as.matrix(rbind(counts[genes,]))
+        rownames(pairCount) <- genes
+        # print(dim(pairCount))
+
+        # st = Sys.time()
+        # zscr <- as.matrix(sapply(1:nrow(coords),
+        #                          function(i) {
+        #                              zscores <- apply(pairCount, 1, scale)
+        #                              aggzscores <- sum(zscores[i,])/nrow(pairCount)
+        # }))
+        # et = Sys.time()
+        # message("Runtime of Z-score: ", et-st)
+
+        st = Sys.time()
+        meig <- as.matrix(sapply(1:nrow(coords), function(i) maxEigenVal(pairCount, W[i,])))
+        et = Sys.time()
+        message("Runtime of eigenvalues: ", et-st)
+
+        # st = Sys.time()
+        # msvd <- as.matrix(sapply(1:nrow(coords), function(i) maxSingVal(pairCount, W[i,])))
+        # et = Sys.time()
+        # message("Runtime of singular values: ", et-st)
+
+        message(paste0("Conducting permutation tests for ", cluster))
+
+        # pmeig <- matrix(nrow = nitr, ncol = nrow(coords))
+        # pmeig <- sapply(1:nitr, function(i) {
+        #   cat("\r", "Iteration step", i)
+        #   x <- pairCount
+        #   o = sample(1:nrow(coords))
+        #   x <- t(sapply(1:nrow(pairCount), function(j) {
+        #       x[j,] = pairCount[j,o]
+        #   }))
+        #   pmeig[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
+        # })
+
+        cnt = 1
+        pmeig = c(1:nitr)
+        for (i in 1:nitr) {
+            cat("\r", "Iteration step", i)
+            o = sample(1:nrow(coords))
+            x = pairCount
+            x = t(sapply(1:nrow(pairCount), function(j) {
+                             x[j,] = pairCount[j,o]
+                                                  }))
+            c = coords
+            c = sapply(1:ncol(coords), function(j) {
+                           c[,j] = coords[o,j]
+                            })
+            randloc = sample(1:nrow(W), 1)
+            pmeig[i] = maxEigenVal(x, W[randloc, ])
+            cutoff = if (cluster == "Epithelial") 200 else 150
+            if (pmeig[i] > cutoff & cnt <= 10) {
+                tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, W[i,])))
+                df.eig = data.frame(x = c[,1],
+                                    y = c[,2],
+                                    vals = tmeig)
+                if (!file.exists(paste0("output/dump/", cluster, "x", log(nitr,10)))) {
+                    system((paste0("mkdir output/dump/", cluster, "x", log(nitr,10))))
+                }
+                pdf(paste0("output/dump/", cluster, "x", log(nitr, 10), "/", cluster, "_", i, ".pdf"),
+                    height = 6, width = 10, onefile = F)
+                ploteig(df.eig, df.eig$meig, randloc, "Largest Eigenvalue")
+                dev.off()
+                cnt = cnt + 1
+            }
+        }
+        cat("\n")
+        message(paste0("Permutation tests for ", cluster, " completed"))
+
+        # pvals_cor <- matrix(nrow = nrow(coords), ncol = 1)
+        # pvals_cor <- as.matrix(sapply(1:nrow(wcor), function(i) {
+        #   pvals_cor[i,] = (sum(pwcor[i,] > wcor[i]) + 1) / (nitr + 1)
+        # }))
+        pvals_eig <- matrix(nrow = nrow(coords), ncol = 1)
+        pvals_eig <- as.matrix(sapply(1:nrow(meig), function(i) {
+                                          # pvals_eig[i,] = (sum(pmeig[i,] > meig[i]) + 1) / (nitr + 1)
+                                          pvals_eig[i,] = (sum(pmeig > meig[i]) + 1) / (nitr + 1)
+                                                  }))
+
+        fdrbh_eig = p.adjust(pvals_eig, method="BH")
+
+
+        df_res <- data.frame(x = coords[,"x"],
+                             y = coords[,"y"],
+                             meig = meig,
+                             pval = pvals_eig,
+                             fdr = fdrbh_eig
+        )
+
+        pdf(paste0("output/pval_plots_cancer/", cluster, ".pdf"),
+            height = 6, width = 10, onefile = F)
+        # plotdf(df_res,df_res$zscr,df_res$meig,"Z-score", "Largest Eigenvalue")
+        # plotdf(df_res,df_res$zscr,df_res$meig,"Z-score", "Max Singular Value")
+        # plotdf(df_res,df_res$wcor,df_res$pvals_cor,"Weighted Correlation", "-log10(pval)")
+        # plotdf(df_res,df_res$meig,df_res$pval,"Largest Eigenvalue","-log10(pval)")
+        plotdf(df_res,df_res$meig,df_res$pval,df_res$fdr,"Largest Eigenvalue","-log10(pval)", "-log10(fdr)")
+        dev.off()
+
+        # break
+    }
+}
