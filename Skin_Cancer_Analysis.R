@@ -23,19 +23,19 @@ source("./functions.R")
 #  ----------------------------------------------------------------------
 
 if (!file.exists("output")) {
-  system("mkdir -p output")
+    system("mkdir -p output")
 }
 
-if (!file.exists("output/cancer_plots")) {
-  system("mkdir output/cancer_plots")
+if (!file.exists("output/skin_cancer/plots")) {
+    system("mkdir output/skin_cancer/plots")
 }
 
-if (!file.exists("output/pval_distribution")) {
-  system("mkdir output/pval_distribution")
+if (!file.exists("output/skin_cancer/null_dist")) {
+    system("mkdir output/skin_cancer/null_dist")
 }
 
-if (!file.exists("output/dump")) {
-  system("mkdir output/dump")
+if (!file.exists("output/skin_cancer/dump")) {
+    system("mkdir output/skin_cancer/dump")
 }
 
 
@@ -71,7 +71,7 @@ counts <- logcounts(sce)
 # seqvals = seq(min(dec$mean), max(dec$mean), length.out = 1000)
 # peakExp = seqvals[which.max(metadata(dec)$trend(seqvals))]
 
-# pdf(file = "./output/HVG_selection.pdf", height = 8, width = 8)
+# pdf(file = "./output/skin_cancer/HVG_selection.pdf", height = 8, width = 8)
 # plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
 # curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
 # points(dec$mean[ which(rownames(dec) %in% hvg)],
@@ -86,7 +86,7 @@ counts <- logcounts(sce)
 
 ## read reference data
 clusters.data <- read.delim("./data/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
-clusters.data <- as.data.frame(cluster.data)
+clusters.data <- as.data.frame(clusters.data)
 clusters.genes <- unique(clusters.data$gene)
 
 ## get genes common in reference and st data
@@ -94,17 +94,17 @@ clusters.genes <- unique(clusters.data$gene)
 clusters.genes <- intersect(rownames(counts), clusters.genes)
 
 ## remove data of genes not common in reference and st data
-clusters.data <- cluster.data[cluster.data$gene %in% clusters.genes,]
+clusters.data <- clusters.data[clusters.data$gene %in% clusters.genes,]
 clusters.name <- unique(clusters.data$cluster)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
 
 ## get a list of cluster-gene pairs
 clusters.pair <- list()
 if (length(clusters.name) == 1) {
-    clusters.pair[[clusters.name[1]]] <- clusters.data[cluster.data[,7] == clusters.name[1], 8]
+    clusters.pair[[clusters.name[1]]] <- clusters.data[clusters.data[,7] == clusters.name[1], 8]
 } else {
     clusters.pair <- sapply(clusters.name, function(i) {
-        clusters.pair[[i]] <- clusters.data[cluster.data[,7] == i, 8]
+        clusters.pair[[i]] <- clusters.data[clusters.data[,7] == i, 8]
   })
 }
 
@@ -195,11 +195,10 @@ for (nitr in c(1e3, 1e5)) {
             if (meig.perm[i] > cutoff & cnt <= 10) {
                 tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, W[i,])))
                 df = data.frame(x = c[,1], y = c[,2])
-                                      # vals = tmeig)
-                if (!file.exists(paste0("output/dump/", cluster, "x", log(nitr,10)))) {
-                    system((paste0("mkdir output/dump/", cluster, "x", log(nitr,10))))
+                if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
+                    system((paste0("mkdir output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
-                pdf(paste0("output/dump/", cluster, "x", log(nitr, 10), "/", cluster, "_", i, ".pdf"),
+                pdf(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr, 10), "/", cluster, "_", i, ".pdf"),
                     height = 6, width = 10, onefile = F)
                 ploteig(df, tmeig, randloc, "Largest Eigenvalue")
                 dev.off()
@@ -219,7 +218,7 @@ for (nitr in c(1e3, 1e5)) {
 
         df <- data.frame(x = coords[,"x"], y = coords[,"y"])
 
-        pdf(paste0("output/cancer_plots/", cluster, ".pdf"),
+        pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
         plotdf(df, meig.real, meig.pval, meig.fdr,
                "Largest Eigenvalue","-log10(pval)", "-log10(fdr)")
