@@ -12,7 +12,7 @@ library(patchwork)
 #                                  Preprocessing
 #  ======================================================================
 
-dataset = read.csv(file="./datasets/moffitt/s7.csv")
+dataset = read.csv(file="./data/moffitt/s7.csv")
 
 counts_raw = dataset[,-c(1:5, 8,9)]
 counts = counts_raw[, colSums(counts_raw) != 0]

@@ -2,11 +2,12 @@
 *.vim
 
 output/
+scratch.R
 
 *.RData
-datasets/mmc2-1.tsv
-datasets/mmc2-2.tsv
-datasets/common.tsv
+data/mmc2-1.tsv
+data/mmc2-2.tsv
+data/common.tsv
 
 .Rhistory
 .Rproj.user

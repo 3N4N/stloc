@@ -14,7 +14,7 @@ if (!file.exists("output")) {
 
 ## Process Cancer dataset
 
-counts_raw <- read.delim("./datasets/skin_cancer/GSE144239_ST_P2_S1_counts.tsv", header = TRUE, row.names = 1)
+counts_raw <- read.delim("./data/skin_cancer/GSE144239_ST_P2_S1_counts.tsv", header = TRUE, row.names = 1)
 
 coords_raw <- do.call(rbind, strsplit(rownames(counts_raw), "x"))
 coords <- apply(coords_raw, 1:2, as.numeric)
@@ -52,16 +52,16 @@ counts <- logcounts(sce)
 
 ### Select for downstream analysis those marker genes which are also highly variable
 
-clusterData <- read.delim("./datasets/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
+clusterData <- read.delim("./data/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
 clusterGenes <- clusterData[,8]
 clusterGenes <- unique(clusterGenes)
 # commonGenes <- intersect(hvg, clusterGenes)
 commonGenes <- intersect(rownames(counts), clusterGenes)
 clusterData <- as.data.frame(clusterData)
 write.table(clusterData[clusterData$gene %in% commonGenes,],
-            file = "./datasets/common.tsv", row.names = FALSE, sep = "\t")
+            file = "./data/common.tsv", row.names = FALSE, sep = "\t")
 
-clusterData <- read.delim("./datasets/common.tsv", header = TRUE)
+clusterData <- read.delim("./data/common.tsv", header = TRUE)
 clusterNames <- unique(clusterData[,7])
 clusterNames <- sapply(clusterNames, function(i) i <- toString(i))
 clusterGenes <- clusterData[,8]
