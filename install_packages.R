@@ -1,11 +1,9 @@
-if !requireNamespace("BiocManager", quietly = TRUE))
+if !requireNamespace("BiocManager", quietly = TRUE)
     install.packages("BiocManager")
 
-BiocManager::install("SingleCellExperiment")
-BiocManager::install("scater")
-BiocManager::install("scran")
 
-install.packages("ggforce")
-install.packages("patchwork")
-install.packages("ggpubr")
+packages.cran = c("ggforce", "patchwork", "ggpubr", "Seurat")
+packages.bioc = c("SingleCellExperiment", "scater", "scran")
 
+install.packages(packages.cran, method="wget")
+BiocManager::install(packages.bioc, method="wget")
