@@ -222,3 +222,5 @@ for (nitr in c(1e3, 1e5)) {
         else if (nitr == 1e5 & cluster=="Fibroblast") pmeig.fib.5 = meig.perm
     }
 }
+
+save(pmeig.epi.3, pmeig.fib.3, pmeig.epi.5, pmeig.fib.5, "pmeig.RData")

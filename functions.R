@@ -138,8 +138,6 @@ plotvals = function(n, df, vals, labels, size) {
             NULL
     })
 
-    grid.arrange(grobs=plot.vals, ncol=n)
-    # do.call("grid.arrange", c(plot.vals, ncol=n))
+    # grid.arrange(grobs=plot.vals, ncol=n)
+    do.call("grid.arrange", c(plot.vals, ncol=n))
 }
-
-# plotvals(1, df, c(meig.real, meig.pval, meig.fdr), c("r", "p", "f"))
