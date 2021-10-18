@@ -5,8 +5,8 @@
 library(SingleCellExperiment)
 library(scran)
 
-require(ggplot2)
-require(gridExtra)
+library(ggplot2)
+library(gridExtra)
 
 
 #  ----------------------------------------------------------------------

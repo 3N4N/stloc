@@ -2,7 +2,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 
-packages.cran = c("ggforce", "patchwork", "ggpubr", "Seurat")
+packages.cran = c("ggplot2", "gridExtra")
 packages.bioc = c("SingleCellExperiment", "scran")
 
 # install.packages(packages.cran, method="wget")
