@@ -117,16 +117,16 @@ if (length(clusters.name) == 1) {
 W <- weightMatrix.gaussian(coords, l = 0.5)
 
 set.seed(500)
-# for (nitr in c(1e3)) {
-for (nitr in c(1e3, 1e5)) {
+for (nitr in c(1e3)) {
+# for (nitr in c(1e3, 1e5)) {
     brk = 0
 
     for (cluster in clusters.name) {
         cutoff = if (cluster == "Epithelial") 200 else 150
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
-        # if (!(cluster=="Epithelial")) next
+        # if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
+        if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
         # if (!(cluster=="MyeloidEpithelial" )) next
@@ -180,14 +180,14 @@ for (nitr in c(1e3, 1e5)) {
             if (meig.perm[i] > cutoff & cnt <= 10) {
                 w <- weightMatrix.gaussian(c, l = 0.5)
                 tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, w[i,])))
-                df = data.frame(x = coords[,"x"], y = coords[,"y"])
+                df = data.frame(x = c[,"x"], y = c[,"y"])
                 if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
                     system((paste0("mkdir output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
                 tmeig[randloc] = NA
                 pdf(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr, 10), "/", cluster, "_", i, ".pdf"),
                     height = 6, width = 10, onefile = F)
-                plotvals(1, df, list(-log10(tmeig)), c("Largest Eigenvalue"), 3)
+                plotvals(1, df, list(tmeig), c("Largest Eigenvalue"), 3)
                 dev.off()
                 cnt = cnt + 1
                 # if (cnt > 10) {
@@ -222,5 +222,3 @@ for (nitr in c(1e3, 1e5)) {
         else if (nitr == 1e5 & cluster=="Fibroblast") pmeig.fib.5 = meig.perm
     }
 }
-
-save(pmeig.epi.3, pmeig.fib.3, pmeig.epi.5, pmeig.fib.5, "pmeig.RData")

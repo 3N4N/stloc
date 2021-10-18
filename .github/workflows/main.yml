@@ -14,7 +14,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  linux:
+  cancer-linux:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     env:
@@ -38,4 +38,3 @@ jobs:
       - name: Run the skin-cancer scripts
         run: |
           Rscript Skin_Cancer_Analysis.R
-          Rscript scratch.R
