@@ -30,13 +30,8 @@ if (!file.exists("output/skin_cancer/plots")) {
     system("mkdir output/skin_cancer/plots")
 }
 
-if (!file.exists("output/skin_cancer/null_dist")) {
-    system("mkdir output/skin_cancer/null_dist")
-}
-
-if (!file.exists("output/skin_cancer/dump")) {
-    system("mkdir output/skin_cancer/dump")
-}
+system("rm -rf output/skin_cancer/dump")
+system("mkdir -p output/skin_cancer/dump")
 
 
 #  ----------------------------------------------------------------------
@@ -121,13 +116,18 @@ if (length(clusters.name) == 1) {
 #                                     Analysis
 #  ----------------------------------------------------------------------
 
-# W <- weightMatrix_nD(coords, span = 0.3)
-W <- weightMatrix_gaussian(coords, l = 0.5)
+W <- weightMatrix.gaussian(coords, l = 0.5)
+
+# pmeig.3 = c(1:1e3)
+# pmeig.5 = c(1:1e5)
 
 set.seed(500)
-# for (nitr in c(1e3)) {
-for (nitr in c(1e3, 1e5)) {
+for (nitr in c(1e3)) {
+# for (nitr in c(1e3, 1e5)) {
+    brk = 0
+
     for (cluster in clusters.name) {
+        cutoff = if (cluster == "Epithelial") 200 else 150
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
         if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
@@ -145,7 +145,6 @@ for (nitr in c(1e3, 1e5)) {
 
         pairCount <- as.matrix(rbind(counts[genes,]))
         rownames(pairCount) <- genes
-        # print(dim(pairCount))
 
         # st = Sys.time()
         # zscr <- as.matrix(sapply(1:nrow(coords),
@@ -154,13 +153,13 @@ for (nitr in c(1e3, 1e5)) {
         #                              aggzscores <- sum(zscores[i,])/nrow(pairCount)
         # }))
         # et = Sys.time()
-        # message("Runtime of Z-score: ", et-st)
+        # message("Runtime of Z-score: ", difftime(et,st))
 
         st = Sys.time()
         meig.real <- as.matrix(sapply(1:nrow(coords),
                                       function(i) maxEigenVal(pairCount, W[i,])))
         et = Sys.time()
-        message("Runtime of eigenvalues: ", et-st)
+        message("Runtime of eigenvalues: ", difftime(et,st))
 
         message(paste0("Conducting permutation tests for ", cluster))
 
@@ -178,23 +177,27 @@ for (nitr in c(1e3, 1e5)) {
 
         cnt = 1
         meig.perm = c(1:nitr)
+        brk = 0
+        st = Sys.time()
         for (i in 1:nitr) {
+            if (brk) break
             cat("\r", "Iteration step", i)
             o = sample(1:nrow(coords))
-            x = pairCount
-            x = t(sapply(1:nrow(pairCount), function(j) {
-                    x[j,] = pairCount[j,o]
-            }))
             c = coords
             c = sapply(1:ncol(coords), function(j) {
                     c[,j] = coords[o,j]
             })
-            randloc = sample(1:nrow(W), 1)
-            meig.perm[i] = maxEigenVal(x, W[randloc, ])
-            cutoff = if (cluster == "Epithelial") 200 else 150
+            x = pairCount
+            x = t(sapply(1:nrow(pairCount), function(j) {
+                    x[j,] = pairCount[j,o]
+            }))
+            randloc = sample(1:nrow(coords), 1)
+            w <- weightMatrix.gaussian(c, l = 0.5, cell = randloc)
+            meig.perm[i] = maxEigenVal(x, w)
             if (meig.perm[i] > cutoff & cnt <= 10) {
-                tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, W[i,])))
-                df = data.frame(x = c[,1], y = c[,2])
+                w <- weightMatrix.gaussian(c, l = 0.5)
+                tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, w[i,])))
+                df = data.frame(x = coords[,"x"], y = coords[,"y"])
                 if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
                     system((paste0("mkdir output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
@@ -203,11 +206,17 @@ for (nitr in c(1e3, 1e5)) {
                 ploteig(df, tmeig, randloc, "Largest Eigenvalue")
                 dev.off()
                 cnt = cnt + 1
+                # if (cnt > 10) {
+                #     brk = 1
+                # }
             }
         }
         cat("\n")
-
         message(paste0("Permutation tests for ", cluster, " completed"))
+        et = Sys.time()
+        message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et,st))
+
+        # if (brk == 1) next
 
         meig.pval <- matrix(nrow = nrow(coords), ncol = 1)
         meig.pval <- as.matrix(sapply(1:nrow(meig.real), function(i) {
@@ -223,5 +232,9 @@ for (nitr in c(1e3, 1e5)) {
         plotdf(df, meig.real, meig.pval, meig.fdr,
                "Largest Eigenvalue","-log10(pval)", "-log10(fdr)")
         dev.off()
+        if (nitr == 1e3 & cluster=="Epithelial") pmeig.epi.3 = meig.perm
+        else if (nitr == 1e3 & cluster=="Fibroblast") pmeig.fib.3 = meig.perm
+        else if (nitr == 1e5 & cluster=="Epithelial") pmeig.epi.5 = meig.perm
+        else if (nitr == 1e5 & cluster=="Fibroblast") pmeig.fib.5 = meig.perm
     }
 }
