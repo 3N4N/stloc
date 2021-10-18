@@ -33,6 +33,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run the skin-cancer scripts
         run: |
+          Rscript install_packages.R
           Rscript Skin_Cancer_Analysis.R
           Rscript scratch.R
 
