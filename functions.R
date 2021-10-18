@@ -180,22 +180,12 @@ plotdf = function(df, vals1, vals2, vals3, label1, label2, label3) {
         NULL
 
 
-    plot1.leg = as_ggplot(get_legend(plot1.val))
-    plot2.leg = as_ggplot(get_legend(plot2.val))
-    plot3.leg = as_ggplot(get_legend(plot3.val))
-
-    gridExtra::grid.arrange(plot1.val + theme(legend.position = "none")
-                            + theme(plot.margin = margin(10,0,-10,0)),
-                            plot2.val + theme(legend.position = "none")
-                            + theme(plot.margin = margin(10,0,-10,0)),
-                            plot3.val + theme(legend.position = "none")
-                            + theme(plot.margin = margin(10,0,-10,0)),
-                            plot1.leg, plot2.leg, plot3.leg,
-                            layout_matrix = matrix(c(1,1,2,2,3,3,
-                                                     1,1,2,2,3,3,
-                                                     4,4,5,5,6,6),
-                                                   ncol = 6,
-                                                   byrow = TRUE))
+    grid.arrange(plot1.val, plot2.val, plot3.val,
+                 layout_matrix = matrix(c(1,1,2,2,3,3,
+                                          1,1,2,2,3,3,
+                                          1,1,2,2,3,3),
+                                        ncol = 6,
+                                        byrow = TRUE))
 }
 
 ploteig = function(df.eig, vals, loc, label) {
@@ -216,18 +206,15 @@ ploteig = function(df.eig, vals, loc, label) {
         coord_fixed() +
         guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
         theme(legend.key.width = unit(0.5, "inches")) +
+        # theme(plot.margin = margin(10,0,10,0)) +
         theme(plot.title = element_text(size = 20)) +
         theme(axis.title = element_text(size = 15)) +
         theme(legend.title = element_text(size = 15)) +
         labs(colour = label) +
         NULL
 
-    vals.leg = as_ggplot(get_legend(plot.vals))
-
-    gridExtra::grid.arrange(plot.vals + theme(legend.position = "none")
-                            + theme(plot.margin = margin(10,0,-10,0)),
-                            vals.leg,
+    gridExtra::grid.arrange(plot.vals,
                             layout_matrix = rbind(c(1,1,1),
                                                   c(1,1,1),
-                                                  c(2,2,2)))
+                                                  c(1,1,1)))
 }

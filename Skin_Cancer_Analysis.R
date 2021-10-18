@@ -3,12 +3,10 @@
 #  ----------------------------------------------------------------------
 
 library(SingleCellExperiment)
-library(scater)
 library(scran)
 
-require(ggforce)
-require(patchwork)
-require(ggpubr)
+require(ggplot2)
+require(gridExtra)
 
 
 #  ----------------------------------------------------------------------
@@ -118,9 +116,6 @@ if (length(clusters.name) == 1) {
 
 W <- weightMatrix.gaussian(coords, l = 0.5)
 
-# pmeig.3 = c(1:1e3)
-# pmeig.5 = c(1:1e5)
-
 set.seed(500)
 for (nitr in c(1e3)) {
 # for (nitr in c(1e3, 1e5)) {
@@ -130,8 +125,8 @@ for (nitr in c(1e3)) {
         cutoff = if (cluster == "Epithelial") 200 else 150
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
-        # if (!(cluster=="Epithelial")) next
+        # if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
+        if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
         # if (!(cluster=="MyeloidEpithelial" )) next
