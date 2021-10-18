@@ -117,16 +117,16 @@ if (length(clusters.name) == 1) {
 W <- weightMatrix.gaussian(coords, l = 0.5)
 
 set.seed(500)
-for (nitr in c(1e3)) {
-# for (nitr in c(1e3, 1e5)) {
+# for (nitr in c(1e3)) {
+for (nitr in c(1e3, 1e5)) {
     brk = 0
 
     for (cluster in clusters.name) {
         cutoff = if (cluster == "Epithelial") 200 else 150
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        # if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
-        if (!(cluster=="Epithelial")) next
+        if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
+        # if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
         # if (!(cluster=="MyeloidEpithelial" )) next
@@ -158,18 +158,6 @@ for (nitr in c(1e3)) {
 
         message(paste0("Conducting permutation tests for ", cluster))
 
-        # meig.perm <- matrix(nrow = nitr, ncol = nrow(coords))
-        # meig.perm <- sapply(1:nitr, function(i) {
-        #   cat("\r", "Iteration step", i)
-        #   o = sample(1:nrow(coords))
-        #   x <- pairCount
-        #   x <- t(sapply(1:nrow(pairCount), function(j) {
-        #       x[j,] = pairCount[j,o]
-        #   }))
-        #   meig.perm[i,] = sapply(1:nrow(W), function(j) maxEigenVal(x, W[j, ]))
-        # })
-        # cat("\n")
-
         cnt = 1
         meig.perm = c(1:nitr)
         brk = 0
@@ -196,9 +184,10 @@ for (nitr in c(1e3)) {
                 if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
                     system((paste0("mkdir output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
+                tmeig[randloc] = NA
                 pdf(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr, 10), "/", cluster, "_", i, ".pdf"),
                     height = 6, width = 10, onefile = F)
-                ploteig(df, tmeig, randloc, "Largest Eigenvalue")
+                plotvals(1, df, list(-log10(tmeig)), c("Largest Eigenvalue"), 3)
                 dev.off()
                 cnt = cnt + 1
                 # if (cnt > 10) {
@@ -224,8 +213,8 @@ for (nitr in c(1e3)) {
 
         pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
-        plotdf(df, meig.real, meig.pval, meig.fdr,
-               "Largest Eigenvalue","-log10(pval)", "-log10(fdr)")
+        plotvals(3, df, vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+                 c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3)
         dev.off()
         if (nitr == 1e3 & cluster=="Epithelial") pmeig.epi.3 = meig.perm
         else if (nitr == 1e3 & cluster=="Fibroblast") pmeig.fib.3 = meig.perm

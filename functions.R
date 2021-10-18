@@ -113,108 +113,33 @@ zScore <- function(x, index, meanOfZenes, sdOfZenes)
     return (aggrZscore)
 }
 
-plotdf = function(df, vals1, vals2, vals3, label1, label2, label3) {
 
-    plot1.val <- ggplot(df, aes(x = x, y = -y)) +
-        geom_point(aes(colour = vals1), size = 5) +
-        theme_minimal() +
-        theme(panel.grid = element_blank()) +
-        theme(axis.text = element_blank()) +
-        xlab("") +
-        ylab("") +
-        labs(colour = "") +
-        theme(legend.position = "bottom") +
-        theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-        scale_color_viridis_c(option = "plasma") +
-        coord_fixed() +
-        guides(colour = guide_colourbar(title.position = "top",
-                                        title.hjust = 0.5)) +
-        theme(legend.key.width = unit(0.5, "inches")) +
-        theme(plot.title = element_text(size = 20)) +
-        theme(axis.title = element_text(size = 15)) +
-        theme(legend.title = element_text(size = 15)) +
-        labs(colour = label1) +
-        NULL
+plotvals = function(n, df, vals, labels, size) {
+    plot.vals <- lapply(1:n, function(i) {
+        ggplot(df, aes(x = x, y = -y)) +
+            geom_point(aes(colour = vals[[i]]), size = size) +
+            theme_minimal() +
+            theme(panel.grid = element_blank()) +
+            theme(axis.text = element_blank()) +
+            xlab("") +
+            ylab("") +
+            labs(colour = "") +
+            theme(legend.position = "bottom") +
+            theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+            scale_color_viridis_c(option = "plasma", na.value="red") +
+            coord_fixed() +
+            guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
+            theme(legend.key.width = unit(0.5, "inches")) +
+            # theme(plot.margin = margin(10,0,10,0)) +
+            theme(plot.title = element_text(size = 20)) +
+            theme(axis.title = element_text(size = 15)) +
+            theme(legend.title = element_text(size = 15)) +
+            labs(colour = labels[i]) +
+            NULL
+    })
 
-    plot2.val <- ggplot(df, aes(x = x, y = -y)) +
-        # geom_point(aes(colour = vals2), size = 5) +
-        geom_point(aes(colour = -log10(vals2)), size = 5) +
-        theme_minimal() +
-        theme(panel.grid = element_blank()) +
-        theme(axis.text = element_blank()) +
-        xlab("") +
-        ylab("") +
-        labs(colour = "") +
-        theme(legend.position = "bottom") +
-        theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-        scale_color_viridis_c(option = "plasma") +
-        coord_fixed() +
-        guides(colour = guide_colourbar(title.position = "top",
-                                        title.hjust = 0.5)) +
-        theme(legend.key.width = unit(0.5, "inches")) +
-        theme(plot.title = element_text(size = 20)) +
-        theme(axis.title = element_text(size = 15)) +
-        theme(legend.title = element_text(size = 15)) +
-        labs(colour = label2) +
-        NULL
-
-    plot3.val <- ggplot(df, aes(x = x, y = -y)) +
-        geom_point(aes(colour = -log10(vals3)), size = 5) +
-        theme_minimal() +
-        theme(panel.grid = element_blank()) +
-        theme(axis.text = element_blank()) +
-        xlab("") +
-        ylab("") +
-        labs(colour = "") +
-        theme(legend.position = "bottom") +
-        theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-        scale_color_viridis_c(option = "plasma") +
-        coord_fixed() +
-        guides(colour = guide_colourbar(title.position = "top",
-                                        title.hjust = 0.5)) +
-        theme(legend.key.width = unit(0.5, "inches")) +
-        theme(plot.title = element_text(size = 20)) +
-        theme(axis.title = element_text(size = 15)) +
-        theme(legend.title = element_text(size = 15)) +
-        labs(colour = label3) +
-        NULL
-
-
-    grid.arrange(plot1.val, plot2.val, plot3.val,
-                 layout_matrix = matrix(c(1,1,2,2,3,3,
-                                          1,1,2,2,3,3,
-                                          1,1,2,2,3,3),
-                                        ncol = 6,
-                                        byrow = TRUE))
+    grid.arrange(grobs=plot.vals, ncol=n)
+    # do.call("grid.arrange", c(plot.vals, ncol=n))
 }
 
-ploteig = function(df.eig, vals, loc, label) {
-
-    if (loc != 0) vals[loc] = NA
-
-    plot.vals = ggplot(df.eig, aes(x = x, y = -y)) +
-        geom_point(aes(colour = vals), size = 3) +
-        theme_minimal() +
-        theme(panel.grid = element_blank()) +
-        theme(axis.text = element_blank()) +
-        xlab("") +
-        ylab("") +
-        labs(colour = "") +
-        theme(legend.position = "bottom") +
-        theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-        scale_color_viridis_c(option = "plasma", na.value="red") +
-        coord_fixed() +
-        guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
-        theme(legend.key.width = unit(0.5, "inches")) +
-        # theme(plot.margin = margin(10,0,10,0)) +
-        theme(plot.title = element_text(size = 20)) +
-        theme(axis.title = element_text(size = 15)) +
-        theme(legend.title = element_text(size = 15)) +
-        labs(colour = label) +
-        NULL
-
-    gridExtra::grid.arrange(plot.vals,
-                            layout_matrix = rbind(c(1,1,1),
-                                                  c(1,1,1),
-                                                  c(1,1,1)))
-}
+# plotvals(1, df, c(meig.real, meig.pval, meig.fdr), c("r", "p", "f"))
