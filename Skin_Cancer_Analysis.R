@@ -180,7 +180,8 @@ for (nitr in c(1e3)) {
             if (meig.perm[i] > cutoff & cnt <= 10) {
                 w <- weightMatrix.gaussian(c, l = 0.5)
                 tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, w[i,])))
-                df = data.frame(x = c[,"x"], y = c[,"y"])
+                df = data.frame(x = coords[,"x"], y = coords[,"y"])
+                # df = data.frame(x = c[,1], y = c[,2])
                 if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
                     system((paste0("mkdir output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
