@@ -153,13 +153,13 @@ for (nitr in c(1e3)) {
         #                              aggzscores <- sum(zscores[i,])/nrow(pairCount)
         # }))
         # et = Sys.time()
-        # message("Runtime of Z-score: ", difftime(et,st))
+        # message("Runtime of Z-score: ", difftime(et,st,units="mins"), " mins")
 
         st = Sys.time()
         meig.real <- as.matrix(sapply(1:nrow(coords),
                                       function(i) maxEigenVal(pairCount, W[i,])))
         et = Sys.time()
-        message("Runtime of eigenvalues: ", difftime(et,st))
+        message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
 
         message(paste0("Conducting permutation tests for ", cluster))
 
@@ -214,7 +214,7 @@ for (nitr in c(1e3)) {
         cat("\n")
         message(paste0("Permutation tests for ", cluster, " completed"))
         et = Sys.time()
-        message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et,st))
+        message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et,st,units="mins"), " mins")
 
         # if (brk == 1) next
 
