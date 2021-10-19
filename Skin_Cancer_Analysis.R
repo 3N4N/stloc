@@ -25,7 +25,7 @@ if (!file.exists("output")) {
 }
 
 if (!file.exists("output/skin_cancer/plots")) {
-    system("mkdir output/skin_cancer/plots")
+    system("mkdir -p output/skin_cancer/plots")
 }
 
 system("rm -rf output/skin_cancer/dump")
@@ -183,7 +183,7 @@ for (nitr in c(1e3)) {
                 df = data.frame(x = coords[,"x"], y = coords[,"y"])
                 # df = data.frame(x = c[,1], y = c[,2])
                 if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
-                    system((paste0("mkdir output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
+                    system((paste0("mkdir -p output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
                 tmeig[randloc] = NA
                 pdf(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr, 10), "/", cluster, "_", i, ".pdf"),
