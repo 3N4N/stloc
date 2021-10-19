@@ -6,6 +6,7 @@ library(SingleCellExperiment)
 library(dplyr)
 library(Seurat)
 library(patchwork)
+library(scran)
 
 
 #  ======================================================================
@@ -26,18 +27,11 @@ rownames(coords) = apply(coords, 1, function(i) {
 rownames(counts) = rownames(coords)
 counts = counts[,-c(1,2)]
 
+genes = colnames(counts)
+message("Number of genes: ", length(genes))
+clusters = unique(dataset[,8])
+message("Number of clusters: ", length(clusters))
 
 sce = SingleCellExperiment(assays = list(counts = t(counts)), colData = coords)
 sce = logNormCounts(sce)
 counts = logcounts(sce)
-
-
-
-
-plot(counts[,4])
-
-genes = colnames(counts)[-c(1,2,3)]
-message("Number of genes: ", length(genes))
-
-clusters = unique(counts[,3])
-message("Number of clusters: ", length(clusters))

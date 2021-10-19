@@ -20,11 +20,11 @@ weightMatrix.nD = function(x, span = 0.5)
     return(W)
 }
 
-weightMatrix.gaussian  = function(x, l=20, cell=0)
+weightMatrix.gaussian  = function(coords, l=20, cell=0)
 {
 
-    ncells = nrow(x)
-    coords = as.matrix(x)
+    ncells = nrow(coords)
+    coords = as.matrix(coords)
     d = as.matrix(dist(coords))
 
     if (cell != 0) {
