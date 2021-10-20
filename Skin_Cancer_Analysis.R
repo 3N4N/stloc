@@ -114,19 +114,21 @@ if (length(clusters.name) == 1) {
 #                                     Analysis
 #  ----------------------------------------------------------------------
 
-W <- weightMatrix.gaussian(coords, l = 0.5)
+
+d <- sort (as.numeric (dist (coords )))[1]
+W <- weightMatrix.gaussian(coords, l = d*1)
 
 set.seed(500)
-for (nitr in c(1e3)) {
-# for (nitr in c(1e3, 1e5)) {
+# for (nitr in c(1e3)) {
+for (nitr in c(1e3, 1e5)) {
     brk = 0
 
     for (cluster in clusters.name) {
         cutoff = if (cluster == "Epithelial") 200 else 150
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        # if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
-        if (!(cluster=="Epithelial")) next
+        if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
+        # if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
         # if (!(cluster=="MyeloidEpithelial" )) next
@@ -154,6 +156,7 @@ for (nitr in c(1e3)) {
         meig.real <- as.matrix(sapply(1:nrow(coords),
                                       function(i) maxEigenVal(pairCount, W[i,])))
         et = Sys.time()
+        # print(summary(meig.real))
         message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
 
         message(paste0("Conducting permutation tests for ", cluster))
@@ -166,22 +169,17 @@ for (nitr in c(1e3)) {
             if (brk) break
             cat("\r", "Iteration step", i)
             o = sample(1:nrow(coords))
-            c = coords
-            c = sapply(1:ncol(coords), function(j) {
-                    c[,j] = coords[o,j]
-            })
             x = pairCount
             x = t(sapply(1:nrow(pairCount), function(j) {
                     x[j,] = pairCount[j,o]
             }))
             randloc = sample(1:nrow(coords), 1)
-            w <- weightMatrix.gaussian(c, l = 0.5, cell = randloc)
-            meig.perm[i] = maxEigenVal(x, w)
-            if (meig.perm[i] > cutoff & cnt <= 10) {
-                w <- weightMatrix.gaussian(c, l = 0.5)
-                tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, w[i,])))
+            meig.perm[i] = maxEigenVal(x, W[randloc,])
+            if (F | meig.perm[i] > cutoff & cnt <= 5) {
+                tmeig = as.matrix(sapply(1:ncol(x), function(i) maxEigenVal(x, W[i,])))
+                print(summary(tmeig))
+                print(all.equal(sort(tmeig), sort(meig.real)))
                 df = data.frame(x = coords[,"x"], y = coords[,"y"])
-                # df = data.frame(x = c[,1], y = c[,2])
                 if (!file.exists(paste0("output/skin_cancer/dump/", cluster, "x", log(nitr,10)))) {
                     system((paste0("mkdir -p output/skin_cancer/dump/", cluster, "x", log(nitr,10))))
                 }
@@ -216,6 +214,7 @@ for (nitr in c(1e3)) {
             height = 6, width = 10, onefile = F)
         plotvals(3, df, vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
                  c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3)
+        # plotvals(1, df, vals=list(meig.real), c("Largest Eigenvalue"), 3)
         dev.off()
         if (nitr == 1e3 & cluster=="Epithelial") pmeig.epi.3 = meig.perm
         else if (nitr == 1e3 & cluster=="Fibroblast") pmeig.fib.3 = meig.perm
