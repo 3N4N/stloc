@@ -27,20 +27,11 @@ weightMatrix.gaussian  = function(coords, l=20, cell=0)
     coords = as.matrix(coords)
     d = as.matrix(dist(coords))
 
-    if (cell != 0) {
-        dvec = d[cell,]
-        vals = rep(0, ncells)
-        for(i in 1:length(vals)) {
-            vals[i] = exp(-d[cell,i]^2 / l^2)
-        }
-        return(vals)
-    }
-
     W.raw = sapply(seq_len(ncells), function(cell) {
         dvec = d[cell,]
         vals = rep(0, ncells)
         for(i in 1:length(vals)) {
-            vals[i] = exp(-d[cell,i]^2 / l^2)
+            vals[i] = (1 / (l * sqrt(2*pi))) * exp(-(1/2) * d[cell,i]^2 / l^2)
         }
         return(vals)
     }, simplify = FALSE)
