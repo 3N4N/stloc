@@ -216,6 +216,7 @@ for (nitr in c(1e3, 1e5)) {
                  c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3)
         # plotvals(1, df, vals=list(meig.real), c("Largest Eigenvalue"), 3)
         dev.off()
+
         if (nitr == 1e3 & cluster=="Epithelial") pmeig.epi.3 = meig.perm
         else if (nitr == 1e3 & cluster=="Fibroblast") pmeig.fib.3 = meig.perm
         else if (nitr == 1e5 & cluster=="Epithelial") pmeig.epi.5 = meig.perm

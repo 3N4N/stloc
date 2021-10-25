@@ -1,3 +1,7 @@
+minmax <- function(x) {
+    (x - min(x)) / (max(x) - min(x))
+}
+
 weightMatrix.nD = function(x, span = 0.5)
 {
 
