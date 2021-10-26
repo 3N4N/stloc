@@ -70,7 +70,7 @@ for cell_type in cell_types:
 
 #markerGene_for_cell_types = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=['cell_type', 'marker_gene', 'p_value'])
 
-markerGene_for_cell_types_top10.to_csv('markerGene_for_merfish_data.csv')
+markerGene_for_cell_types_top10.to_csv('./data/moffitt/markerGene_for_merfish_data.csv', index = False)
 # for cell_type in cell_types:
 #   var = data[data['cell_type'] == cell_type]
 
