@@ -1,4 +1,4 @@
-dataset = read.csv(file="./data/moffitt/s7.csv")
+dataset = read.csv(file="./data/merfish/s7.csv")
 data = dataset[, colSums(dataset[,-c(1:5, 8,9)]) != 0]
 
 counts = data[,-c(1:5, 8,9)]

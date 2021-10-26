@@ -2,7 +2,7 @@ library(dplyr)
 library(Seurat)
 
 #reading merfish data
-dataset = read.csv(file="./data/moffitt/s7.csv")
+dataset = read.csv(file="./data/merfish/s7.csv")
 data = dataset[, colSums(dataset[,-c(1:9)]) != 0]
 counts = data[,-c(1:9)]
 

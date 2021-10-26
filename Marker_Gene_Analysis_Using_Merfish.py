@@ -15,7 +15,7 @@
 import pandas as pd
 from scipy.stats import mannwhitneyu
 
-data = pd.read_csv("./data/moffitt/s7.csv")
+data = pd.read_csv("./data/merfish/s7.csv")
 
 # datatop = data.head()
 # print(datatop)
@@ -70,7 +70,7 @@ for cell_type in cell_types:
 
 #markerGene_for_cell_types = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=['cell_type', 'marker_gene', 'p_value'])
 
-markerGene_for_cell_types_top10.to_csv('./data/moffitt/markerGene_for_merfish_data.csv', index = False)
+markerGene_for_cell_types_top10.to_csv('./data/merfish/markerGene_for_merfish_data.csv', index = False)
 # for cell_type in cell_types:
 #   var = data[data['cell_type'] == cell_type]
 
