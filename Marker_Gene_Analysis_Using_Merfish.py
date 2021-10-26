@@ -60,7 +60,7 @@ for cell_type in cell_types:
   temp = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=['cell_type', 'marker_gene', 'p_value'])
   temp = temp.sort_values('p_value')
   if(len(temp.index) > 10):
-    temp = temp.iloc[0:9, :]
+    temp = temp.iloc[0:10, :]
   cellTypeCSV.clear()
   markerGeneCSV.clear()
   pvalCSV.clear()
@@ -74,7 +74,7 @@ markerGene_for_cell_types_top10.to_csv('./data/moffitt/markerGene_for_merfish_da
 # for cell_type in cell_types:
 #   var = data[data['cell_type'] == cell_type]
 
-for cell_type in cell_types:
-  print(cell_type)
-  print(len(markerGenes[cell_type]))
-  print(markerGenes[cell_type])
+# for cell_type in cell_types:
+#   print(cell_type)
+#   print(len(markerGenes[cell_type]))
+#   print(markerGenes[cell_type])
