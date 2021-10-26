@@ -124,7 +124,7 @@ for (nitr in c(1e3, 1e5)) {
     brk = 0
 
     for (cluster in clusters.name) {
-        cutoff = if (cluster == "Epithelial") 200 else 150
+        
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
         if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next

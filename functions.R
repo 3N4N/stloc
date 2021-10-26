@@ -111,7 +111,7 @@ zScore <- function(x, index, meanOfZenes, sdOfZenes)
 
 plotvals = function(n, df, vals, labels, size) {
     plot.vals <- lapply(1:n, function(i) {
-        ggplot(df, aes(x = x, y = -y)) +
+        ggplot(df, aes(x = -x, y = -y)) +
             geom_point(aes(colour = vals[[i]]), size = size) +
             theme_minimal() +
             theme(panel.grid = element_blank()) +
