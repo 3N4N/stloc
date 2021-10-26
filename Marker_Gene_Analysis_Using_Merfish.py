@@ -35,6 +35,12 @@ geneList = data.keys().tolist()
 cell_types = ["Astrocyte", "Inhibitory", "Pericytes", "Ambiguous", "Endothelial 1",  "Excitatory", "OD Immature 1", "OD Immature 2", "Microglia", "OD Mature 2", "OD Mature 1", "Endothelial 3", "OD Mature 3", "OD Mature 4", "Endothelial 2", "Ependymal"]
 
 markerGenes = dict()
+markerGene_for_cell_types_top10 = pd.DataFrame(columns=['cell_type', 'marker_gene', 'p_value'])
+
+cellTypeCSV = list()
+markerGeneCSV = list()
+pvalCSV = list()
+
 
 for cell_type in cell_types:
   markerGenes[cell_type] = list()
@@ -47,9 +53,26 @@ for cell_type in cell_types:
     newY = y.iloc[:, [gene]]
     U1, p = mannwhitneyu(newX, newY, alternative="greater")
     if p < .001:  
+      cellTypeCSV.append(cell_type)
+      markerGeneCSV.append(geneList[gene])
+      pvalCSV.append(p)
       markerGenes[cell_type].append(geneList[gene])
+  temp = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=['cell_type', 'marker_gene', 'p_value'])
+  temp = temp.sort_values('p_value')
+  if(len(temp.index) > 10):
+    temp = temp.iloc[0:9, :]
+  cellTypeCSV.clear()
+  markerGeneCSV.clear()
+  pvalCSV.clear()
+  markerGene_for_cell_types_top10 = pd.concat([markerGene_for_cell_types_top10, temp], axis = 0)
 
 #print(markerGenes)
+
+#markerGene_for_cell_types = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=['cell_type', 'marker_gene', 'p_value'])
+
+markerGene_for_cell_types_top10.to_csv('markerGene_for_merfish_data.csv')
+# for cell_type in cell_types:
+#   var = data[data['cell_type'] == cell_type]
 
 for cell_type in cell_types:
   print(cell_type)
