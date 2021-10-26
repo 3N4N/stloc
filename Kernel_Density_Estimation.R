@@ -100,30 +100,39 @@ message(paste0("Number of genes: ", length(clusters.genes)))
 #                                   kde plotting
 #  ----------------------------------------------------------------------
 
-cluster = "Epithelial"
 
 counts.flat.all <- colSums(counts)
-counts.flat.epi <- colSums(counts[clusters.pair[[cluster]],])
+counts.flat.epi <- colSums(counts[clusters.pair[["Epithelial"]],])
+counts.flat.fib <- colSums(counts[clusters.pair[["Fibroblast"]],])
+counts.flat.mye <- colSums(counts[clusters.pair[["Myeloid"]],])
 
 kde.all.norm = kdensity(minmax(counts.flat.all), kernel = "gaussian")
 kde.epi.norm = kdensity(minmax(counts.flat.epi), kernel = "gaussian")
+kde.fib.norm = kdensity(minmax(counts.flat.fib), kernel = "gaussian")
+kde.mye.norm = kdensity(minmax(counts.flat.mye), kernel = "gaussian")
 
 kde.all.std = kdensity(scale(counts.flat.all), kernel = "gaussian")
 kde.epi.std = kdensity(scale(counts.flat.epi), kernel = "gaussian")
+kde.fib.std = kdensity(scale(counts.flat.fib), kernel = "gaussian")
+kde.mye.std = kdensity(scale(counts.flat.mye), kernel = "gaussian")
 
 
 pdf(paste0("output/kde_cancer_minmax.pdf"),
     height = 6, width = 10, onefile = F)
 plot(kde.all.norm, col="red", main="KDE with Min-Max Normalization")
 lines(kde.epi.norm, col="blue")
-legend("topleft", legend=c("All", cluster),
-        col=c("red", "blue"), lty=1)
+lines(kde.fib.norm, col="green")
+lines(kde.mye.norm, col="brown")
+legend("topleft", legend=c("All", "Epithelial", "Fibroblast", "Myeloid"),
+        col=c("red", "blue", "green", "brown"), lty=1)
 dev.off()
 
 pdf(paste0("output/kde_cancer_scale.pdf"),
     height = 6, width = 10, onefile = F)
 plot(kde.all.std, col="red", main="KDE with Z-score Standardization")
 lines(kde.epi.std, col="blue")
-legend("topleft", legend=c("All", cluster),
-        col=c("red", "blue"), lty=1)
+lines(kde.fib.std, col="green")
+lines(kde.mye.std, col="brown")
+legend("topleft", legend=c("All", "Epithelial", "Fibroblast", "Myeloid"),
+        col=c("red", "blue", "green", "brown"), lty=1)
 dev.off()
