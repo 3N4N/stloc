@@ -63,14 +63,14 @@ W <- weightMatrix.gaussian(coords, l = d*1)
 
 set.seed(500)
 # for (nitr in c(1e3)) {
-for (nitr in c(1, 2)) {
+for (nitr in c(1e3)) {
     brk = 0
 
     for (cluster in clusters.name) {
         
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        if (!(cluster=="Excitatory" | cluster=="Inhibitory")) next
+        if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial 1"| cluster==  "Excitatory"| cluster=="OD Immature 1" | cluster=="OD Immature 2" | cluster== "Microglia" | cluster=="OD Mature 2" | cluster== "OD Mature 1" | cluster== "Endothelial 3" | cluster=="OD Mature 3" | cluster== "OD Mature 4" | cluster== "Endothelial 2" | cluster== "Ependymal")) next
         # if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
