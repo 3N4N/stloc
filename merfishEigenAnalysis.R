@@ -30,7 +30,7 @@ if (!file.exists("output/merfish/plots")) {
 
 
 
-counts.raw <- read.table("./data/moffitt/merfishSpatial.csv", header = TRUE, row.names = 1)
+counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
 coords.raw <- do.call(rbind, strsplit(rownames(counts.raw), "x"))
 coords <- apply(coords.raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
@@ -43,7 +43,7 @@ sce <- logNormCounts(sce)
 counts <- logcounts(sce)
 
 
-clusters.data <- read.table("./data/moffitt/markerGene_for_merfish_data.csv", sep=",",header = TRUE)
+clusters.data <- read.table("./data/merfish/markerGene_for_merfish_data.csv", sep=",",header = TRUE)
 clusters.data <- as.data.frame(clusters.data)
 clusters.name <- unique(clusters.data$cell_type)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))

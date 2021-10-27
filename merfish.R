@@ -2,7 +2,7 @@ library("readxl")
 require(dplyr)
 
 
-dataset = read_xlsx("./data/moffitt/s7.xlsx")
+dataset = read_xlsx("./data/merfish/s7.xlsx")
 
 dataset <- dataset[ -c(1:5) ]
 

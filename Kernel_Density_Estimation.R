@@ -27,23 +27,23 @@ source("./functions.R")
 #                                   merfish data
 #  ----------------------------------------------------------------------
 
-# dataset = read.csv("./data/moffitt/s7.csv")
+# dataset <- read.csv("./data/merfish/s7.csv")
 
-# counts_raw = dataset[,-c(1:5, 8,9)]
-# counts = counts_raw[, colSums(counts_raw) != 0]
+# counts_raw <- dataset[,-c(1:5, 8,9)]
+# counts <- counts_raw[, colSums(counts_raw) != 0]
 
-# coords = -1 * counts[,c(1,2)]
-# colnames(coords) = c("x", "y")
-# rownames(coords) = apply(coords, 1, function(i) {
+# coords <- -1 * counts[,c(1,2)]
+# colnames(coords) <- c("x", "y")
+# rownames(coords) <- apply(coords, 1, function(i) {
 #    paste0(i[1], "x", i[2])
 # })
 
-# rownames(counts) = rownames(coords)
-# counts = counts[,-c(1,2)]
+# rownames(counts) <- rownames(coords)
+# counts <- counts[,-c(1,2)]
 
 
-# clusters = unique(dataset[,8])
-# genes = colnames(counts)
+# clusters <- unique(dataset[,8])
+# genes <- colnames(counts)
 # message(paste0("Number of clusters: ", length(clusters)))
 # message(paste0("Number of genes: ", length(genes)))
 
@@ -106,15 +106,15 @@ counts.flat.epi <- colSums(counts[clusters.pair[["Epithelial"]],])
 counts.flat.fib <- colSums(counts[clusters.pair[["Fibroblast"]],])
 counts.flat.mye <- colSums(counts[clusters.pair[["Myeloid"]],])
 
-kde.all.norm = kdensity(minmax(counts.flat.all), kernel = "gaussian")
-kde.epi.norm = kdensity(minmax(counts.flat.epi), kernel = "gaussian")
-kde.fib.norm = kdensity(minmax(counts.flat.fib), kernel = "gaussian")
-kde.mye.norm = kdensity(minmax(counts.flat.mye), kernel = "gaussian")
+kde.all.norm <- kdensity(minmax(counts.flat.all), kernel = "gaussian")
+kde.epi.norm <- kdensity(minmax(counts.flat.epi), kernel = "gaussian")
+kde.fib.norm <- kdensity(minmax(counts.flat.fib), kernel = "gaussian")
+kde.mye.norm <- kdensity(minmax(counts.flat.mye), kernel = "gaussian")
 
-kde.all.std = kdensity(scale(counts.flat.all), kernel = "gaussian")
-kde.epi.std = kdensity(scale(counts.flat.epi), kernel = "gaussian")
-kde.fib.std = kdensity(scale(counts.flat.fib), kernel = "gaussian")
-kde.mye.std = kdensity(scale(counts.flat.mye), kernel = "gaussian")
+kde.all.std <- kdensity(scale(counts.flat.all), kernel = "gaussian")
+kde.epi.std <- kdensity(scale(counts.flat.epi), kernel = "gaussian")
+kde.fib.std <- kdensity(scale(counts.flat.fib), kernel = "gaussian")
+kde.mye.std <- kdensity(scale(counts.flat.mye), kernel = "gaussian")
 
 
 pdf(paste0("output/kde_cancer_minmax.pdf"),
