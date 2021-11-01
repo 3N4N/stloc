@@ -73,8 +73,8 @@ for (nitr in c(1e3)) {
         
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial 1"| cluster==  "Excitatory"| cluster=="OD Immature 1" | cluster=="OD Immature 2" | cluster== "Microglia" | cluster=="OD Mature 2" | cluster== "OD Mature 1" | cluster== "Endothelial 3" | cluster=="OD Mature 3" | cluster== "OD Mature 4" | cluster== "Endothelial 2" | cluster== "Ependymal")) next
-        # if (!(cluster=="Astrocyte")) next
+        # if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial 1"| cluster==  "Excitatory"| cluster=="OD Immature 1" | cluster=="OD Immature 2" | cluster== "Microglia" | cluster=="OD Mature 2" | cluster== "OD Mature 1" | cluster== "Endothelial 3" | cluster=="OD Mature 3" | cluster== "OD Mature 4" | cluster== "Endothelial 2" | cluster== "Ependymal")) next
+        if (!(cluster=="Astrocyte")) next
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
         if (length(genes) == 1) next
@@ -143,7 +143,14 @@ for (nitr in c(1e3)) {
 
          scatterDf <- data.frame(x= counts.raw$cellCount, y = meig.real)
 
+        # b<- boxplot(meig.real~counts.raw$cellCount,xlab="Cell Count",ylab="Maximum Eigen value")
 
+        # # b<- boxplot(scatterDf$y ~scatterDf$x,xlab="Cell Count",ylab="Maximum Eigen value",main=cluster)
+        # medianBox<- b$stats[3,]
+        # groupName<- strtoi(b$names)
+        # corValue<-cor(medianBox,groupName,method = "pearson")
+        # mtext(paste0('Correlation value ',as.character(corValue)), side=1, line=4, at=3)
+        # cor(medianBox,groupName,method = "kendall")
         pdf(paste0("output/merfish/scatterPlots/", cluster, ".pdf"),
             height = 8, width = 8, onefile = F)
 
