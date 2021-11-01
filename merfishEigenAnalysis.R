@@ -27,6 +27,9 @@ if (!file.exists("output")) {
 if (!file.exists("output/merfish/plots")) {
     system("mkdir -p output/merfish/plots")
 }
+if (!file.exists("output/merfish/scatterPlots")) {
+    system("mkdir -p output/merfish/scatterPlots")
+}
 
 
 
@@ -58,7 +61,7 @@ if (length(clusters.name) == 1) {
 }
 
 d <- sort (as.numeric (dist (coords )))[1]
-W <- weightMatrix.gaussian(coords, l = d*1)
+W <- weightMatrix.gaussian(coords, l = 0.1)
 
 
 set.seed(500)
@@ -71,7 +74,7 @@ for (nitr in c(1e3)) {
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
         if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial 1"| cluster==  "Excitatory"| cluster=="OD Immature 1" | cluster=="OD Immature 2" | cluster== "Microglia" | cluster=="OD Mature 2" | cluster== "OD Mature 1" | cluster== "Endothelial 3" | cluster=="OD Mature 3" | cluster== "OD Mature 4" | cluster== "Endothelial 2" | cluster== "Ependymal")) next
-    
+        # if (!(cluster=="Astrocyte")) next
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
         if (length(genes) == 1) next
@@ -130,13 +133,23 @@ for (nitr in c(1e3)) {
         meig.fdr = p.adjust(meig.pval, method="BH")
 
         df <- data.frame(x = coords[,"x"], y = coords[,"y"])
-
+        
         pdf(paste0("output/merfish/plots/", cluster, ".pdf"),
             height = 6, width = 10, onefile = F)
         plotvals(3, df, vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
                  c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3)
         # plotvals(1, df, vals=list(meig.real), c("Largest Eigenvalue"), 3)
         dev.off()
+
+         scatterDf <- data.frame(x= counts.raw$cellCount, y = meig.real)
+
+
+        pdf(paste0("output/merfish/scatterPlots/", cluster, ".pdf"),
+            height = 8, width = 8, onefile = F)
+
+        scatterPlot(scatterDf)
+        dev.off()
+
 
     }
 }

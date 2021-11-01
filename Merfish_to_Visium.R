@@ -20,9 +20,6 @@ dataset <- dataset[order(dataset[,1], dataset[,2]),]
 
 
 
-# write.table(dataset,"./data/temporary.csv",row.names = FALSE)
-
-
 max_New_X = max(dataset$new_X)
 max_New_Y = max(dataset$new_Y)
 
@@ -31,15 +28,17 @@ startX=25
 startY=25
 tempDataFrame <- dataset[0,]
 tempRow <- dataset[1,]
-for( k in 1: nrow(dataset))
+spotCellCount=1
+for( k in 2: nrow(dataset))
 {
     if( sqrt((dataset[k,]$Centroid_X -dataset[k,]$new_X)^2 +(dataset[k,]$Centroid_Y - dataset[k,]$new_Y )^2 ) >=20)
     {
         next
     }
     print(k)
-    if(dataset[k,]$new_X == startX  && dataset[k,]$new_Y == startY)
+    if( dataset[k,]$new_X == startX  && dataset[k,]$new_Y == startY)
     {
+        spotCellCount= spotCellCount+ 1
 
         for ( i in 7 : ncol(dataset))
         {
@@ -47,8 +46,10 @@ for( k in 1: nrow(dataset))
         } 
     }
     else{
-        print(tempRow)
+        print( spotCellCount)
+        tempRow$cellCount = spotCellCount
         tempDataFrame <- rbind(tempDataFrame,tempRow)
+        spotCellCount=1
         tempRow <- dataset[k,]
         startX= dataset[k,]$new_X
         startY = dataset[k,]$new_Y
@@ -60,3 +61,6 @@ tempDataFrame$coord<- paste( tempDataFrame$new_X ,tempDataFrame$new_Y,sep="x")
 tempDataFrame <- tempDataFrame %>% select(coord,everything())
 tempDataFrame = select(tempDataFrame,-new_X,-new_Y,-Centroid_X,-Centroid_Y,-Cell_class,-Neuron_cluster_ID)
 write.table(tempDataFrame,"./data/merfish/merfishSpatial.csv",row.names = FALSE,append= FALSE)
+
+
+write.table(t(pairCount),"./data/merfish/markerExpression.csv",row.names = FALSE,append= FALSE)

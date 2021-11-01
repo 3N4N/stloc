@@ -136,3 +136,15 @@ plotvals <- function(n, df, vals, labels, size) {
     # grid.arrange(grobs=plot.vals, ncol=n)
     do.call("grid.arrange", c(plot.vals, ncol=n))
 }
+
+scatterPlot<-function(df){
+    plotvar <-ggplot(df, aes(x=x, y=y)) +
+        geom_point(size=2, shape=23) +
+        labs(x="Cell Count " ,y= "Maximum Eigen value")
+       
+
+
+    plot(plotvar)
+
+
+}
