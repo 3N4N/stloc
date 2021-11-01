@@ -46,8 +46,8 @@ sce <- logNormCounts(sce)
 counts <- logcounts(sce)
 
 
-clusters.data <- read.table("./data/merfish/markerGene_for_merfish_data.csv", sep=",",header = TRUE)
-clusters.data <- as.data.frame(clusters.data)
+clusters.data <- read.table("./data/merfish/markerGene_for_merfish_data.csv", sep=",",header = TRUE, check.names = FALSE)
+clusters.data <- as.data.frame(clusters.data, check.names = FALSE)
 clusters.name <- unique(clusters.data$cell_type)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
 
@@ -73,8 +73,8 @@ for (nitr in c(1e3)) {
         
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        # if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial 1"| cluster==  "Excitatory"| cluster=="OD Immature 1" | cluster=="OD Immature 2" | cluster== "Microglia" | cluster=="OD Mature 2" | cluster== "OD Mature 1" | cluster== "Endothelial 3" | cluster=="OD Mature 3" | cluster== "OD Mature 4" | cluster== "Endothelial 2" | cluster== "Ependymal")) next
-        if (!(cluster=="Astrocyte")) next
+        if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial1"| cluster==  "Excitatory"| cluster=="ODImmature1" | cluster=="ODImmature2" | cluster== "Microglia" | cluster=="ODMature2" | cluster== "ODMature1" | cluster== "Endothelial3" | cluster=="ODMature3" | cluster== "ODMature4" | cluster== "Endothelial2" | cluster== "Ependymal")) next
+        # if (!(cluster=="Endothelial 1")) next
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
         if (length(genes) == 1) next
@@ -141,7 +141,7 @@ for (nitr in c(1e3)) {
         # plotvals(1, df, vals=list(meig.real), c("Largest Eigenvalue"), 3)
         dev.off()
 
-         scatterDf <- data.frame(x= counts.raw$cellCount, y = meig.real)
+         scatterDf <- data.frame(x= counts.raw[,cluster], y = meig.real, check.names = FALSE)
 
         # b<- boxplot(meig.real~counts.raw$cellCount,xlab="Cell Count",ylab="Maximum Eigen value")
 
