@@ -142,21 +142,10 @@ scatterPlot<-function(scatterdf){
     plotvar <-ggplot(scatterdf, aes(x=x, y=y)) +
         geom_point(size=2, shape=23) +
         labs(x="Cell Count " ,y= "Maximum Eigen value")
-    plot(plotvar)
-    # b<- boxplot(meig.real~counts.raw$cellCount,xlab="Cell Count",ylab="Maximum Eigen value",main=cluster)
 
-    b<- boxplot(scatterdf$y ~scatterdf$x,xlab="Cell Count",ylab="Maximum Eigen value")
-    print(head(b))
-    medianBox<- b$stats[3,]
-    groupName<- strtoi(b$names)
-    corValue<-cor(medianBox,groupName,method = "pearson")
-    print("here")
+    plotbox <-ggplot(scatterdf, aes(x=x, y=y, group=x)) +
+        geom_boxplot() +
+        labs(x="Cell Count " ,y= "Maximum Eigen value")
 
-    mtext(paste0('Correlation value ',as.character(corValue)), side=1, line=4, at=3)
-
-    
-    # plot(b)
-    # do.call("grid.arrange", c(plotvar,b))
-
-
+    do.call("grid.arrange", c(list(plotvar, plotbox), ncol=2))
 }
