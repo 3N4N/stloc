@@ -7,6 +7,7 @@ library(scran)
 
 library(ggplot2)
 library(gridExtra)
+library(grid)
 
 
 #  ----------------------------------------------------------------------
@@ -101,12 +102,12 @@ if (length(clusters.name) == 1) {
   })
 }
 
-# clusters.name <- append(clusters.name,"EpithelialFibroblast" ,length(clusters.name))
-# clusters.name <- append(clusters.name,"MyeloidFibroblast" ,length(clusters.name))
-# clusters.name <- append(clusters.name,"MyeloidEpithelial" ,length(clusters.name))
-# clusters.pair[["MyeloidFibroblast"]] <- unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Fibroblast"]])) )
-# clusters.pair[["EpithelialFibroblast"]] <- unlist((list(clusters.pair[["Epithelial"]], clusters.pair[["Fibroblast"]])) )
-# clusters.pair[["MyeloidEpithelial"]] <- unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Epithelial"]])) )
+clusters.name <- append(clusters.name,"EpithelialFibroblast" ,length(clusters.name))
+clusters.name <- append(clusters.name,"MyeloidFibroblast" ,length(clusters.name))
+clusters.name <- append(clusters.name,"MyeloidEpithelial" ,length(clusters.name))
+clusters.pair[["MyeloidFibroblast"]] <- unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Fibroblast"]])) )
+clusters.pair[["EpithelialFibroblast"]] <- unlist((list(clusters.pair[["Epithelial"]], clusters.pair[["Fibroblast"]])) )
+clusters.pair[["MyeloidEpithelial"]] <- unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Epithelial"]])) )
 
 
 
@@ -116,14 +117,14 @@ if (length(clusters.name) == 1) {
 
 
 d <- sort (as.numeric (dist (coords )))[1]
-W <- weightMatrix.gaussian(coords, l = d*1)
+W <- weightMatrix.gaussian(coords, l = 0.5)
 
 set.seed(500)
 for (nitr in c(1e3)) {
 # for (nitr in c(1e3, 1e5)) {
     for (cluster in clusters.name) {
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        # if (!(cluster=="Epithelial" | cluster=="Fibroblast")) next
+        # if (!(cluster=="Fibroblast" | cluster=="Myeloid" | cluster=="MyeloidFibroblast")) next
         if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
@@ -185,9 +186,9 @@ for (nitr in c(1e3)) {
 
         pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
-        plotvals(3, df, vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
-                 c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3)
-        # plotvals(1, df, vals=list(meig.real), c("Largest Eigenvalue"), 3)
+        plotvals(3, df, cluster,
+                 vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+                 c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3, 1, 3)
         dev.off()
     }
 }
