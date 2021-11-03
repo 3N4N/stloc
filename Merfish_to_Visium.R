@@ -1,8 +1,16 @@
 library("readxl")
 require(dplyr)
+library(ggplot2)
 
 cellType= c("Astrocyte", "Inhibitory","Pericytes", "Ambiguous","Endothelial1","Excitatory","ODImmature1","ODImmature2","Microglia","ODMature2","ODMature1","Endothelial3","ODMature3","ODMature4","Endothelial2","Ependymal")
 dataset = read_xlsx("./data/merfish/s7.xlsx")
+# cellType= c("Astrocyte", "Inhibitory","Pericytes", "Ambiguous","Endothelial","Excitatory","ODImmature","Microglia","ODMature","Ependymal")
+
+#Merfish plot regenerate
+# sp<-ggplot(dataset, aes(Centroid_X, Centroid_Y, colour = Cell_class)) + 
+#   geom_point(size=0.8) 
+# sp<-sp + scale_color_manual(values=c("grey", "brown", "yellow","purple","#2398cf","red","pink","black","green","#2d7d85"))
+# sp
 
 for ( cell in cellType)
 {
