@@ -117,14 +117,14 @@ clusters.pair[["MyeloidEpithelial"]] <- unlist((list(clusters.pair[["Myeloid"]],
 
 
 d <- sort (as.numeric (dist (coords )))[1]
-W <- weightMatrix.gaussian(coords, l = 0.5)
+W <- weightMatrix.gaussian(coords, l = d*1)
 
 set.seed(500)
-for (nitr in c(1e3)) {
+for (nitr in c(1e5)) {
 # for (nitr in c(1e3, 1e5)) {
     for (cluster in clusters.name) {
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        # if (!(cluster=="Fibroblast" | cluster=="Myeloid" | cluster=="MyeloidFibroblast")) next
+        # if (!(cluster=="Epithelial" | cluster=="MyeloidFibroblast")) next
         if (!(cluster=="Epithelial")) next
 
         # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
@@ -151,7 +151,7 @@ for (nitr in c(1e3)) {
 
         st <- Sys.time()
         meig.real <- as.matrix(sapply(1:nrow(coords),
-                                      function(i) maxEigenVal(pairCount, W[i,])))
+                function(i) maxEigenVal(pairCount, W[i,])/nrow(pairCount)))
         et <- Sys.time()
         # print(summary(meig.real))
         message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
@@ -168,7 +168,7 @@ for (nitr in c(1e3)) {
                     x[j,] <- pairCount[j,o]
             }))
             randloc <- sample(1:nrow(coords), 1)
-            meig.perm[i] <- maxEigenVal(x, W[randloc,])
+            meig.perm[i] <- maxEigenVal(x, W[randloc,])/nrow(x)
         }
         cat("\n")
         message(paste0("Permutation tests for ", cluster, " completed"))
@@ -186,9 +186,11 @@ for (nitr in c(1e3)) {
 
         pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
-        plotvals(3, df, cluster,
-                 vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
-                 c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3, 1, 3)
+        # plotvals(3, df, cluster,
+        #          vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+        #          c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3, 1, 3)
+        plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)),
+                 c("Largest Eigenvalue","-log10(pval)"), 3, 1, 2)
         dev.off()
     }
 }
