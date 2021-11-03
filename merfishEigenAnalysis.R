@@ -70,7 +70,7 @@ for (nitr in c(1e3)) {
     brk = 0
 
     for (cluster in clusters.name) {
-        
+
 
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
         if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial1"| cluster==  "Excitatory"| cluster=="ODImmature1" | cluster=="ODImmature2" | cluster== "Microglia" | cluster=="ODMature2" | cluster== "ODMature1" | cluster== "Endothelial3" | cluster=="ODMature3" | cluster== "ODMature4" | cluster== "Endothelial2" | cluster== "Ependymal")) next
@@ -133,12 +133,12 @@ for (nitr in c(1e3)) {
         meig.fdr = p.adjust(meig.pval, method="BH")
 
         df <- data.frame(x = coords[,"x"], y = coords[,"y"])
-        
+
         pdf(paste0("output/merfish/plots/", cluster, ".pdf"),
             height = 6, width = 10, onefile = F)
-        plotvals(3, df, vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+        plotvals(3, df, cluster,
+                 vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
                  c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3)
-        # plotvals(1, df, vals=list(meig.real), c("Largest Eigenvalue"), 3)
         dev.off()
 
          scatterDf <- data.frame(x= counts.raw[,cluster], y = meig.real, check.names = FALSE)

@@ -109,7 +109,7 @@ zScore <- function(x, index, meanOfZenes, sdOfZenes)
 }
 
 
-plotvals <- function(n, df, vals, labels, size) {
+plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
         ggplot(df, aes(x = -x, y = -y)) +
             geom_point(aes(colour = vals[[i]]), size = size) +
@@ -125,7 +125,7 @@ plotvals <- function(n, df, vals, labels, size) {
             coord_fixed() +
             guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
             theme(legend.key.width = unit(0.5, "inches")) +
-            # theme(plot.margin = margin(10,0,10,0)) +
+            theme(plot.margin = margin(-10,0,10,0)) +
             theme(plot.title = element_text(size = 20)) +
             theme(axis.title = element_text(size = 15)) +
             theme(legend.title = element_text(size = 15)) +
@@ -133,12 +133,20 @@ plotvals <- function(n, df, vals, labels, size) {
             NULL
     })
 
-    # grid.arrange(grobs=plot.vals, ncol=n)
-    do.call("grid.arrange", c(plot.vals, ncol=n))
+
+    title <- textGrob(title, gp=gpar(fontsize=20))
+
+    # Add a zeroGrob of height 2cm on top of the title
+    title <- arrangeGrob(zeroGrob(), title,
+                         widths = unit(1, 'npc'),
+                         heights = unit(c(2, 1), c('cm', 'npc')),
+                         as.table = FALSE)
+
+    grid.arrange(grobs=plot.vals, nrow=nrow, ncol=ncol, top=title)
 }
 
 scatterPlot<-function(scatterdf){
-    
+
     plotvar <-ggplot(scatterdf, aes(x=x, y=y)) +
         geom_point(size=2, shape=23) +
         labs(x="Cell Count " ,y= "Maximum Eigen value")
