@@ -111,26 +111,26 @@ zScore <- function(x, index, meanOfZenes, sdOfZenes)
 
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
-        ggplot(df, aes(x = -x, y = -y))
-            + geom_point(aes(colour = vals[[i]]), size = size)
-            + theme_minimal()
-            + theme(panel.grid = element_blank())
-            + theme(axis.text = element_blank())
-            + xlab("")
-            + ylab("")
-            + labs(colour = "")
-            + theme(legend.position = "bottom")
-            + theme(plot.title = element_text(hjust = 0.5, face = "italic"))
-            + scale_color_viridis_c(option = "plasma", na.value="red")
-            + coord_fixed()
-            + guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5))
-            + theme(legend.key.width = unit(0.75, "inches"))
-            + theme(legend.text = element_text(size=15))
-            + theme(plot.margin = margin(-10,0,10,0))
-            + theme(plot.title = element_text(size = 20))
-            + theme(axis.title = element_text(size = 15))
-            + theme(legend.title = element_text(size = 20))
-            + labs(colour = labels[i])
+        ggplot(df, aes(x = -x, y = -y)) +
+            geom_point(aes(colour = vals[[i]]), size = size) +
+            theme_minimal() +
+            theme(panel.grid = element_blank()) +
+            theme(axis.text = element_blank()) +
+            xlab("") +
+            ylab("") +
+            labs(colour = "") +
+            theme(legend.position = "bottom") +
+            theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+            scale_color_viridis_c(option = "plasma", na.value="red") +
+            coord_fixed() +
+            guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
+            theme(legend.key.width = unit(0.75, "inches")) +
+            theme(legend.text = element_text(size=15)) +
+            theme(plot.margin = margin(-10,0,10,0)) +
+            theme(plot.title = element_text(size = 20)) +
+            theme(axis.title = element_text(size = 15)) +
+            theme(legend.title = element_text(size = 20)) +
+            labs(colour = labels[i]) +
             NULL
     })
 
