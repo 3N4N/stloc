@@ -117,10 +117,10 @@ clusters.pair[["MyeloidEpithelial"]] <- unlist((list(clusters.pair[["Myeloid"]],
 
 
 d <- sort (as.numeric (dist (coords )))[1]
-W <- weightMatrix.gaussian(coords, l = 0.5)
+W <- weightMatrix.gaussian(coords, l = 0.1)
 
 set.seed(500)
-for (nitr in c(1e3)) {
+for (nitr in c(1e2)) {
 # for (nitr in c(1e3, 1e5)) {
     for (cluster in clusters.name) {
         # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
@@ -180,15 +180,14 @@ for (nitr in c(1e3)) {
                 meig.pval[i,] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
         }))
 
-        meig.fdr <- p.adjust(meig.pval, method="BH")
+        # meig.fdr <- p.adjust(meig.pval, method="BH")
 
         df <- data.frame(x = coords[,"x"], y = coords[,"y"])
 
         pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
-        plotvals(3, df, cluster,
-                 vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
-                 c("Largest Eigenvalue","-log10(pval)", "-log10(fdr)"), 3, 1, 3)
+        plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)),
+                 c("Largest Eigenvalue","-log10(pval)"), 3, 1, 2)
         dev.off()
     }
 }
