@@ -5,10 +5,6 @@
 library(SingleCellExperiment)
 library(scran)
 
-library(ggplot2)
-library(gridExtra)
-library(grid)
-
 
 #  ----------------------------------------------------------------------
 #                              Load helper functions
@@ -105,9 +101,9 @@ if (length(clusters.name) == 1) {
 clusters.name <- append(clusters.name,"EpithelialFibroblast" ,length(clusters.name))
 clusters.name <- append(clusters.name,"MyeloidFibroblast" ,length(clusters.name))
 clusters.name <- append(clusters.name,"MyeloidEpithelial" ,length(clusters.name))
-clusters.pair[["MyeloidFibroblast"]] <- unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Fibroblast"]])) )
-clusters.pair[["EpithelialFibroblast"]] <- unlist((list(clusters.pair[["Epithelial"]], clusters.pair[["Fibroblast"]])) )
-clusters.pair[["MyeloidEpithelial"]] <- unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Epithelial"]])) )
+clusters.pair[["MyeloidFibroblast"]] <- unique(unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Fibroblast"]])) ))
+clusters.pair[["EpithelialFibroblast"]] <- unique(unlist((list(clusters.pair[["Epithelial"]], clusters.pair[["Fibroblast"]])) ))
+clusters.pair[["MyeloidEpithelial"]] <- unique(unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Epithelial"]])) ))
 
 
 
@@ -120,74 +116,77 @@ d <- sort (as.numeric (dist (coords )))[1]
 W <- weightMatrix.gaussian(coords, l = 0.1)
 
 set.seed(500)
-for (nitr in c(1e2)) {
-# for (nitr in c(1e3, 1e5)) {
-    for (cluster in clusters.name) {
-        # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-        # if (!(cluster=="Fibroblast" | cluster=="Myeloid" | cluster=="MyeloidFibroblast")) next
-        if (!(cluster=="Epithelial")) next
+nitr <- 1e3
+for (cluster in clusters.name) {
+    # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
+    # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="EpithelialFibroblast")) next
+    if (!(cluster=="Epithelial")) next
 
-        # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
-        # if (!(cluster=="MyeloidEpithelial" )) next
+    # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
+    # if (!(cluster=="MyeloidEpithelial" )) next
 
-        genes <- unlist(c(clusters.pair[cluster]))
-        genes <- sapply(genes, function(i) i <- toString(i))
-        if (length(genes) == 1) next
+    genes <- unlist(c(clusters.pair[cluster]))
+    genes <- sapply(genes, function(i) i <- toString(i))
+    if (length(genes) == 1) next
 
-        print(cluster)
-        print(genes)
+    print(cluster)
+    print(genes)
 
-        pairCount <- as.matrix(rbind(counts[genes,]))
-        rownames(pairCount) <- genes
+    pairCount <- as.matrix(rbind(counts[genes,]))
+    rownames(pairCount) <- genes
 
-        # st <- Sys.time()
-        # zscr <- as.matrix(sapply(1:nrow(coords),
-        #                          function(i) {
-        #                              zscores <- apply(pairCount, 1, scale)
-        #                              aggzscores <- sum(zscores[i,])/nrow(pairCount)
-        # }))
-        # et <- Sys.time()
-        # message("Runtime of Z-score: ", difftime(et,st,units="mins"), " mins")
+    # pairCount <- counts
+    # for (i in rownames(pairCount)) {
+    #     pairCount[i,] <- rep(0,ncol(pairCount))
+    # }
 
-        st <- Sys.time()
-        meig.real <- as.matrix(sapply(1:nrow(coords),
-                                      function(i) maxEigenVal(pairCount, W[i,])))
-        et <- Sys.time()
-        # print(summary(meig.real))
-        message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
+    # st <- Sys.time()
+    # zscores <- apply(pairCount, 1, scale)
+    # zscr <- as.matrix(sapply(1:nrow(coords),
+    #                          function(i) {
+    #                              aggzscores <- sum(zscores[i,])/nrow(pairCount)
+    # }))
+    # et <- Sys.time()
+    # message("Runtime of Z-score: ", difftime(et,st,units="mins"), " mins")
 
-        message(paste0("Conducting permutation tests for ", cluster))
+    st <- Sys.time()
+    meig.real <- as.matrix(sapply(1:nrow(coords),
+                                    function(i) maxEigenVal(pairCount, W[i,])))
+    et <- Sys.time()
+    # print(summary(meig.real))
+    message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
 
-        meig.perm <- c(1:nitr)
-        st <- Sys.time()
-        for (i in 1:nitr) {
-            cat("\r", "Iteration step", i)
-            o <- sample(1:nrow(coords))
-            x <- pairCount
-            x <- t(sapply(1:nrow(pairCount), function(j) {
-                    x[j,] <- pairCount[j,o]
-            }))
-            randloc <- sample(1:nrow(coords), 1)
-            meig.perm[i] <- maxEigenVal(x, W[randloc,])
-        }
-        cat("\n")
-        message(paste0("Permutation tests for ", cluster, " completed"))
-        et <- Sys.time()
-        message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et,st,units="mins"), " mins")
+    message(paste0("Conducting permutation tests for ", cluster))
 
-        meig.pval <- matrix(nrow = nrow(coords), ncol = 1)
-        meig.pval <- as.matrix(sapply(1:nrow(meig.real), function(i) {
-                meig.pval[i,] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
+    meig.perm <- c(1:nitr)
+    st <- Sys.time()
+    for (i in 1:nitr) {
+        cat("\r", "Iteration step", i)
+        o <- sample(1:nrow(coords))
+        x <- pairCount
+        x <- t(sapply(1:nrow(pairCount), function(j) {
+                x[j,] <- pairCount[j,o]
         }))
-
-        # meig.fdr <- p.adjust(meig.pval, method="BH")
-
-        df <- data.frame(x = coords[,"x"], y = coords[,"y"])
-
-        pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
-            height = 6, width = 10, onefile = F)
-        plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)),
-                 c("Largest Eigenvalue","-log10(pval)"), 3, 1, 2)
-        dev.off()
+        randloc <- sample(1:nrow(coords), 1)
+        meig.perm[i] <- maxEigenVal(x, W[randloc,])
     }
+    cat("\n")
+    message(paste0("Permutation tests for ", cluster, " completed"))
+    et <- Sys.time()
+    message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et,st,units="mins"), " mins")
+
+    meig.pval <- matrix(nrow = nrow(coords), ncol = 1)
+    meig.pval <- as.matrix(sapply(1:nrow(meig.real), function(i) {
+            meig.pval[i,] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
+    }))
+
+    # meig.fdr <- p.adjust(meig.pval, method="BH")
+
+    df <- data.frame(x = coords[,"x"], y = coords[,"y"])
+
+    pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
+        height = 6, width = 10, onefile = F)
+    plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)),
+                c("Largest Eigenvalue","-log10(pval)"), 3, 1, 2)
+    dev.off()
 }

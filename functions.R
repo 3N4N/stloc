@@ -77,10 +77,11 @@ maxEigenVal <- function(x, w=1)
         w <- rep(1, ncol(x))
     }
 
-    d <- nrow(x)
     x <- apply(x, 1, function(i) w*i)
 
-    return (max(eigen(t(x) %*% x,only.values=TRUE)$values))
+    eigvals <- eigen(t(x) %*% x,only.values=TRUE)$values
+
+    return (max(eigvals))
 }
 
 maxSingVal <- function(x, w=1) {
@@ -92,7 +93,6 @@ maxSingVal <- function(x, w=1) {
         w <- rep(1, ncol(x))
     }
 
-    d <- nrow(x)
     x <- apply(x, 1, function(i) w*i)
 
     return (max(svd(t(x))$d))
