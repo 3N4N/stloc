@@ -4,28 +4,31 @@
 
 
 #  ----------------------------------------------------------------------
-#                                 loading packages
+#                                  load packages
 #  ----------------------------------------------------------------------
 
+message("Loading packages . . .")
 
 # We can use stats::density to determine kde
 # but kdensity packages gives us more freedom
-
 library(kdensity)
+
+# And ks::kde can handle multivariate data
+library(ks)
+
+# SCE is for log-normalization
 library(SingleCellExperiment)
 library(scran)
+library(scater)
 
-
-#  ----------------------------------------------------------------------
-#                             source helper functions
-#  ----------------------------------------------------------------------
-
-source("./functions.R")
+message("Packages loaded.")
 
 
 #  ----------------------------------------------------------------------
 #                                   merfish data
 #  ----------------------------------------------------------------------
+
+# message("Processing MERFISH data . . .")
 
 # dataset <- read.csv("./data/merfish/s7.csv")
 
@@ -47,16 +50,20 @@ source("./functions.R")
 # message(paste0("Number of clusters: ", length(clusters)))
 # message(paste0("Number of genes: ", length(genes)))
 
+# message("MERFISH data processed.")
+
 
 #  ----------------------------------------------------------------------
 #                                 skin cancer data
 #  ----------------------------------------------------------------------
 
+message("Processing skin cancer data . . .")
+
 counts.raw <- read.delim("./data/skin_cancer/GSE144239_ST_P2_S1_counts.tsv", header = T, row.names = 1)
 
 coords.raw <- do.call(rbind, strsplit(rownames(counts.raw), "x"))
 coords <- apply(coords.raw, 1:2, as.numeric)
-colnames(coords) <- c("x","y")
+colnames(coords) <- c("X","Y")
 rownames(coords) <- rownames(counts.raw)
 
 counts <- t(counts.raw)
@@ -66,12 +73,11 @@ sce <- logNormCounts(sce)
 counts <- logcounts(sce)
 
 ## read reference data
-clusters.data <- read.delim("./data/skin_cancer/reference_markers_for_NMF.tsv", header = TRUE)
+clusters.data <- read.delim("./data/skin_cancer/reference_markers_for_NMF.tsv", header=T)
 clusters.data <- as.data.frame(clusters.data)
 clusters.genes <- unique(clusters.data$gene)
 
 ## get genes common in reference and st data
-# clusters.genes <- intersect(hvg, clusters.genes)
 clusters.genes <- intersect(rownames(counts), clusters.genes)
 
 ## remove data of genes not common in reference and st data
@@ -89,6 +95,8 @@ if (length(clusters.name) == 1) {
   })
 }
 
+message("Skin cancer data processed.")
+
 message(paste0("Number of clusters: ", length(clusters.name)))
 message(paste0("Number of genes: ", length(clusters.genes)))
 
@@ -97,42 +105,49 @@ message(paste0("Number of genes: ", length(clusters.genes)))
 
 
 #  ----------------------------------------------------------------------
-#                                   kde plotting
+#                                       KDE
 #  ----------------------------------------------------------------------
 
+message("Calculating KDE . . .")
 
-counts.flat.all <- colSums(counts)
-counts.flat.epi <- colSums(counts[clusters.pair[["Epithelial"]],])
-counts.flat.fib <- colSums(counts[clusters.pair[["Fibroblast"]],])
-counts.flat.mye <- colSums(counts[clusters.pair[["Myeloid"]],])
+counts.flat <- colSums(counts)
 
-kde.all.norm <- kdensity(minmax(counts.flat.all), kernel = "gaussian")
-kde.epi.norm <- kdensity(minmax(counts.flat.epi), kernel = "gaussian")
-kde.fib.norm <- kdensity(minmax(counts.flat.fib), kernel = "gaussian")
-kde.mye.norm <- kdensity(minmax(counts.flat.mye), kernel = "gaussian")
+data <- rep(names(counts.flat), counts.flat)
+data <- do.call(rbind, strsplit(data, "x"))
+data <- apply(data, c(1,2), as.numeric)
+colnames(data) <- c("X", "Y")
 
-kde.all.std <- kdensity(scale(counts.flat.all), kernel = "gaussian")
-kde.epi.std <- kdensity(scale(counts.flat.epi), kernel = "gaussian")
-kde.fib.std <- kdensity(scale(counts.flat.fib), kernel = "gaussian")
-kde.mye.std <- kdensity(scale(counts.flat.mye), kernel = "gaussian")
+kde <- kde(x=data)
+# kde <- kde(x = data, gridsize = c(200, 200), xmin = c(-4, -3), xmax = c(4, 3))
+
+message ("KDE calculated. Plotting . . .")
+
+# plot w/o kde.plot
+# image(kde$eval.points[[1]], kde$eval.points[[2]], kde$estimate, col = viridis::viridis(20))
+
+# Contourplot
+plot(kde, display = "slice", cont = c(25, 50, 75))
+
+# # Raw image with custom colors
+# tiff(file="./output/skin_cancer/kde.tif", height=8, width=8, units="in", res=300)
+# plot(kde, display = "image", col = viridis::viridis(20))
+# dev.off()
+
+# Perspective plot
+# plot(kde, display = "persp", col.fun = viridis::viridis)
 
 
-pdf(paste0("output/kde_cancer_minmax.pdf"),
-    height = 6, width = 10, onefile = F)
-plot(kde.all.norm, col="red", main="KDE with Min-Max Normalization")
-lines(kde.epi.norm, col="blue")
-lines(kde.fib.norm, col="green")
-lines(kde.mye.norm, col="brown")
-legend("topleft", legend=c("All", "Epithelial", "Fibroblast", "Myeloid"),
-        col=c("red", "blue", "green", "brown"), lty=1)
-dev.off()
+message("Exiting . . .")
 
-pdf(paste0("output/kde_cancer_scale.pdf"),
-    height = 6, width = 10, onefile = F)
-plot(kde.all.std, col="red", main="KDE with Z-score Standardization")
-lines(kde.epi.std, col="blue")
-lines(kde.fib.std, col="green")
-lines(kde.mye.std, col="brown")
-legend("topleft", legend=c("All", "Epithelial", "Fibroblast", "Myeloid"),
-        col=c("red", "blue", "green", "brown"), lty=1)
-dev.off()
+
+#  ----------------------------------------------------------------------
+#                           KDE of bivariate normal data
+#  ----------------------------------------------------------------------
+
+# # Simulated data from a bivariate normal
+# n <- 200
+# set.seed(35233)
+# x <- mvtnorm::rmvnorm(n=n, mean=c(0, 0), sigma=rbind(c(1.5, 0.25), c(0.25, 0.5)))
+# kde <- kde(x)
+# plot(kde)
+# plot(kde, display="image", col=viridis::viridis(20))
