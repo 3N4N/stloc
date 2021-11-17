@@ -4,6 +4,7 @@
 
 library(SingleCellExperiment)
 library(scran)
+library(ks)
 
 
 #  ----------------------------------------------------------------------
@@ -46,29 +47,6 @@ sce <- SingleCellExperiment(assays = list(counts = counts), colData = coords)
 sce <- logNormCounts(sce)
 counts <- logcounts(sce)
 
-#  ----------------------------------------------------------------------
-#                         Determine highly variable genes
-#  ----------------------------------------------------------------------
-
-# sce <- SingleCellExperiment(assays = list(counts = counts), colData = coords)
-# sce <- logNormCounts(sce)
-# dec <- modelGeneVar(sce)
-
-# hvg <- getTopHVGs(dec,fdr.threshold = 0.05)
-# hvg <- sort(hvg)
-# length(hvg)
-
-# seqvals <- seq(min(dec$mean), max(dec$mean), length.out = 1000)
-# peakExp <- seqvals[which.max(metadata(dec)$trend(seqvals))]
-
-# pdf(file = "./output/skin_cancer/HVG_selection.pdf", height = 8, width = 8)
-# plot(dec$mean, dec$total, xlab = "Mean log-expression", ylab = "Variance")
-# curve(metadata(dec)$trend(x), col = "blue", add = TRUE)
-# points(dec$mean[ which(rownames(dec) %in% hvg)],
-#        dec$total[which(rownames(dec) %in% hvg)],
-#        col = "red", pch = 16)
-# abline(v = peakExp, lty = 2, col = "black")
-# dev.off()
 
 #  ----------------------------------------------------------------------
 #                            Process reference dataset
@@ -106,6 +84,21 @@ clusters.pair[["EpithelialFibroblast"]] <- unique(unlist((list(clusters.pair[["E
 clusters.pair[["MyeloidEpithelial"]] <- unique(unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Epithelial"]])) ))
 
 
+#  ----------------------------------------------------------------------
+#                                       kde
+#  ----------------------------------------------------------------------
+
+counts.flat <- colSums(counts)
+
+data <- rep(names(counts.flat), counts.flat)
+data <- do.call(rbind, strsplit(data, "x"))
+data <- apply(data, c(1,2), as.numeric)
+colnames(data) <- c("x", "y")
+
+hpi <- Hscv(x=data)
+kde <- kde(x=data, H=hpi, eval.points=coords)
+
+
 
 #  ----------------------------------------------------------------------
 #                                     Analysis
@@ -113,14 +106,14 @@ clusters.pair[["MyeloidEpithelial"]] <- unique(unlist((list(clusters.pair[["Myel
 
 
 d <- sort (as.numeric (dist (coords )))[1]
-W <- weightMatrix.gaussian(coords, l = 0.1)
+W <- weightMatrix.gaussian(coords, l = 1)
 
 set.seed(500)
 nitr <- 1e3
 for (cluster in clusters.name) {
     # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-    # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="EpithelialFibroblast")) next
-    if (!(cluster=="Epithelial")) next
+    if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="EpithelialFibroblast")) next
+    # if (!(cluster=="EpithelialFibroblast")) next
 
     # if (!(cluster=="MyeloidFibroblast" | cluster=="EpithelialFibroblast" | cluster=="MyeloidEpithelial")) next
     # if (!(cluster=="MyeloidEpithelial" )) next
@@ -129,16 +122,11 @@ for (cluster in clusters.name) {
     genes <- sapply(genes, function(i) i <- toString(i))
     if (length(genes) == 1) next
 
-    print(cluster)
-    print(genes)
+    message("Analyzing cluster ", cluster)
+    message("Number of marker genes: ", length(genes))
 
     pairCount <- as.matrix(rbind(counts[genes,]))
     rownames(pairCount) <- genes
-
-    # pairCount <- counts
-    # for (i in rownames(pairCount)) {
-    #     pairCount[i,] <- rep(0,ncol(pairCount))
-    # }
 
     # st <- Sys.time()
     # zscores <- apply(pairCount, 1, scale)
@@ -151,9 +139,11 @@ for (cluster in clusters.name) {
 
     st <- Sys.time()
     meig.real <- as.matrix(sapply(1:nrow(coords),
-                                    function(i) maxEigenVal(pairCount, W[i,])))
+            function(i) (maxEigenVal(pairCount, W[i,]) / kde$estimate[i])))
     et <- Sys.time()
-    # print(summary(meig.real))
+
+    # write.table(meig.real, file=paste0("output/skin_cancer/", cluster, ".txt"), row.names=FALSE, col.names=FALSE)
+
     message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
 
     message(paste0("Conducting permutation tests for ", cluster))
@@ -163,12 +153,9 @@ for (cluster in clusters.name) {
     for (i in 1:nitr) {
         cat("\r", "Iteration step", i)
         o <- sample(1:nrow(coords))
-        x <- pairCount
-        x <- t(sapply(1:nrow(pairCount), function(j) {
-                x[j,] <- pairCount[j,o]
-        }))
+        x <- pairCount[,o]
         randloc <- sample(1:nrow(coords), 1)
-        meig.perm[i] <- maxEigenVal(x, W[randloc,])
+        meig.perm[i] <- maxEigenVal(x, W[randloc,]) / kde$estimate[o[randloc]]
     }
     cat("\n")
     message(paste0("Permutation tests for ", cluster, " completed"))
@@ -182,7 +169,7 @@ for (cluster in clusters.name) {
 
     # meig.fdr <- p.adjust(meig.pval, method="BH")
 
-    df <- data.frame(x = coords[,"x"], y = coords[,"y"])
+    df <- data.frame(x = coords[,"x"], y = -coords[,"y"])
 
     pdf(paste0("output/skin_cancer/plots/", cluster, "x", log(nitr, 10), ".pdf"),
         height = 6, width = 10, onefile = F)
