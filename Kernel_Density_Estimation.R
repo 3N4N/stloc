@@ -21,6 +21,8 @@ library(SingleCellExperiment)
 library(scran)
 library(scater)
 
+library(viridis)
+
 message("Packages loaded.")
 
 
@@ -63,7 +65,7 @@ counts.raw <- read.delim("./data/skin_cancer/GSE144239_ST_P2_S1_counts.tsv", hea
 
 coords.raw <- do.call(rbind, strsplit(rownames(counts.raw), "x"))
 coords <- apply(coords.raw, 1:2, as.numeric)
-colnames(coords) <- c("X","Y")
+colnames(coords) <- c("x","y")
 rownames(coords) <- rownames(counts.raw)
 
 counts <- t(counts.raw)
@@ -115,39 +117,27 @@ counts.flat <- colSums(counts)
 data <- rep(names(counts.flat), counts.flat)
 data <- do.call(rbind, strsplit(data, "x"))
 data <- apply(data, c(1,2), as.numeric)
-colnames(data) <- c("X", "Y")
+colnames(data) <- c("x", "y")
 
-kde <- kde(x=data)
+hpi <- Hscv(x=data)
+kde <- kde(x=data, H=hpi, eval.points=coords)
+kde <- kde(x=data, H=hpi)
 # kde <- kde(x = data, gridsize = c(200, 200), xmin = c(-4, -3), xmax = c(4, 3))
 
 message ("KDE calculated. Plotting . . .")
 
-# plot w/o kde.plot
-# image(kde$eval.points[[1]], kde$eval.points[[2]], kde$estimate, col = viridis::viridis(20))
+# # plot w/o kde.plot
+# image(kde$eval.points[[1]], kde$eval.points[[2]], kde$estimate, col = viridis(20))
 
-# Contourplot
-plot(kde, display = "slice", cont = c(25, 50, 75))
-
-# # Raw image with custom colors
-# tiff(file="./output/skin_cancer/kde.tif", height=8, width=8, units="in", res=300)
-# plot(kde, display = "image", col = viridis::viridis(20))
+# # Perspective plot
+# tiff(file="./output/skin_cancer/kde_persp.tif", height=8, width=8, units="in", res=400)
+# plot(kde, display = "persp", col.fun = viridis)
 # dev.off()
 
-# Perspective plot
-# plot(kde, display = "persp", col.fun = viridis::viridis)
-
+tiff(file="./output/skin_cancer/kde.tif", height=8, width=16, units="in", res=400)
+par(mfrow = c(1,2))
+plot(kde, display = "slice", cont = c(25, 50, 75), main="Contour Plot")
+plot(kde, display = "image", col = viridis(20), main="Colour Plot")
+dev.off()
 
 message("Exiting . . .")
-
-
-#  ----------------------------------------------------------------------
-#                           KDE of bivariate normal data
-#  ----------------------------------------------------------------------
-
-# # Simulated data from a bivariate normal
-# n <- 200
-# set.seed(35233)
-# x <- mvtnorm::rmvnorm(n=n, mean=c(0, 0), sigma=rbind(c(1.5, 0.25), c(0.25, 0.5)))
-# kde <- kde(x)
-# plot(kde)
-# plot(kde, display="image", col=viridis::viridis(20))
