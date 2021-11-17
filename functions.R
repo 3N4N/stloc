@@ -80,6 +80,7 @@ maxEigenVal <- function(x, w=1)
     x <- apply(x, 1, function(i) w*i)
 
     eigvals <- eigen(t(x) %*% x,only.values=TRUE)$values
+    # eigvals <- eigen(cov(x),only.values=TRUE)$values
 
     return (max(eigvals))
 }
@@ -115,7 +116,7 @@ zScore <- function(x, index, meanOfZenes, sdOfZenes)
 
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
-        ggplot(df, aes(x = -x, y = -y)) +
+        ggplot(df, aes(x = x, y = y)) +
             geom_point(aes(colour = vals[[i]]), size = size) +
             theme_minimal() +
             theme(panel.grid = element_blank()) +
