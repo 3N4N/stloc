@@ -106,7 +106,7 @@ kde <- kde(x=data, H=hpi, eval.points=coords)
 
 
 d <- sort (as.numeric (dist (coords )))[1]
-W <- weightMatrix.gaussian(coords, l = 1)
+W <- weightMatrix.gaussian(coords, l = d*1)
 
 set.seed(500)
 nitr <- 1e3
