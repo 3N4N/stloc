@@ -27,7 +27,7 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
 
 
     for (cluster in clusters.name) {
-        # if(!cluster =="Ependymal") next
+        if(!cluster =="Ependymal") next
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
         if (length(genes) == 1) next
@@ -88,7 +88,8 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
         pdf(paste0(outdir, cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
         # plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)), c("Largest Eigenvalue",-log10(meig.pval)), 3, 1, 2)
-        plotvals(3, df, "", vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+
+        plotvals(3, df, cluster, vals=list( minmax(meig.real), minmax(-log10(meig.pval)), minmax(-log10(meig.fdr))),
                     c("Largest Eigenvalue","-log10(pval)","-log10(fdr)"), 3, 1, 3)
         dev.off()
     }
