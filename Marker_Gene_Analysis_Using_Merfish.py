@@ -36,6 +36,8 @@ cell_types = ["Astrocyte", "Inhibitory", "Pericytes", "Ambiguous", "Endothelial 
 
 markerGenes = dict()
 markerGene_for_cell_types_top10 = pd.DataFrame(columns=['cell_type', 'marker_gene', 'p_value'])
+tempo = pd.DataFrame(columns=['cell_type', 'marker_gene', 'p_value'])
+
 
 cellTypeCSV = list()
 markerGeneCSV = list()
@@ -67,6 +69,17 @@ for cell_type in cell_types:
   markerGene_for_cell_types_top10 = pd.concat([markerGene_for_cell_types_top10, temp], axis = 0)
 
 #print(markerGenes)
+
+#ependymal-inhibitory
+llen = list()
+for x in range(20):
+  llen.append("EpendymalInhibitory")
+
+tempo = markerGene_for_cell_types_top10[markerGene_for_cell_types_top10['cell_type'] == "Inhibitory"]
+tempo1 = markerGene_for_cell_types_top10[markerGene_for_cell_types_top10['cell_type'] == "Ependymal"]
+tempo = pd.concat([tempo, tempo1], axis=0)
+tempo["cell_type"] = llen
+markerGene_for_cell_types_top10 = pd.concat([markerGene_for_cell_types_top10, tempo], axis=0)
 
 #markerGene_for_cell_types = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=['cell_type', 'marker_gene', 'p_value'])
 
