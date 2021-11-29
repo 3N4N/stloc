@@ -4,6 +4,8 @@
 
 library(SingleCellExperiment)
 library(scran)
+library(ks)
+
 
 library(ggplot2)
 library(gridExtra)

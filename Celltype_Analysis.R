@@ -16,12 +16,18 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
     kd <- kde(x=data, H=hpi)
 
     d <- sort (as.numeric (dist (coords )))[1]
-    W <- weightMatrix.gaussian(coords, l = d*0.1)
+    W <- weightMatrix.gaussian(coords, l = d*1)
 
     set.seed(500)
     nitr <- 1e3
 
+    #_________________________Cell type names for two datasets_______________________
+    # if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial1"| cluster==  "Excitatory"| cluster=="ODImmature1" | cluster=="ODImmature2" | cluster== "Microglia" | cluster=="ODMature2" | cluster== "ODMature1" | cluster== "Endothelial3" | cluster=="ODMature3" | cluster== "ODMature4" | cluster== "Endothelial2" | cluster== "Ependymal")) next
+    # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
+
+
     for (cluster in clusters.name) {
+        # if(!cluster =="Ependymal") next
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
         if (length(genes) == 1) next
