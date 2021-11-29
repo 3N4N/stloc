@@ -19,7 +19,7 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
     W <- weightMatrix.gaussian(coords, l = d*0.1)
 
     set.seed(500)
-    nitr <- 1e2
+    nitr <- 1e3
 
     for (cluster in clusters.name) {
         genes <- unlist(c(clusters.pair[cluster]))
@@ -75,15 +75,15 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
                 meig.pval[i,] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
         }))
 
-        # meig.fdr <- p.adjust(meig.pval, method="BH")
+        meig.fdr <- p.adjust(meig.pval, method="BH")
 
         df <- data.frame(x = coords[,"x"], y = -coords[,"y"])
 
         pdf(paste0(outdir, cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
         # plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)), c("Largest Eigenvalue",-log10(meig.pval)), 3, 1, 2)
-        plotvals(3, df, "", vals=list(meig.real, (meig.pval), -log10(meig.pval)),
-                    c("Largest Eigenvalue","meig.pval","-log10(pval)"), 3, 1, 3)
+        plotvals(3, df, "", vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+                    c("Largest Eigenvalue","-log10(pval)","-log10(fdr)"), 3, 1, 3)
         dev.off()
     }
 }
