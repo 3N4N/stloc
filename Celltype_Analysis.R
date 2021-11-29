@@ -58,7 +58,7 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
             o <- sample(1:nrow(coords))
             x <- pairCount[,o]
             randloc <- sample(1:nrow(coords), 1)
-            meig.perm[i] <- maxEigenVal(x, W[randloc,]) / kde$estimate[o[randloc]]
+            meig.perm[i] <- maxEigenVal(x, W[randloc,]) #/ kde$estimate[o[randloc]]
             # meig.perm[i] <- colSums(x)[randloc] #/ kde$estimate[o[randloc]]
         }
         cat("\n")
