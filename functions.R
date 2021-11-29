@@ -126,10 +126,11 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
             labs(colour = "") +
             theme(legend.position = "bottom") +
             theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-            scale_color_viridis_c(option = "plasma", na.value="red") +
+            # scale_color_viridis_c(option = "plasma", na.value="red") +
+            scale_color_binned(n.breaks=4,nice.breaks=F)+
             coord_fixed() +
             guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
-            theme(legend.key.width = unit(0.75, "inches")) +
+            theme(legend.key.width = unit(0.5, "inches")) +
             theme(legend.text = element_text(size=15)) +
             theme(plot.margin = margin(-10,0,10,0)) +
             theme(plot.title = element_text(size = 20)) +
