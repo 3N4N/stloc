@@ -129,7 +129,7 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
             scale_color_viridis_c(option = "plasma", na.value="red") +
             coord_fixed() +
             guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
-            theme(legend.key.width = unit(0.75, "inches")) +
+            theme(legend.key.width = unit(0.5, "inches")) +
             theme(legend.text = element_text(size=15)) +
             theme(plot.margin = margin(-10,0,10,0)) +
             theme(plot.title = element_text(size = 20)) +
