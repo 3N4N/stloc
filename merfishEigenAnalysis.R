@@ -30,6 +30,7 @@ counts <- t(counts.raw)
 sce <- SingleCellExperiment(assays = list(counts = counts), colData = coords)
 sce <- logNormCounts(sce)
 counts <- logcounts(sce)
+counts <- t(apply(counts, 1, minmax))
 
 
 clusters.data <- read.table("./data/merfish/markerGene_for_merfish_data.csv", sep=",",header = TRUE, check.names = FALSE)

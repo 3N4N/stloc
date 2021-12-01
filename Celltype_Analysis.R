@@ -15,7 +15,7 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
     kde <- kde(x=data, H=hpi, eval.points=coords)
 
     d <- sort (as.numeric (dist (coords )))[1]
-    W <- weightMatrix.gaussian(coords, l = d*1)
+    W <- weightMatrix.gaussian(coords, l = d*0.1)
 
     set.seed(500)
     nitr <- 1e3
@@ -84,15 +84,11 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
 
         df <- data.frame(x = coords[,"x"], y = -coords[,"y"])
 
-        # meig.real <- minmax(meig.real)
-        # meig.pval <- minmax(meig.pval)
-        # meig.fdr <- minmax(meig.fdr)
-
         pdf(paste0(outdir, cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)
         # plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)), c("Largest Eigenvalue",-log10(meig.pval)), 3, 1, 2)
 
-        plotvals(3, df, cluster, vals=list( minmax(meig.real), minmax(-log10(meig.pval)), minmax(-log10(meig.fdr))),
+        plotvals(3, df, cluster, vals=list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
                     c("Largest Eigenvalue","-log10(pval)","-log10(fdr)"), 3, 1, 3)
         dev.off()
     }
