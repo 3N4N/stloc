@@ -26,8 +26,6 @@ if (!file.exists("output/skin_cancer/plots")) {
     system("mkdir -p output/skin_cancer/plots")
 }
 
-system("rm -rf output/skin_cancer/dump")
-system("mkdir -p output/skin_cancer/dump")
 
 
 #  ----------------------------------------------------------------------
@@ -46,6 +44,7 @@ counts <- t(counts.raw)
 sce <- SingleCellExperiment(assays = list(counts = counts), colData = coords)
 sce <- logNormCounts(sce)
 counts <- logcounts(sce)
+counts <- t(apply(counts, 1, minmax))
 
 
 #  ----------------------------------------------------------------------
@@ -67,7 +66,7 @@ clusters.name <- unique(clusters.data$cluster)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
 
 clusters.name <- list("Epithelial", "Fibroblast", "EpithelialFibroblast")
-names(clusters.name) <- list("Epithelial", "Fibroblast", "EpithelialFibroblast")
+names(clusters.name) <- clusters.name
 
 ## get a list of cluster-gene pairs
 clusters.pair <- list()

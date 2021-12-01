@@ -1,7 +1,3 @@
-#  ----------------------------------------------------------------------
-#                                  Load packages
-#  ----------------------------------------------------------------------
-
 library(SingleCellExperiment)
 library(scran)
 
@@ -9,16 +5,8 @@ library(ggplot2)
 library(gridExtra)
 
 
-#  ----------------------------------------------------------------------
-#                              Load helper functions
-#  ----------------------------------------------------------------------
-
 source("./functions.R")
 
-
-#  ----------------------------------------------------------------------
-#                            Create output directories
-#  ----------------------------------------------------------------------
 
 if (!file.exists("output")) {
     system("mkdir -p output")
@@ -27,10 +15,6 @@ if (!file.exists("output")) {
 if (!file.exists("output/merfish/plots")) {
     system("mkdir -p output/merfish/plots")
 }
-if (!file.exists("output/merfish/scatterPlots")) {
-    system("mkdir -p output/merfish/scatterPlots")
-}
-
 
 
 counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)

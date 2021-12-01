@@ -13,15 +13,16 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
 
     hpi <- Hscv(x=data)
     kde <- kde(x=data, H=hpi, eval.points=coords)
-    kd <- kde(x=data, H=hpi)
 
     d <- sort (as.numeric (dist (coords )))[1]
-    W <- weightMatrix.gaussian(coords, l = d*0.1)
+    W <- weightMatrix.gaussian(coords, l = d*1)
 
     set.seed(500)
     nitr <- 1e3
 
     for (cluster in clusters.name) {
+        # if (cluster != "Endothelial1") next
+
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
         if (length(genes) == 1) next
@@ -43,8 +44,10 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
 
         st <- Sys.time()
         meig.real <- as.matrix(sapply(1:nrow(coords),
-                function(i) (maxEigenVal(pairCount, W[i,])))) #/ kde$estimate[i])))
-        # meig.real <- colSums(pairCount) / kde$estimate
+                function(i) (maxEigenVal(pairCount, W[i,]))))
+                # function(i) (maxEigenVal(pairCount, W[i,]) * kde$estimate[i])))
+        # tmp <- colSums(pairCount) #/ kde$estimate
+        # for (i in 1:length(meig.real)) meig.real[i] <- sum(tmp * W[i,])
         et <- Sys.time()
 
         message("Runtime of eigenvalues: ", difftime(et,st,units="mins"), " mins")
@@ -58,26 +61,27 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir)
             o <- sample(1:nrow(coords))
             x <- pairCount[,o]
             randloc <- sample(1:nrow(coords), 1)
-            meig.perm[i] <- maxEigenVal(x, W[randloc,]) #/ kde$estimate[o[randloc]]
-            # meig.perm[i] <- colSums(x)[randloc] #/ kde$estimate[o[randloc]]
+            meig.perm[i] <- maxEigenVal(x, W[randloc,])
+            # meig.perm[i] <- maxEigenVal(x, W[randloc,]) * kde$estimate[o[randloc]]
+            # meig.perm[i] <- colSums(x)[randloc] / kde$estimate[o[randloc]]
+            # meig.perm[i] <- sum(colSums(x) #/ kde$estimate[o[randloc]] * W[randloc,])
         }
         cat("\n")
         message(paste0("Permutation tests for ", cluster, " completed"))
         et <- Sys.time()
         message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et,st,units="mins"), " mins")
 
-        # meig.pval <- meig.real
-        # for (i in 1:nrow(coords))
-        #     meig.pval[i] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
-
-        meig.pval <- matrix(nrow = nrow(coords), ncol = 1)
-        meig.pval <- as.matrix(sapply(1:nrow(meig.real), function(i) {
-                meig.pval[i,] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
-        }))
+        meig.pval <- meig.real
+        for (i in 1:nrow(coords))
+            meig.pval[i] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
 
         meig.fdr <- p.adjust(meig.pval, method="BH")
 
         df <- data.frame(x = coords[,"x"], y = -coords[,"y"])
+
+        # meig.real <- minmax(meig.real)
+        # meig.pval <- minmax(meig.pval)
+        # meig.fdr <- minmax(meig.fdr)
 
         pdf(paste0(outdir, cluster, "x", log(nitr, 10), ".pdf"),
             height = 6, width = 10, onefile = F)

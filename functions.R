@@ -3,7 +3,8 @@ library(gridExtra)
 library(grid)
 
 minmax <- function(x) {
-    (x - min(x)) / (max(x) - min(x))
+    if (max(x) != min(x)) return ((x - min(x)) / (max(x) - min(x)))
+    else return (x*0)
 }
 
 weightMatrix.nD <- function(x, span = 0.5)
@@ -39,6 +40,7 @@ weightMatrix.gaussian  <- function(coords, l=20, cell=0)
         dvec <- d[cell,]
         vals <- rep(0, ncells)
         for(i in 1:length(vals)) {
+            # vals[i] = exp(-d[cell,i]^2 / l^2)
             vals[i] <- (1 / (l * sqrt(2*pi))) * exp(-(1/2) * d[cell,i]^2 / l^2)
         }
         return(vals)
@@ -67,12 +69,21 @@ corTaylor <- function(x, w = 1)
 }
 
 
-maxEigenVal <- function(x, w=1)
+tmaxEigenVal <- function(x, w=1)
 {
-    if(!inherits(x,"matrix")) {
-        stop("Input must be inherit ’matrix’ class.")
+    if (length(w) == 1) {
+        w <- rep(1, ncol(x))
     }
 
+    x <- apply(x, 1, function(i) w*i)
+
+    covmat <- cov(x)
+
+    return ((sum(colSums(covmat)))/ncol(x))
+}
+
+maxEigenVal <- function(x, w=1)
+{
     if (length(w) == 1) {
         w <- rep(1, ncol(x))
     }
@@ -99,21 +110,6 @@ maxSingVal <- function(x, w=1) {
     return (max(svd(t(x))$d))
 }
 
-zScore <- function(x, index, meanOfZenes, sdOfZenes)
-{
-    zscore_for_single_gene <- matrix(nrow = nrow(x), ncol = 1);
-
-    sm <- 0
-    for(i in 1:(nrow(x))) {
-        zscore_for_single_gene[i, 1] <- (x[i, index] - meanOfZenes[i]) / sdOfZenes[i];
-        sm <- sm + zscore_for_single_gene[i, 1]
-    }
-    aggrZscore <- sm / sqrt(nrow(x));
-
-    return (aggrZscore)
-}
-
-
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
         ggplot(df, aes(x = x, y = y)) +
@@ -126,11 +122,16 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
             labs(colour = "") +
             theme(legend.position = "bottom") +
             theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-            scale_color_viridis_c(option = "plasma", na.value="red") +
+            # scale_color_viridis_c(option = "plasma", na.value="red") +
+            scale_color_binned() +
+            # scale_color_binned(n.breaks=4, nice.breaks=F, labels=function(x) {
+            #                        if (x >= 10) round(x)
+            #                        else sprintf("%.2f", x)
+            #     }) +
             coord_fixed() +
             guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
             theme(legend.key.width = unit(0.5, "inches")) +
-            theme(legend.text = element_text(size=15)) +
+            theme(legend.text = element_text(size=12)) +
             theme(plot.margin = margin(-10,0,10,0)) +
             theme(plot.title = element_text(size = 20)) +
             theme(axis.title = element_text(size = 15)) +

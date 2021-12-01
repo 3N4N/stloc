@@ -32,7 +32,10 @@ data = data.drop(['Centroid_Y', 'Animal_ID', 'Animal_sex', 'Behavior', 'Bregma',
 # y = y.iloc[:, [2]]
 
 geneList = data.keys().tolist()
-cell_types = ["Astrocyte", "Inhibitory", "Pericytes", "Ambiguous", "Endothelial 1",  "Excitatory", "OD Immature 1", "OD Immature 2", "Microglia", "OD Mature 2", "OD Mature 1", "Endothelial 3", "OD Mature 3", "OD Mature 4", "Endothelial 2", "Ependymal"]
+cell_types = ["Astrocyte", "Inhibitory", "Pericytes", "Ambiguous", "Endothelial 1",
+        "Excitatory", "OD Immature 1", "OD Immature 2", "Microglia", "OD Mature 2",
+        "OD Mature 1", "Endothelial 3", "OD Mature 3", "OD Mature 4", "Endothelial 2",
+        "Ependymal"]
 
 markerGenes = dict()
 markerGene_for_cell_types_top10 = pd.DataFrame(columns=['cell_type', 'marker_gene', 'p_value'])
