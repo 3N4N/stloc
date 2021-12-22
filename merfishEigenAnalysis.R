@@ -20,6 +20,8 @@ if (!file.exists("output/merfish/plots")) {
 
 
 counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
+counts.raw <- counts.raw[1:(length(counts.raw)-16)] #remove the last 16 columns
+
 coords.raw <- do.call(rbind, strsplit(rownames(counts.raw), "x"))
 coords <- apply(coords.raw, 1:2, as.numeric)
 colnames(coords) <- c("x","y")
