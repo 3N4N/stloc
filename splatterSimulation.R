@@ -6,7 +6,7 @@ sce <- mockSCE()
 params <- newSplatParams()
 # counts <- counts(sce)
 # counts
-sim <- splatSimulate(params, batchCells = c(1000, 1000,1000,1000), verbose = FALSE,nGenes=1000)
+sim <- splatSimulate(params, batchCells = c(1000, 1000,1000,1000), verbose = FALSE,nGenes=6)
 
 
 sim <- logNormCounts(sim)
@@ -22,33 +22,49 @@ write.csv(df_mtx, file = "splatterCSV.csv", append = FALSE, quote = TRUE, sep = 
 
 plotPCA(simPCA, colour_by = "Batch")
 
-cellTypes <-as.list(unique(df_mtx["cellType"]))
+cellTypes <-unique(df_mtx["cellType"])
 
-typeWiseDf<- c()
-for ( type in cellTypes)
+#typeWiseDf
+typeWiseDf<- vector(mode = "list", length = length(cellTypes))
+
+# for ( type  in cellTypes)
+for ( i in 1: length(cellTypes[[1]]))
 {
-    x<-df_mtx[df_mtx["cellType"]==type,]
-    typeWiseDf<- append(typeWiseDf,x)
+    print(cellTypes[[1]][i])
+    x<-df_mtx[ df_mtx["cellType"]==cellTypes[[1]][i] ,]
+    print(x)
+    typeWiseDf[[i]]<-x
+    # k=k+1
 }
-for ( i in 1:20)
-{
-    for( j in 1:20)
-    {
-        if( 1<=i &&  i <=10 && 1<=j && j<=10)
-        {
 
+
+shape = 20
+for ( i in 1:shape)
+{
+    for( j in 1:shape)
+    {
+        if( 1<=i &&  i <=shape/2 && 1<=j && j<=shape/2)
+        {
             "cellTypeA"
+            s<-seq(2)
+            tempDf <- typeWiseDf[[1]] #selecting subset of type A
+            tempDf <- tempDf[1:2,] #selecting first two rows
+            tempDf <- subset(tempDf,select=-c(ncol(tempDf))) # deleting last column of type name
+            ro<-colSums(tempDf) # sum of the cell counts
             
+            typeWiseDf[[1]]<-typeWiseDf[[1]][-s,] #deleting first two rows that were selected
+            # typeWiseDf[[1]]<- subset(typeWiseDf[[1]],select = -c(ncol(typeWiseDf[[1]])))
+            print(tempDf)
         }
-        else if (11<= i  &&  i <=20  && 1<=j && j<=10) {
-           "cellTypeB"
-        }
-        else if (1<= i  && i <=10  &&  11<=j && j<=20) {
-           "cellTypeC"
-        }
-        else if(11<=i && i<=20  &&  11<=j && j<=20){
-            "cellType D"
-        }
+        # else if (11<= i  &&  i <=20  && 1<=j && j<=10) {
+        #    "cellTypeB"
+        # }
+        # else if (1<= i  && i <=10  &&  11<=j && j<=20) {
+        #    "cellTypeC"
+        # }
+        # else if(11<=i && i<=20  &&  11<=j && j<=20){
+        #     "cellType D"
+        # }
 
     }
 }
