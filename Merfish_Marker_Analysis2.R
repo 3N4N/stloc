@@ -29,6 +29,8 @@ so <- CreateSeuratObject(counts = counts, project = "merfish")
 #   randVal = sample(1:6, 1)
 #   clusterList = c(clusterList, randVal)
 # }
+pbmc = so
+
 
 pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-") # for nothing i donno
 #normalize data
