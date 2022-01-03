@@ -3,13 +3,14 @@ library(gridExtra)
 library(grid)
 
 minmax <- function(x) {
-    if (max(x) != min(x)) return ((x - min(x)) / (max(x) - min(x)))
-    else return (x*0)
+    if (max(x) != min(x)) {
+        return((x - min(x)) / (max(x) - min(x)))
+    } else {
+        return(x * 0)
+    }
 }
 
-weightMatrix.nD <- function(x, span = 0.5)
-{
-
+weightMatrix.nD <- function(x, span = 0.5) {
     ncells <- nrow(x)
     coords <- as.matrix(x)
     d <- as.matrix(dist(coords))
@@ -17,31 +18,29 @@ weightMatrix.nD <- function(x, span = 0.5)
     # extract a weights vector per cell
 
     W.raw <- sapply(seq_len(ncells), function(cell) {
-                       dvec <- d[cell,]
-                       vals <- rep(0, ncells)
-                       vals[order(dvec)[1:ceiling(span*ncells)]] <- seq(1, 0, length.out = ceiling(span*ncells))
-                       # vals[order(dvec)[1:ceiling(span*ncells)]] <- 1
-                       return(vals)
-            }, simplify = FALSE)
+        dvec <- d[cell, ]
+        vals <- rep(0, ncells)
+        vals[order(dvec)[1:ceiling(span * ncells)]] <- seq(1, 0, length.out = ceiling(span * ncells))
+        # vals[order(dvec)[1:ceiling(span*ncells)]] <- 1
+        return(vals)
+    }, simplify = FALSE)
 
     W <- do.call(rbind, W.raw)
 
     return(W)
 }
 
-weightMatrix.gaussian  <- function(coords, l=20, cell=0)
-{
-
+weightMatrix.gaussian <- function(coords, l = 20, cell = 0) {
     ncells <- nrow(coords)
     coords <- as.matrix(coords)
     d <- as.matrix(dist(coords))
 
     W.raw <- sapply(seq_len(ncells), function(cell) {
-        dvec <- d[cell,]
+        dvec <- d[cell, ]
         vals <- rep(0, ncells)
-        for(i in 1:length(vals)) {
+        for (i in 1:length(vals)) {
             # vals[i] = exp(-d[cell,i]^2 / l^2)
-            vals[i] <- (1 / (l * sqrt(2*pi))) * exp(-(1/2) * d[cell,i]^2 / l^2)
+            vals[i] <- (1 / (l * sqrt(2 * pi))) * exp(-(1 / 2) * d[cell, i]^2 / l^2)
         }
         return(vals)
     }, simplify = FALSE)
@@ -52,9 +51,8 @@ weightMatrix.gaussian  <- function(coords, l=20, cell=0)
 }
 
 
-corTaylor <- function(x, w = 1)
-{
-    if(!inherits(x, "matrix")) {
+corTaylor <- function(x, w = 1) {
+    if (!inherits(x, "matrix")) {
         stop("Input must be inherit ’matrix’ class.")
     }
 
@@ -62,42 +60,40 @@ corTaylor <- function(x, w = 1)
         w <- rep(1, ncol(x))
     }
 
-    x <- apply(x, 1, function(i) w*i)
+    x <- apply(x, 1, function(i) w * i)
     d <- ncol(x)
 
-    return ((1/sqrt(d)) * sd(eigen(cor(x),only.values=TRUE)$values))
+    return((1 / sqrt(d)) * sd(eigen(cor(x), only.values = TRUE)$values))
 }
 
 
-tmaxEigenVal <- function(x, w=1)
-{
+tmaxEigenVal <- function(x, w = 1) {
     if (length(w) == 1) {
         w <- rep(1, ncol(x))
     }
 
-    x <- apply(x, 1, function(i) w*i)
+    x <- apply(x, 1, function(i) w * i)
 
     covmat <- cov(x)
 
-    return ((sum(colSums(covmat)))/ncol(x))
+    return((sum(colSums(covmat))) / ncol(x))
 }
 
-maxEigenVal <- function(x, w=1)
-{
+maxEigenVal <- function(x, w = 1) {
     if (length(w) == 1) {
         w <- rep(1, ncol(x))
     }
 
-    x <- apply(x, 1, function(i) w*i)
+    x <- apply(x, 1, function(i) w * i)
 
-    eigvals <- eigen(t(x) %*% x,only.values=TRUE)$values
+    eigvals <- eigen(t(x) %*% x, only.values = TRUE)$values
     # eigvals <- eigen(cov(x),only.values=TRUE)$values
 
-    return (max(eigvals))
+    return(max(eigvals))
 }
 
-maxSingVal <- function(x, w=1) {
-    if(!inherits(x,"matrix")) {
+maxSingVal <- function(x, w = 1) {
+    if (!inherits(x, "matrix")) {
         stop("Input must be inherit ’matrix’ class.")
     }
 
@@ -105,9 +101,9 @@ maxSingVal <- function(x, w=1) {
         w <- rep(1, ncol(x))
     }
 
-    x <- apply(x, 1, function(i) w*i)
+    x <- apply(x, 1, function(i) w * i)
 
-    return (max(svd(t(x))$d))
+    return(max(svd(t(x))$d))
 }
 
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
@@ -131,8 +127,8 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
             coord_fixed() +
             guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
             theme(legend.key.width = unit(0.5, "inches")) +
-            theme(legend.text = element_text(size=12)) +
-            theme(plot.margin = margin(-10,0,10,0)) +
+            theme(legend.text = element_text(size = 12)) +
+            theme(plot.margin = margin(-10, 0, 10, 0)) +
             theme(plot.title = element_text(size = 20)) +
             theme(axis.title = element_text(size = 15)) +
             theme(legend.title = element_text(size = 20)) +
@@ -141,26 +137,26 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     })
 
 
-    title <- textGrob(title, gp=gpar(fontsize=20))
+    title <- textGrob(title, gp = gpar(fontsize = 20))
 
     # Add a zeroGrob of height 2cm on top of the title
     title <- arrangeGrob(zeroGrob(), title,
-                         widths = unit(1, 'npc'),
-                         heights = unit(c(2, 1), c('cm', 'npc')),
-                         as.table = FALSE)
+        widths = unit(1, "npc"),
+        heights = unit(c(2, 1), c("cm", "npc")),
+        as.table = FALSE
+    )
 
-    grid.arrange(grobs=plot.vals, nrow=nrow, ncol=ncol, top=title)
+    grid.arrange(grobs = plot.vals, nrow = nrow, ncol = ncol, top = title)
 }
 
-scatterPlot<-function(scatterdf){
+scatterPlot <- function(scatterdf) {
+    plotvar <- ggplot(scatterdf, aes(x = x, y = y)) +
+        geom_point(size = 2, shape = 23) +
+        labs(x = "Cell Count ", y = "Maximum Eigen value")
 
-    plotvar <-ggplot(scatterdf, aes(x=x, y=y)) +
-        geom_point(size=2, shape=23) +
-        labs(x="Cell Count " ,y= "Maximum Eigen value")
-
-    plotbox <-ggplot(scatterdf, aes(x=x, y=y, group=x)) +
+    plotbox <- ggplot(scatterdf, aes(x = x, y = y, group = x)) +
         geom_boxplot() +
-        labs(x="Cell Count " ,y= "Maximum Eigen value")
+        labs(x = "Cell Count ", y = "Maximum Eigen value")
 
-    do.call("grid.arrange", c(list(plotvar, plotbox), ncol=2))
+    do.call("grid.arrange", c(list(plotvar, plotbox), ncol = 2))
 }

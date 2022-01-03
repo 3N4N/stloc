@@ -1,12 +1,12 @@
 library(dplyr)
 library(Seurat)
 
-#reading merfish data
-dataset = read.csv(file="./data/merfish/s7.csv")
-data = dataset[, colSums(dataset[,-c(1:9)]) != 0]
-counts = data[,-c(1:9)]
+# reading merfish data
+dataset <- read.csv(file = "./data/merfish/s7.csv")
+data <- dataset[, colSums(dataset[, -c(1:9)]) != 0]
+counts <- data[, -c(1:9)]
 
-#reading pbmc data
+# reading pbmc data
 pbmc.data <- Read10X(data.dir = "./data/pbmc3k/filtered_gene_bc_matrices/hg19")
 pbmc <- CreateSeuratObject(counts = pbmc.data, project = "pbmc3k", min.cells = 3, min.features = 200)
 pbmc
@@ -25,12 +25,9 @@ pbmc <- FindClusters(pbmc, resolution = 2)
 pbmc <- RunUMAP(pbmc, dims = 1:10)
 pbmc.markers <- FindAllMarkers(pbmc, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
 
-markerGenes = list()
+markerGenes <- list()
 
-for(x in 1:16){
+for (x in 1:16) {
   print(x)
-  markerGenes[[x]] = intersect((pbmc.markers[pbmc.markers[6] == x-1,][[7]]), toupper(colnames(counts)))
+  markerGenes[[x]] <- intersect((pbmc.markers[pbmc.markers[6] == x - 1, ][[7]]), toupper(colnames(counts)))
 }
-
-
-
