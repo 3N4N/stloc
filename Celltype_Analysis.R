@@ -21,7 +21,8 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir) {
     # _________________________Cell type names for two datasets_______________________
     # if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial1"| cluster==  "Excitatory"| cluster=="ODImmature1" | cluster=="ODImmature2" | cluster== "Microglia" | cluster=="ODMature2" | cluster== "ODMature1" | cluster== "Endothelial3" | cluster=="ODMature3" | cluster== "ODMature4" | cluster== "Endothelial2" | cluster== "Ependymal")) next
     # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-    resultFrame <- data.frame()
+    mat <- matrix(ncol = 0, nrow = 1249)
+    resultFrame <- data.frame(mat)
 
     for (cluster in clusters.name) {
         # if (cluster != "Endothelial1") next
@@ -50,6 +51,7 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir) {
             1:nrow(coords),
             function(i) (maxSingVal(pairCount, W[i, ]))
         ))
+        resultFrame[cluster] <- meig.real
         # resultFrame[cluster] <- meig.real
         # function(i) (maxEigenVal(pairCount, W[i,]) * kde$estimate[i])))
         # tmp <- colSums(pairCount) #/ kde$estimate
@@ -58,43 +60,45 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir) {
 
         message("Runtime of eigenvalues: ", difftime(et, st, units = "mins"), " mins")
 
-        message(paste0("Conducting permutation tests for ", cluster))
+        # message(paste0("Conducting permutation tests for ", cluster))
 
-        meig.perm <- c(1:nitr)
-        st <- Sys.time()
-        for (i in 1:nitr) {
-            cat("\r", "Iteration step", i)
-            o <- sample(1:nrow(coords))
-            x <- pairCount[, o]
-            randloc <- sample(1:nrow(coords), 1)
-            meig.perm[i] <- maxSingVal(x, W[randloc, ])
-            # meig.perm[i] <- maxEigenVal(x, W[randloc,]) * kde$estimate[o[randloc]]
-            # meig.perm[i] <- colSums(x)[randloc] / kde$estimate[o[randloc]]
-            # meig.perm[i] <- sum(colSums(x) #/ kde$estimate[o[randloc]] * W[randloc,])
-        }
-        cat("\n")
-        message(paste0("Permutation tests for ", cluster, " completed"))
-        et <- Sys.time()
-        message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et, st, units = "mins"), " mins")
+        # meig.perm <- c(1:nitr)
+        # st <- Sys.time()
+        # for (i in 1:nitr) {
+        #     cat("\r", "Iteration step", i)
+        #     o <- sample(1:nrow(coords))
+        #     x <- pairCount[, o]
+        #     randloc <- sample(1:nrow(coords), 1)
+        #     meig.perm[i] <- maxSingVal(x, W[randloc, ])
+        #     # meig.perm[i] <- maxEigenVal(x, W[randloc,]) * kde$estimate[o[randloc]]
+        #     # meig.perm[i] <- colSums(x)[randloc] / kde$estimate[o[randloc]]
+        #     # meig.perm[i] <- sum(colSums(x) #/ kde$estimate[o[randloc]] * W[randloc,])
+        # }
+        # cat("\n")
+        # message(paste0("Permutation tests for ", cluster, " completed"))
+        # et <- Sys.time()
+        # message("Runtime of ", cluster, " for ", nitr, " iterations: ", difftime(et, st, units = "mins"), " mins")
 
-        meig.pval <- meig.real
-        for (i in 1:nrow(coords)) {
-            meig.pval[i] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
-        }
+        # meig.pval <- meig.real
+        # for (i in 1:nrow(coords)) {
+        #     meig.pval[i] <- (sum(meig.perm > meig.real[i]) + 1) / (nitr + 1)
+        # }
 
-        meig.fdr <- p.adjust(meig.pval, method = "BH")
+        # meig.fdr <- p.adjust(meig.pval, method = "BH")
 
-        df <- data.frame(x = coords[, "x"], y = -coords[, "y"])
+        # df <- data.frame(x = coords[, "x"], y = -coords[, "y"])
 
-        pdf(paste0(outdir, cluster, "x", log(nitr, 10), ".pdf"),
-            height = 6, width = 10, onefile = F
-        )
-        # plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)), c("Largest Eigenvalue",-log10(meig.pval)), 3, 1, 2)
+        # pdf(paste0(outdir, cluster, "x", log(nitr, 10), ".pdf"),
+        #     height = 6, width = 10, onefile = F
+        # )
+        # # plotvals(2, df, "", vals=list(meig.real, -log10(meig.pval)), c("Largest Eigenvalue",-log10(meig.pval)), 3, 1, 2)
 
-        plotvals(3, df, cluster,
-            vals = list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
-            c("Largest Eigenvalue", "-log10(pval)", "-log10(fdr)"), 3, 1, 3
-        )
-        dev.off()
+        # plotvals(3, df, cluster,
+        #     vals = list(meig.real, -log10(meig.pval), -log10(meig.fdr)),
+        #     c("Largest Eigenvalue", "-log10(pval)", "-log10(fdr)"), 3, 1, 3
+        # )
+        # dev.off()
     }
+    SVDcor <- resultFrame
+    return(SVDcor)
 }
