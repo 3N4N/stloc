@@ -2,9 +2,21 @@ library("readxl")
 require(dplyr)
 library(ggplot2)
 
-cellType <- c("Astrocyte", "Inhibitory", "Pericytes", "Ambiguous", "Endothelial1", "Excitatory", "ODImmature1", "ODImmature2", "Microglia", "ODMature2", "ODMature1", "Endothelial3", "ODMature3", "ODMature4", "Endothelial2", "Ependymal")
-dataset <- read_xlsx("./data/merfish/s7.xlsx")
-# cellType= c("Astrocyte", "Inhibitory","Pericytes", "Ambiguous","Endothelial","Excitatory","ODImmature","Microglia","ODMature","Ependymal")
+
+BregmaValue <- 0.06
+inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
+# dataset <- read_xlsx("./data/merfish/s7.xlsx")
+dataset <- read_xlsx(inputFile)
+for (row in 1:nrow(dataset)) {
+    dataset[row, "Cell_class"] <- gsub(" ", "", dataset[row, "Cell_class"], fixed = TRUE)
+}
+
+visiumFile <- paste("./data/merfish/Bregma/visiumData/BregmaVisium_", as.character(BregmaValue), ".csv")
+write.csv(dataset, visiumFile, row.names = FALSE)
+
+cellType <- unique(dataset["Cell_class"])
+
+
 
 # Merfish plot regenerate
 # sp<-ggplot(dataset, aes(Centroid_X, Centroid_Y, colour = Cell_class)) +
@@ -64,4 +76,6 @@ for (k in 2:nrow(dataset))
 tempDataFrame$coord <- paste(tempDataFrame$new_X, tempDataFrame$new_Y, sep = "x")
 tempDataFrame <- tempDataFrame %>% select(coord, everything())
 tempDataFrame <- select(tempDataFrame, -new_X, -new_Y, -Centroid_X, -Centroid_Y, -Cell_class, -Neuron_cluster_ID)
-write.table(tempDataFrame, "./data/merfish/merfishSpatial.csv", row.names = FALSE, append = FALSE)
+
+outputFile <- paste("./data/merfish/Bregma/spatialData/BregmaSpatial_", as.character((BregmaValue)), ".csv", sep = "")
+write.table(tempDataFrame, outputFile, row.names = FALSE, append = FALSE)
