@@ -54,4 +54,6 @@ if (length(clusters.name) == 1) {
 
 source("Celltype_Analysis.R")
 
-analyze(clusters.name, clusters.pair, counts, "output/merfish/plots/")
+resultFrame <- analyze(clusters.name, clusters.pair, counts, "output/merfish/plots/")
+corOutput <- cor(resultFrame)
+CV <- sapply(resultFrame, function(x) sd(x) / mean(x) * 100)
