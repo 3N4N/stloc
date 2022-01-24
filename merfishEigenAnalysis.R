@@ -1,6 +1,7 @@
 library(SingleCellExperiment)
 library(scran)
 library(ks)
+require(dplyr)
 
 
 library(ggplot2)
@@ -18,11 +19,19 @@ if (!file.exists("output/merfish/plots")) {
     system("mkdir -p output/merfish/plots")
 }
 
+if (!file.exists("output/merfish/Bregma/scatterPlot")) {
+    system("mkdir -p output/merfish/Bregma/scatterPlot")
+}
 
-counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
-cellCount <- counts.raw[(length(counts.raw) - 15):length(counts.raw)]
-correlationMatrix <- cor(cellCount)
-counts.raw <- counts.raw[1:(length(counts.raw) - 16)]
+
+counts.raw <- read.table("./data/merfish/Bregma/spatialData/BregmaSpatial_0.06.csv", header = TRUE, row.names = 1)
+counts.raw <- select(counts.raw, -Fos) # Remove Fos column only for bregma
+
+
+# counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
+cellCount <- counts.raw[(length(counts.raw) - 15):length(counts.raw)] # cellCount of each cell type
+
+counts.raw <- counts.raw[1:(length(counts.raw) - 16)] # removing last 16 columns
 
 coords.raw <- do.call(rbind, strsplit(rownames(counts.raw), "x"))
 coords <- apply(coords.raw, 1:2, as.numeric)
@@ -39,6 +48,10 @@ counts <- t(apply(counts, 1, minmax))
 
 clusters.data <- read.table("./data/merfish/markerGene_for_merfish_data.csv", sep = ",", header = TRUE, check.names = FALSE)
 clusters.data <- as.data.frame(clusters.data, check.names = FALSE)
+for (row in 1:nrow(clusters.data)) {
+    clusters.data[row, "cell_type"] <- gsub(" ", "", clusters.data[row, "cell_type"], fixed = TRUE)
+}
+write.table(clusters.data, "./data/merfish/markerGene_for_merfish_data.csv", sep = ",", row.names = FALSE, append = FALSE)
 clusters.name <- unique(clusters.data$cell_type)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
 
@@ -54,6 +67,8 @@ if (length(clusters.name) == 1) {
 
 source("Celltype_Analysis.R")
 
-resultFrame <- analyze(clusters.name, clusters.pair, counts, "output/merfish/plots/")
+bregmaOutputDirectory <- "output/merfish/Bregma/scatterPlot/"
+resultFrame <- analyze(clusters.name, clusters.pair, counts, cellCount, bregmaOutputDirectory)
 corOutput <- cor(resultFrame)
+write.table(corOutput, "svdCor.txt")
 CV <- sapply(resultFrame, function(x) sd(x) / mean(x) * 100)

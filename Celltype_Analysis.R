@@ -1,7 +1,7 @@
 source("./functions.R")
 
 
-analyze <- function(clusters.name, clusters.pair, counts, outdir) {
+analyze <- function(clusters.name, clusters.pair, counts, cellCount, outdir) {
     counts.flat <- colSums(counts)
 
     data <- rep(names(counts.flat), counts.flat)
@@ -21,15 +21,16 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir) {
     # _________________________Cell type names for two datasets_______________________
     # if (!(cluster=="Excitatory" | cluster=="Inhibitory" | cluster== "Astrocyte" | cluster==  "Inhibitory" | cluster== "Pericytes" | cluster== "Ambiguous" | cluster=="Endothelial1"| cluster==  "Excitatory"| cluster=="ODImmature1" | cluster=="ODImmature2" | cluster== "Microglia" | cluster=="ODMature2" | cluster== "ODMature1" | cluster== "Endothelial3" | cluster=="ODMature3" | cluster== "ODMature4" | cluster== "Endothelial2" | cluster== "Ependymal")) next
     # if (!(cluster=="Epithelial" | cluster=="Fibroblast" | cluster=="Myeloid")) next
-    mat <- matrix(ncol = 0, nrow = 1249)
+    mat <- matrix(ncol = 0, nrow = ncol(counts))
+
     resultFrame <- data.frame(mat)
+    print(clusters.name)
 
     for (cluster in clusters.name) {
-        # if (cluster != "Endothelial1") next
-
+        # if (!(cluster == "Excitatory")) next
         genes <- unlist(c(clusters.pair[cluster]))
         genes <- sapply(genes, function(i) i <- toString(i))
-        if (length(genes) == 1) next
+        # if (length(genes) == 1) next
 
         message("Analyzing cluster ", cluster)
         message("Number of marker genes: ", length(genes))
@@ -98,6 +99,12 @@ analyze <- function(clusters.name, clusters.pair, counts, outdir) {
         #     c("Largest Eigenvalue", "-log10(pval)", "-log10(fdr)"), 3, 1, 3
         # )
         # dev.off()
+        pdf(paste0(outdir, cluster, ".pdf"),
+            height = 6, width = 10
+        )
+        scatterDf <- data.frame(x = cellCount[, cluster], y = meig.real)
+        scatterPlot(scatterDf)
+        dev.off()
     }
     SVDcor <- resultFrame
     return(SVDcor)

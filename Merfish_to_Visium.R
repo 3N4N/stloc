@@ -3,17 +3,25 @@ require(dplyr)
 library(ggplot2)
 
 
-BregmaValue <- 0.06
-inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
-# dataset <- read_xlsx("./data/merfish/s7.xlsx")
+bregmaAnalysis <- FALSE
+if (isTRUE(bregmaAnalysis)) {
+    BregmaValue <- 0.06
+    inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
+} else {
+    inputFile <- "./data/merfish/s7.xlsx"
+}
 dataset <- read_xlsx(inputFile)
+
 for (row in 1:nrow(dataset)) {
     dataset[row, "Cell_class"] <- gsub(" ", "", dataset[row, "Cell_class"], fixed = TRUE)
 }
 
-visiumFile <- paste("./data/merfish/Bregma/visiumData/BregmaVisium_", as.character(BregmaValue), ".csv")
+if (isTRUE(bregmaAnalysis)) {
+    visiumFile <- paste("./data/merfish/Bregma/visiumData/BregmaVisium_", as.character(BregmaValue), ".csv")
+} else {
+    visiumFile <- "./data/merfish/s7.csv"
+}
 write.csv(dataset, visiumFile, row.names = FALSE)
-
 cellType <- unique(dataset["Cell_class"])
 
 
@@ -77,5 +85,10 @@ tempDataFrame$coord <- paste(tempDataFrame$new_X, tempDataFrame$new_Y, sep = "x"
 tempDataFrame <- tempDataFrame %>% select(coord, everything())
 tempDataFrame <- select(tempDataFrame, -new_X, -new_Y, -Centroid_X, -Centroid_Y, -Cell_class, -Neuron_cluster_ID)
 
-outputFile <- paste("./data/merfish/Bregma/spatialData/BregmaSpatial_", as.character((BregmaValue)), ".csv", sep = "")
+if (isTRUE(bregmaAnalysis)) {
+    outputFile <- paste("./data/merfish/Bregma/spatialData/BregmaSpatial_", as.character((BregmaValue)), ".csv", sep = "")
+} else {
+    outputFile <- "./data/merfish/merfishSpatial.csv"
+    withoutCount <- "./data/merfish/merfishWithoutCout"
+}
 write.table(tempDataFrame, outputFile, row.names = FALSE, append = FALSE)
