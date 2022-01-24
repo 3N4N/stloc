@@ -19,7 +19,7 @@ for (row in 1:nrow(dataset)) {
 if (isTRUE(bregmaAnalysis)) {
     visiumFile <- paste("./data/merfish/Bregma/visiumData/BregmaVisium_", as.character(BregmaValue), ".csv")
 } else {
-    visiumFile <- "./data/merfish/s7.csv"
+    visiumFile <- "./data/merfish/merfishVisium.csv"
 }
 write.csv(dataset, visiumFile, row.names = FALSE)
 cellType <- unique(dataset["Cell_class"])
@@ -52,9 +52,11 @@ dataset <- dataset %>% relocate(new_X, new_Y, .before = Centroid_X)
 dataset <- dataset[order(dataset[, 1], dataset[, 2]), ]
 
 
-
+# write.csv(dataset, "./changed.csv")
 max_New_X <- max(dataset$new_X)
 max_New_Y <- max(dataset$new_Y)
+
+dataset <- as.data.frame(dataset)
 
 
 startX <- 25
@@ -62,9 +64,16 @@ startY <- 25
 tempDataFrame <- dataset[0, ]
 tempRow <- dataset[1, ]
 tempRow[dataset[1, ]$Cell_class] <- 1
+checkOutside <- function(dataRow) {
+    if (sqrt((dataRow$Centroid_X - dataRow$new_X)^2 + (dataRow$Centroid_Y - dataRow$new_Y)^2) >= 20) {
+        return(TRUE)
+    }
+    return(FALSE)
+}
 for (k in 2:nrow(dataset))
 {
-    if (sqrt((dataset[k, ]$Centroid_X - dataset[k, ]$new_X)^2 + (dataset[k, ]$Centroid_Y - dataset[k, ]$new_Y)^2) >= 20) {
+    # if (sqrt((dataset[k, ]$Centroid_X - dataset[k, ]$new_X)^2 + (dataset[k, ]$Centroid_Y - dataset[k, ]$new_Y)^2) >= 20) {
+    if (checkOutside(dataset[k, ])) {
         next
     }
     print(k)
@@ -75,8 +84,17 @@ for (k in 2:nrow(dataset))
             tempRow[1, i] <- tempRow[1, i] + dataset[k, i]
         }
     } else {
+        # print(tempRow[(ncol(dataset) - 16):ncol(dataset)])
         tempDataFrame <- rbind(tempDataFrame, tempRow)
+        while (k <= nrow(dataset)) {
+            if (checkOutside(dataset[k, ])) {
+                k <- k + 1
+            } else {
+                break
+            }
+        }
         tempRow <- dataset[k, ]
+        tempRow[dataset[k, ]$Cell_class] <- 1
         startX <- dataset[k, ]$new_X
         startY <- dataset[k, ]$new_Y
     }
@@ -89,6 +107,5 @@ if (isTRUE(bregmaAnalysis)) {
     outputFile <- paste("./data/merfish/Bregma/spatialData/BregmaSpatial_", as.character((BregmaValue)), ".csv", sep = "")
 } else {
     outputFile <- "./data/merfish/merfishSpatial.csv"
-    withoutCount <- "./data/merfish/merfishWithoutCout"
 }
 write.table(tempDataFrame, outputFile, row.names = FALSE, append = FALSE)
