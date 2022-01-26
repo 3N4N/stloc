@@ -44,10 +44,12 @@ dataset$Centroid_Y <- -1 * dataset$Centroid_Y
 minX <- min(dataset$Centroid_X)
 minY <- min(dataset$Centroid_Y)
 
+
+tileWidth <- 100.0
 dataset$Centroid_X <- dataset$Centroid_X - minX
 dataset$Centroid_Y <- dataset$Centroid_Y - minY
-dataset$new_X <- (floor(dataset$Centroid_X / 50.0) * 50) + 25
-dataset$new_Y <- (floor(dataset$Centroid_Y / 50.0) * 50) + 25
+dataset$new_X <- (floor(dataset$Centroid_X / tileWidth) * tileWidth) + tileWidth / 2
+dataset$new_Y <- (floor(dataset$Centroid_Y / tileWidth) * tileWidth) + tileWidth / 2
 dataset <- dataset %>% relocate(new_X, new_Y, .before = Centroid_X)
 dataset <- dataset[order(dataset[, 1], dataset[, 2]), ]
 
@@ -65,7 +67,7 @@ tempDataFrame <- dataset[0, ]
 tempRow <- dataset[1, ]
 tempRow[dataset[1, ]$Cell_class] <- 1
 checkOutside <- function(dataRow) {
-    if (sqrt((dataRow$Centroid_X - dataRow$new_X)^2 + (dataRow$Centroid_Y - dataRow$new_Y)^2) >= 20) {
+    if (sqrt((dataRow$Centroid_X - dataRow$new_X)^2 + (dataRow$Centroid_Y - dataRow$new_Y)^2) >= tileWidth * 0.4) {
         return(TRUE)
     }
     return(FALSE)
