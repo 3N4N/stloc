@@ -3,7 +3,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 
 
 packages.cran = c("ggplot2", "gridExtra", "ks")
-packages.bioc = c("SingleCellExperiment", "scran")
+packages.bioc = c("SingleCellExperiment", "scran", "splatter")
 
 install.packages(packages.cran, method="wget")
 BiocManager::install(packages.bioc, method="wget")
