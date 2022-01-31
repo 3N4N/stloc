@@ -9,8 +9,13 @@ library(igraph)
 library(RColorBrewer)
 
 
-counts.raw <- read.table("./data/merfish/s7.csv", header = TRUE, sep = ",")
+counts.raw <- read.table("./data/merfish/Bregma/visiumData/BregmaVisium_06.csv", header = TRUE, sep = ",")
+
+# counts.raw <- read.table("./data/merfish/s7.csv", header = TRUE, sep = ",")
 data <- subset(counts.raw, select = -c(1, 2, 3, 4, 5, 6, 7, 8, 9))
+#remove NA
+data = subset(data, select = -c(Fos))
+
 cortex_sc <- CreateSeuratObject(counts = t(data))
 
 cortex_sc[["subclass"]] <- counts.raw[[8]]
@@ -32,9 +37,34 @@ data <- do.call(data.frame, lapply(DT, function(x) replace(x, is.infinite(x), NA
 
 
 
+#spatial data
+rawSpatial <- read.table("./data/merfish/Bregma/spatialData/BregmaSpatial_06.csv", header = TRUE, sep = ' ')
+spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
+spatialData = subset(spatialData, select = -c(Fos))
+anterior = subset(spatialData, select = -c(1))
+anterior <- CreateSeuratObject(counts = t(anterior))
 
+#preprocessing
 
+set.seed(123)
+cortex_sc <- Seurat::SCTransform(cortex_sc, verbose = FALSE) %>%
+  Seurat::RunPCA(., verbose = FALSE) %>%
+  Seurat::RunUMAP(., dims = 1:30, verbose = FALSE)
 
+Seurat::DimPlot(cortex_sc,
+                group.by = "subclass",
+                label = TRUE) + Seurat::NoLegend()
+
+#marker gene
+Seurat::Idents(object = cortex_sc) <- cortex_sc@meta.data$subclass
+cluster_markers_all <- Seurat::FindAllMarkers(object = cortex_sc, 
+                                              assay = "SCT",
+                                              slot = "data",
+                                              verbose = TRUE, 
+                                              only.pos = TRUE)
+
+saveRDS(object = cluster_markers_all,
+        file = here::here("inst/markers_sc.RDS"))
 
 
 set.seed(123)
@@ -55,19 +85,12 @@ spotlight_ls <- spotlight_deconvolution(
 saveRDS(object = spotlight_ls, file = here::here("inst/spotlight_ls.rds"))
 
 
-start_time <- Sys.time()
-nmf_mod_ls <- train_nmf(
-  cluster_markers = cluster_markers_all,
-  se_sc = se_sc_down,
-  mtrx_spatial = anterior@assays$RNA@counts,
-  clust_vr = "subclass",
-  ntop = NULL,
-  hvg = 3000,
-  transf = "uv",
-  method = "nsNMF"
-)
+#deconvolution
+spotlight_ls <- readRDS(file = here::here("inst/spotlight_ls.rds"))
 
-nmf_mod <- nmf_mod_ls[[1]]
+nmf_mod <- spotlight_ls[[1]]
+decon_mtrx <- spotlight_ls[[2]]
+spotlight_correlation = cor(decon_mtrx)
 
 
 spot_counts <- anterior@assays$RNA@counts
@@ -78,3 +101,48 @@ for (r in 1:row) {
     decon_mtrx1[r, c] <- (decon_mtrx[r, c] / sum(decon_mtrx[r, ])) * 100
   }
 }
+
+#cellCount
+cellCount = rawSpatial[(length(rawSpatial)-15):length(rawSpatial)]
+cellCountCorrelation = cor(cellCount)
+
+cellTypes = colnames(cellCount)
+
+#singular value correlation
+singularValueCorrelation <- read.table("./data/merfish/Bregma/singularData/svdCor06.txt", header = TRUE, sep = " ")
+
+fractionCorrelationList = c()
+cellCountCorelationList = c()
+singularValueCorrelationList = c()
+
+for(r in 1:16){
+  for(c in (r + 1):16){
+    if(c == 17) break
+    cellCountCorelationList = append(cellCountCorelationList, cellCountCorrelation[cellTypes[r], cellTypes[c]])
+    fractionCorrelationList = append(fractionCorrelationList, spotlight_correlation[cellTypes[r], cellTypes[c]])
+    singularValueCorrelationList = append(singularValueCorrelationList, singularValueCorrelation[cellTypes[r], cellTypes[c]])
+  }
+}
+
+cor(fractionCorrelationList, cellCountCorelationList)
+cor(singularValueCorrelationList, cellCountCorelationList)
+
+
+#writing files to 
+write.table(cellCountCorrelation, './data/merfish/Bregma/correlations/cellcount/06.txt', append = FALSE, sep = " ", dec = ".",
+            row.names = TRUE, col.names = TRUE)
+write.table(spotlight_correlation, './data/merfish/Bregma/correlations/franction/06.txt', append = FALSE, sep = " ", dec = ".",
+            row.names = TRUE, col.names = TRUE)
+write.table(cellCountCorrelation, './data/merfish/Bregma/correlations/singularval/06.txt', append = FALSE, sep = " ", dec = ".",
+            row.names = TRUE, col.names = TRUE)
+
+
+#scatterplot
+#excitatory
+scatterDf <- data.frame(x= cellCount[,3], y = decon_mtrx[,7], check.names = FALSE)
+#ependymal
+scatterDf <- data.frame(x= cellCount[,14], y = decon_mtrx[,6], check.names = FALSE)
+#inihibitory
+scatterDf <- data.frame(x= cellCount[,2], y = decon_mtrx[,8], check.names = FALSE)
+#astrocyte
+scatterDf <- data.frame(x= cellCount[,5], y = decon_mtrx[,2], check.names = FALSE)
