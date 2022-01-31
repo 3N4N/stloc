@@ -1,12 +1,15 @@
 library("splatter")
 library("scater")
 library("ggplot2")
+
 set.seed(1)
+
 sce <- mockSCE()
 params <- newSplatParams()
 # counts <- counts(sce)
 # counts
-sim <- splatSimulate(params, batchCells = c(1000, 1000,1000,1000), verbose = FALSE,nGenes=6)
+sim <- splatSimulate(params, batchCells = c(300, 300, 300, 300, 300, 300),
+                     verbose = FALSE,nGenes=200)
 
 
 sim <- logNormCounts(sim)
@@ -18,28 +21,28 @@ df_mtx <- as.data.frame(mat)
 df_mtx["cellType"]<-as.list(p['Batch'])
 # mat<-  cbind(mat,Class= as.list(p['Batch'])
 r<-rownames(mat)
-write.csv(df_mtx, file = "splatterCSV.csv", append = FALSE, quote = TRUE, sep = ",")
+write.csv(df_mtx, file = "data/splatter/splatterCSV.csv", quote = TRUE)
 
 plotPCA(simPCA, colour_by = "Batch")
 
-cellTypes <-unique(df_mtx["cellType"])
+cellTypes <- unique(df_mtx["cellType"])
 
 #typeWiseDf
-typeWiseDf<- vector(mode = "list", length = length(cellTypes))
+typeWiseDf <- vector(mode = "list", length = length(cellTypes))
 
 # for ( type  in cellTypes)
-for ( i in 1: length(cellTypes[[1]]))
+for (i in 1: length(cellTypes[[1]]))
 {
-    print(cellTypes[[1]][i])
+    # print(cellTypes[[1]][i])
     x<-df_mtx[ df_mtx["cellType"]==cellTypes[[1]][i] ,]
-    print(x)
+    # print(x)
     typeWiseDf[[i]]<-x
     # k=k+1
 }
 
 
-shape = 20
-for ( i in 1:shape)
+shape = 30
+for (i in 1:shape)
 {
     for( j in 1:shape)
     {
@@ -51,7 +54,7 @@ for ( i in 1:shape)
             tempDf <- tempDf[1:2,] #selecting first two rows
             tempDf <- subset(tempDf,select=-c(ncol(tempDf))) # deleting last column of type name
             ro<-colSums(tempDf) # sum of the cell counts
-            
+
             typeWiseDf[[1]]<-typeWiseDf[[1]][-s,] #deleting first two rows that were selected
             # typeWiseDf[[1]]<- subset(typeWiseDf[[1]],select = -c(ncol(typeWiseDf[[1]])))
             print(tempDf)

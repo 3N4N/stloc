@@ -3,17 +3,25 @@ require(dplyr)
 library(ggplot2)
 
 
-BregmaValue <- 0.06
-inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
-# dataset <- read_xlsx("./data/merfish/s7.xlsx")
+bregmaAnalysis <- FALSE
+if (isTRUE(bregmaAnalysis)) {
+    BregmaValue <- 0.06
+    inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
+} else {
+    inputFile <- "./data/merfish/s7.xlsx"
+}
 dataset <- read_xlsx(inputFile)
+
 for (row in 1:nrow(dataset)) {
     dataset[row, "Cell_class"] <- gsub(" ", "", dataset[row, "Cell_class"], fixed = TRUE)
 }
 
-visiumFile <- paste("./data/merfish/Bregma/visiumData/BregmaVisium_", as.character(BregmaValue), ".csv")
+if (isTRUE(bregmaAnalysis)) {
+    visiumFile <- paste("./data/merfish/Bregma/visiumData/BregmaVisium_", as.character(BregmaValue), ".csv")
+} else {
+    visiumFile <- "./data/merfish/merfishVisium.csv"
+}
 write.csv(dataset, visiumFile, row.names = FALSE)
-
 cellType <- unique(dataset["Cell_class"])
 
 
@@ -36,17 +44,21 @@ dataset$Centroid_Y <- -1 * dataset$Centroid_Y
 minX <- min(dataset$Centroid_X)
 minY <- min(dataset$Centroid_Y)
 
+
+tileWidth <- 100.0
 dataset$Centroid_X <- dataset$Centroid_X - minX
 dataset$Centroid_Y <- dataset$Centroid_Y - minY
-dataset$new_X <- (floor(dataset$Centroid_X / 50.0) * 50) + 25
-dataset$new_Y <- (floor(dataset$Centroid_Y / 50.0) * 50) + 25
+dataset$new_X <- (floor(dataset$Centroid_X / tileWidth) * tileWidth) + tileWidth / 2
+dataset$new_Y <- (floor(dataset$Centroid_Y / tileWidth) * tileWidth) + tileWidth / 2
 dataset <- dataset %>% relocate(new_X, new_Y, .before = Centroid_X)
 dataset <- dataset[order(dataset[, 1], dataset[, 2]), ]
 
 
-
+# write.csv(dataset, "./changed.csv")
 max_New_X <- max(dataset$new_X)
 max_New_Y <- max(dataset$new_Y)
+
+dataset <- as.data.frame(dataset)
 
 
 startX <- 25
@@ -54,9 +66,16 @@ startY <- 25
 tempDataFrame <- dataset[0, ]
 tempRow <- dataset[1, ]
 tempRow[dataset[1, ]$Cell_class] <- 1
+checkOutside <- function(dataRow) {
+    if (sqrt((dataRow$Centroid_X - dataRow$new_X)^2 + (dataRow$Centroid_Y - dataRow$new_Y)^2) >= tileWidth * 0.4) {
+        return(TRUE)
+    }
+    return(FALSE)
+}
 for (k in 2:nrow(dataset))
 {
-    if (sqrt((dataset[k, ]$Centroid_X - dataset[k, ]$new_X)^2 + (dataset[k, ]$Centroid_Y - dataset[k, ]$new_Y)^2) >= 20) {
+    # if (sqrt((dataset[k, ]$Centroid_X - dataset[k, ]$new_X)^2 + (dataset[k, ]$Centroid_Y - dataset[k, ]$new_Y)^2) >= 20) {
+    if (checkOutside(dataset[k, ])) {
         next
     }
     print(k)
@@ -67,8 +86,17 @@ for (k in 2:nrow(dataset))
             tempRow[1, i] <- tempRow[1, i] + dataset[k, i]
         }
     } else {
+        # print(tempRow[(ncol(dataset) - 16):ncol(dataset)])
         tempDataFrame <- rbind(tempDataFrame, tempRow)
+        while (k <= nrow(dataset)) {
+            if (checkOutside(dataset[k, ])) {
+                k <- k + 1
+            } else {
+                break
+            }
+        }
         tempRow <- dataset[k, ]
+        tempRow[dataset[k, ]$Cell_class] <- 1
         startX <- dataset[k, ]$new_X
         startY <- dataset[k, ]$new_Y
     }
@@ -77,5 +105,9 @@ tempDataFrame$coord <- paste(tempDataFrame$new_X, tempDataFrame$new_Y, sep = "x"
 tempDataFrame <- tempDataFrame %>% select(coord, everything())
 tempDataFrame <- select(tempDataFrame, -new_X, -new_Y, -Centroid_X, -Centroid_Y, -Cell_class, -Neuron_cluster_ID)
 
-outputFile <- paste("./data/merfish/Bregma/spatialData/BregmaSpatial_", as.character((BregmaValue)), ".csv", sep = "")
+if (isTRUE(bregmaAnalysis)) {
+    outputFile <- paste("./data/merfish/Bregma/spatialData/BregmaSpatial_", as.character((BregmaValue)), ".csv", sep = "")
+} else {
+    outputFile <- "./data/merfish/merfishSpatial.csv"
+}
 write.table(tempDataFrame, outputFile, row.names = FALSE, append = FALSE)

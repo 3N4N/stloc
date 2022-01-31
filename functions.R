@@ -152,11 +152,11 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
 scatterPlot <- function(scatterdf) {
     plotvar <- ggplot(scatterdf, aes(x = x, y = y)) +
         geom_point(size = 2, shape = 23) +
-        labs(x = "Cell Count ", y = "Maximum Eigen value")
+        labs(x = "Cell Count ", y = "Singular value")
 
     plotbox <- ggplot(scatterdf, aes(x = x, y = y, group = x)) +
         geom_boxplot() +
-        labs(x = "Cell Count ", y = "Maximum Eigen value")
+        labs(x = "Cell Count ", y = "Singular value")
 
     do.call("grid.arrange", c(list(plotvar, plotbox), ncol = 2))
 }

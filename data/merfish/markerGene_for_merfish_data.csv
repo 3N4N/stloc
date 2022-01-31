@@ -1,169 +1,149 @@
-cell_type,marker_gene,p_value
-Astrocyte,Aldh1l1,[0.]
-Astrocyte,Aqp4,[0.]
-Astrocyte,Cxcl14,[0.]
-Astrocyte,Mlc1,[0.]
-Astrocyte,Ttyh2,[1.03243826e-267]
-Astrocyte,Sox8,[1.3657778e-208]
-Astrocyte,Sox6,[1.14953915e-191]
-Astrocyte,Pou3f2,[3.12081644e-178]
-Astrocyte,Cck,[7.11575467e-80]
-Astrocyte,Cyr61,[5.56636726e-77]
-Inhibitory,Gad1,[0.]
-Inhibitory,Irs4,[6.86690434e-268]
-Inhibitory,Prlr,[5.06710331e-220]
-Inhibitory,Pak3,[1.94637768e-212]
-Inhibitory,Ar,[2.68983398e-212]
-Inhibitory,Gpr165,[7.5570108e-192]
-Inhibitory,Esr1,[4.38003088e-190]
-Inhibitory,Coch,[4.27303874e-185]
-Inhibitory,Oprl1,[5.86782275e-173]
-Inhibitory,Pgr,[2.70553586e-159]
-Pericytes,Myh11,[5.81177905e-95]
-Pericytes,Lmod1,[6.91720498e-68]
-Pericytes,Fn1,[2.47974465e-48]
-Pericytes,Ccnd2,[8.76390339e-37]
-Pericytes,Rgs5,[2.28949504e-29]
-Pericytes,Klf4,[3.40031832e-28]
-Pericytes,Gnrh1,[2.17823817e-23]
-Pericytes,Npy1r,[5.03188598e-16]
-Pericytes,Plin3,[5.84568068e-15]
-Pericytes,Adora2a,[2.20255156e-14]
-Ambiguous,Gjc3,[4.58366939e-54]
-Ambiguous,Mbp,[1.41426259e-49]
-Ambiguous,Sgk1,[5.57635574e-47]
-Ambiguous,Opalin,[9.63605431e-42]
-Ambiguous,Ermn,[2.4124049e-41]
-Ambiguous,Lpar1,[4.52505453e-25]
-Ambiguous,Ttyh2,[6.91113552e-24]
-Ambiguous,Sox8,[7.89900775e-24]
-Ambiguous,Ndrg1,[1.46203016e-23]
-Ambiguous,Isl1,[1.69244396e-23]
-Endothelial 1,Fn1,[3.28199276e-299]
-Endothelial 1,Slco1a4,[4.85060278e-222]
-Endothelial 1,Sema3c,[4.03458328e-195]
-Endothelial 1,Klf4,[2.10156461e-194]
-Endothelial 1,Igf1r,[1.72683754e-169]
-Endothelial 1,Rgs5,[2.60639616e-153]
-Endothelial 1,Ndrg1,[1.69014644e-111]
-Endothelial 1,Cdkn1a,[2.14888587e-69]
-Endothelial 1,Trh,[1.35521663e-33]
-Endothelial 1,Cck,[2.87042805e-32]
-Excitatory,Slc17a6,[0.]
-Excitatory,Cbln1,[2.78975205e-252]
-Excitatory,Cbln2,[1.2649941e-216]
-Excitatory,Syt4,[2.393991e-179]
-Excitatory,Adcyap1,[4.84389808e-139]
-Excitatory,Necab1,[1.05358319e-135]
-Excitatory,Gabra1,[1.5116004e-124]
-Excitatory,Nos1,[1.57705333e-108]
-Excitatory,Oprl1,[1.68789506e-103]
-Excitatory,Pak3,[3.73565326e-87]
-OD Immature 1,Pdgfra,[6.40040634e-213]
-OD Immature 1,Traf4,[2.37895807e-142]
-OD Immature 1,Cspg5,[4.32839851e-133]
-OD Immature 1,Gjc3,[3.88790246e-130]
-OD Immature 1,Sox8,[3.13370592e-111]
-OD Immature 1,Sox6,[2.46153264e-106]
-OD Immature 1,Bmp7,[7.09538924e-73]
-OD Immature 1,Npas1,[1.88068237e-32]
-OD Immature 1,Pcdh11x,[8.20965195e-28]
-OD Immature 1,Etv1,[2.82720103e-27]
-OD Immature 2,Mki67,[2.162061e-06]
-Microglia,Selplg,[1.50668378e-88]
-Microglia,Man1a,[1.67436753e-27]
-Microglia,Sgk1,[3.31771386e-16]
-Microglia,Trh,[3.71517472e-13]
-Microglia,Cck,[6.42472993e-13]
-Microglia,Ebf3,[3.76609586e-12]
-Microglia,Rgs2,[1.78970813e-11]
-Microglia,Sema4d,[5.02179996e-11]
-Microglia,Slc15a3,[8.0499621e-11]
-Microglia,Sst,[1.23193318e-05]
-OD Mature 2,Mbp,[7.87318005e-271]
-OD Mature 2,Ermn,[1.46044099e-230]
-OD Mature 2,Ttyh2,[2.79717118e-167]
-OD Mature 2,Opalin,[5.79019458e-162]
-OD Mature 2,Gjc3,[6.82640789e-160]
-OD Mature 2,Sgk1,[3.10685092e-159]
-OD Mature 2,Ndrg1,[3.8074226e-142]
-OD Mature 2,Lpar1,[2.93738995e-129]
-OD Mature 2,Sox8,[9.36399966e-97]
-OD Mature 2,Plin3,[9.50930548e-59]
-OD Mature 1,Mbp,[1.69320944e-47]
-OD Mature 1,Ermn,[1.03100381e-36]
-OD Mature 1,Sgk1,[9.60804811e-28]
-OD Mature 1,Gjc3,[5.7684982e-24]
-OD Mature 1,Ttyh2,[1.01835449e-20]
-OD Mature 1,Ndrg1,[1.03259315e-19]
-OD Mature 1,Opalin,[2.9660652e-18]
-OD Mature 1,Lpar1,[1.52799924e-14]
-OD Mature 1,Trh,[1.23059178e-12]
-OD Mature 1,Cck,[2.94202993e-11]
-Endothelial 3,Ace2,[5.04550411e-117]
-Endothelial 3,Adora2a,[1.47479403e-107]
-Endothelial 3,Rgs5,[1.66510957e-98]
-Endothelial 3,Fn1,[8.51739179e-68]
-Endothelial 3,Myh11,[2.28719114e-38]
-Endothelial 3,Slco1a4,[1.28847158e-23]
-Endothelial 3,Igf1r,[1.89578793e-23]
-Endothelial 3,Etv1,[4.54255535e-23]
-Endothelial 3,Sema3c,[3.64369939e-18]
-Endothelial 3,Plin3,[5.25539724e-17]
-OD Mature 3,Opalin,[1.73397566e-08]
-OD Mature 3,Mbp,[2.37788325e-08]
-OD Mature 3,Ermn,[2.01002829e-07]
-OD Mature 3,Ttyh2,[5.67405464e-06]
-OD Mature 3,Gjc3,[6.68277175e-06]
-OD Mature 3,Lpar1,[1.04093688e-05]
-OD Mature 3,Sgk1,[1.2893733e-05]
-OD Mature 3,Ndrg1,[5.39267097e-05]
-OD Mature 4,Mbp,[1.80006632e-12]
-OD Mature 4,Opalin,[7.33555009e-11]
-OD Mature 4,Ermn,[4.84843444e-09]
-OD Mature 4,Man1a,[3.81953408e-07]
-OD Mature 4,Lpar1,[4.07283143e-07]
-OD Mature 4,Gjc3,[2.52577239e-06]
-OD Mature 4,Sema4d,[1.81257153e-05]
-OD Mature 4,Omp,[3.87810658e-05]
-OD Mature 4,Sgk1,[6.78057095e-05]
-Endothelial 2,Myh11,[1.056975e-19]
-Endothelial 2,Lmod1,[9.59619929e-19]
-Endothelial 2,Rgs5,[4.1652183e-17]
-Endothelial 2,Bmp7,[2.03680765e-16]
-Endothelial 2,Pdgfra,[2.41694125e-16]
-Endothelial 2,Adora2a,[1.95343172e-11]
-Endothelial 2,Fn1,[4.74005715e-10]
-Endothelial 2,Plin3,[1.42093439e-08]
-Endothelial 2,Klf4,[5.92269261e-08]
-Endothelial 2,Lpar1,[4.37678389e-06]
-Ependymal,Nnat,[2.35870701e-166]
-Ependymal,Cyr61,[1.6720652e-150]
-Ependymal,Cd24a,[2.02152764e-144]
-Ependymal,Ucn3,[3.59469267e-131]
-Ependymal,Cckbr,[7.91546008e-129]
-Ependymal,Mlc1,[2.60618304e-125]
-Ependymal,Gnrh1,[2.63757503e-122]
-Ependymal,Aqp4,[1.39710565e-107]
-Ependymal,Lpar1,[2.53682381e-106]
-Ependymal,Plin3,[9.85783247e-100]
-EpendymalInhibitory,Gad1,[0.]
-EpendymalInhibitory,Irs4,[6.86690434e-268]
-EpendymalInhibitory,Prlr,[5.06710331e-220]
-EpendymalInhibitory,Pak3,[1.94637768e-212]
-EpendymalInhibitory,Ar,[2.68983398e-212]
-EpendymalInhibitory,Gpr165,[7.5570108e-192]
-EpendymalInhibitory,Esr1,[4.38003088e-190]
-EpendymalInhibitory,Coch,[4.27303874e-185]
-EpendymalInhibitory,Oprl1,[5.86782275e-173]
-EpendymalInhibitory,Pgr,[2.70553586e-159]
-EpendymalInhibitory,Nnat,[2.35870701e-166]
-EpendymalInhibitory,Cyr61,[1.6720652e-150]
-EpendymalInhibitory,Cd24a,[2.02152764e-144]
-EpendymalInhibitory,Ucn3,[3.59469267e-131]
-EpendymalInhibitory,Cckbr,[7.91546008e-129]
-EpendymalInhibitory,Mlc1,[2.60618304e-125]
-EpendymalInhibitory,Gnrh1,[2.63757503e-122]
-EpendymalInhibitory,Aqp4,[1.39710565e-107]
-EpendymalInhibitory,Lpar1,[2.53682381e-106]
-EpendymalInhibitory,Plin3,[9.85783247e-100]
+"cell_type","marker_gene","p_value"
+"Astrocyte","Aldh1l1","[0.]"
+"Astrocyte","Aqp4","[0.]"
+"Astrocyte","Cxcl14","[0.]"
+"Astrocyte","Mlc1","[0.]"
+"Astrocyte","Ttyh2","[1.03243826e-267]"
+"Astrocyte","Sox8","[1.3657778e-208]"
+"Astrocyte","Sox6","[1.14953915e-191]"
+"Astrocyte","Pou3f2","[3.12081644e-178]"
+"Astrocyte","Cck","[7.11575467e-80]"
+"Astrocyte","Cyr61","[5.56636726e-77]"
+"Inhibitory","Gad1","[0.]"
+"Inhibitory","Irs4","[6.86690434e-268]"
+"Inhibitory","Prlr","[5.06710331e-220]"
+"Inhibitory","Pak3","[1.94637768e-212]"
+"Inhibitory","Ar","[2.68983398e-212]"
+"Inhibitory","Gpr165","[7.5570108e-192]"
+"Inhibitory","Esr1","[4.38003088e-190]"
+"Inhibitory","Coch","[4.27303874e-185]"
+"Inhibitory","Oprl1","[5.86782275e-173]"
+"Inhibitory","Pgr","[2.70553586e-159]"
+"Pericytes","Myh11","[5.81177905e-95]"
+"Pericytes","Lmod1","[6.91720498e-68]"
+"Pericytes","Fn1","[2.47974465e-48]"
+"Pericytes","Ccnd2","[8.76390339e-37]"
+"Pericytes","Rgs5","[2.28949504e-29]"
+"Pericytes","Klf4","[3.40031832e-28]"
+"Pericytes","Gnrh1","[2.17823817e-23]"
+"Pericytes","Npy1r","[5.03188598e-16]"
+"Pericytes","Plin3","[5.84568068e-15]"
+"Pericytes","Adora2a","[2.20255156e-14]"
+"Ambiguous","Gjc3","[4.58366939e-54]"
+"Ambiguous","Mbp","[1.41426259e-49]"
+"Ambiguous","Sgk1","[5.57635574e-47]"
+"Ambiguous","Opalin","[9.63605431e-42]"
+"Ambiguous","Ermn","[2.4124049e-41]"
+"Ambiguous","Lpar1","[4.52505453e-25]"
+"Ambiguous","Ttyh2","[6.91113552e-24]"
+"Ambiguous","Sox8","[7.89900775e-24]"
+"Ambiguous","Ndrg1","[1.46203016e-23]"
+"Ambiguous","Isl1","[1.69244396e-23]"
+"Endothelial1","Fn1","[3.28199276e-299]"
+"Endothelial1","Slco1a4","[4.85060278e-222]"
+"Endothelial1","Sema3c","[4.03458328e-195]"
+"Endothelial1","Klf4","[2.10156461e-194]"
+"Endothelial1","Igf1r","[1.72683754e-169]"
+"Endothelial1","Rgs5","[2.60639616e-153]"
+"Endothelial1","Ndrg1","[1.69014644e-111]"
+"Endothelial1","Cdkn1a","[2.14888587e-69]"
+"Endothelial1","Trh","[1.35521663e-33]"
+"Endothelial1","Cck","[2.87042805e-32]"
+"Excitatory","Slc17a6","[0.]"
+"Excitatory","Cbln1","[2.78975205e-252]"
+"Excitatory","Cbln2","[1.2649941e-216]"
+"Excitatory","Syt4","[2.393991e-179]"
+"Excitatory","Adcyap1","[4.84389808e-139]"
+"Excitatory","Necab1","[1.05358319e-135]"
+"Excitatory","Gabra1","[1.5116004e-124]"
+"Excitatory","Nos1","[1.57705333e-108]"
+"Excitatory","Oprl1","[1.68789506e-103]"
+"Excitatory","Pak3","[3.73565326e-87]"
+"ODImmature1","Pdgfra","[6.40040634e-213]"
+"ODImmature1","Traf4","[2.37895807e-142]"
+"ODImmature1","Cspg5","[4.32839851e-133]"
+"ODImmature1","Gjc3","[3.88790246e-130]"
+"ODImmature1","Sox8","[3.13370592e-111]"
+"ODImmature1","Sox6","[2.46153264e-106]"
+"ODImmature1","Bmp7","[7.09538924e-73]"
+"ODImmature1","Npas1","[1.88068237e-32]"
+"ODImmature1","Pcdh11x","[8.20965195e-28]"
+"ODImmature1","Etv1","[2.82720103e-27]"
+"ODImmature2","Mki67","[2.162061e-06]"
+"Microglia","Selplg","[1.50668378e-88]"
+"Microglia","Man1a","[1.67436753e-27]"
+"Microglia","Sgk1","[3.31771386e-16]"
+"Microglia","Trh","[3.71517472e-13]"
+"Microglia","Cck","[6.42472993e-13]"
+"Microglia","Ebf3","[3.76609586e-12]"
+"Microglia","Rgs2","[1.78970813e-11]"
+"Microglia","Sema4d","[5.02179996e-11]"
+"Microglia","Slc15a3","[8.0499621e-11]"
+"Microglia","Sst","[1.23193318e-05]"
+"ODMature2","Mbp","[7.87318005e-271]"
+"ODMature2","Ermn","[1.46044099e-230]"
+"ODMature2","Ttyh2","[2.79717118e-167]"
+"ODMature2","Opalin","[5.79019458e-162]"
+"ODMature2","Gjc3","[6.82640789e-160]"
+"ODMature2","Sgk1","[3.10685092e-159]"
+"ODMature2","Ndrg1","[3.8074226e-142]"
+"ODMature2","Lpar1","[2.93738995e-129]"
+"ODMature2","Sox8","[9.36399966e-97]"
+"ODMature2","Plin3","[9.50930548e-59]"
+"ODMature1","Mbp","[1.69320944e-47]"
+"ODMature1","Ermn","[1.03100381e-36]"
+"ODMature1","Sgk1","[9.60804811e-28]"
+"ODMature1","Gjc3","[5.7684982e-24]"
+"ODMature1","Ttyh2","[1.01835449e-20]"
+"ODMature1","Ndrg1","[1.03259315e-19]"
+"ODMature1","Opalin","[2.9660652e-18]"
+"ODMature1","Lpar1","[1.52799924e-14]"
+"ODMature1","Trh","[1.23059178e-12]"
+"ODMature1","Cck","[2.94202993e-11]"
+"Endothelial3","Ace2","[5.04550411e-117]"
+"Endothelial3","Adora2a","[1.47479403e-107]"
+"Endothelial3","Rgs5","[1.66510957e-98]"
+"Endothelial3","Fn1","[8.51739179e-68]"
+"Endothelial3","Myh11","[2.28719114e-38]"
+"Endothelial3","Slco1a4","[1.28847158e-23]"
+"Endothelial3","Igf1r","[1.89578793e-23]"
+"Endothelial3","Etv1","[4.54255535e-23]"
+"Endothelial3","Sema3c","[3.64369939e-18]"
+"Endothelial3","Plin3","[5.25539724e-17]"
+"ODMature3","Opalin","[1.73397566e-08]"
+"ODMature3","Mbp","[2.37788325e-08]"
+"ODMature3","Ermn","[2.01002829e-07]"
+"ODMature3","Ttyh2","[5.67405464e-06]"
+"ODMature3","Gjc3","[6.68277175e-06]"
+"ODMature3","Lpar1","[1.04093688e-05]"
+"ODMature3","Sgk1","[1.2893733e-05]"
+"ODMature3","Ndrg1","[5.39267097e-05]"
+"ODMature4","Mbp","[1.80006632e-12]"
+"ODMature4","Opalin","[7.33555009e-11]"
+"ODMature4","Ermn","[4.84843444e-09]"
+"ODMature4","Man1a","[3.81953408e-07]"
+"ODMature4","Lpar1","[4.07283143e-07]"
+"ODMature4","Gjc3","[2.52577239e-06]"
+"ODMature4","Sema4d","[1.81257153e-05]"
+"ODMature4","Omp","[3.87810658e-05]"
+"ODMature4","Sgk1","[6.78057095e-05]"
+"Endothelial2","Myh11","[1.056975e-19]"
+"Endothelial2","Lmod1","[9.59619929e-19]"
+"Endothelial2","Rgs5","[4.1652183e-17]"
+"Endothelial2","Bmp7","[2.03680765e-16]"
+"Endothelial2","Pdgfra","[2.41694125e-16]"
+"Endothelial2","Adora2a","[1.95343172e-11]"
+"Endothelial2","Fn1","[4.74005715e-10]"
+"Endothelial2","Plin3","[1.42093439e-08]"
+"Endothelial2","Klf4","[5.92269261e-08]"
+"Endothelial2","Lpar1","[4.37678389e-06]"
+"Ependymal","Nnat","[2.35870701e-166]"
+"Ependymal","Cyr61","[1.6720652e-150]"
+"Ependymal","Cd24a","[2.02152764e-144]"
+"Ependymal","Ucn3","[3.59469267e-131]"
+"Ependymal","Cckbr","[7.91546008e-129]"
+"Ependymal","Mlc1","[2.60618304e-125]"
+"Ependymal","Gnrh1","[2.63757503e-122]"
+"Ependymal","Aqp4","[1.39710565e-107]"
+"Ependymal","Lpar1","[2.53682381e-106]"
+"Ependymal","Plin3","[9.85783247e-100]"
