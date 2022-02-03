@@ -9,7 +9,7 @@ library(igraph)
 library(RColorBrewer)
 
 
-counts.raw <- read.table("./data/merfish/Bregma/visiumData/BregmaVisium_06.csv", header = TRUE, sep = ",")
+counts.raw <- read.table("./data/merfish/merfishVisium.csv", header = TRUE, sep = ",")
 
 # counts.raw <- read.table("./data/merfish/s7.csv", header = TRUE, sep = ",")
 data <- subset(counts.raw, select = -c(1, 2, 3, 4, 5, 6, 7, 8, 9))
@@ -38,7 +38,7 @@ data <- do.call(data.frame, lapply(DT, function(x) replace(x, is.infinite(x), NA
 
 
 #spatial data
-rawSpatial <- read.table("./data/merfish/Bregma/spatialData/BregmaSpatial_06.csv", header = TRUE, sep = ' ')
+rawSpatial <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, sep = ' ')
 spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
 spatialData = subset(spatialData, select = -c(Fos))
 anterior = subset(spatialData, select = -c(1))
@@ -96,8 +96,8 @@ spotlight_correlation = cor(decon_mtrx)
 spot_counts <- anterior@assays$RNA@counts
 
 
-for (r in 1:row) {
-  for (c in 1:col) {
+for (r in 1:nrow(decon_mtrx)) {
+  for (c in 1:ncol(decon_mtrx)) {
     decon_mtrx1[r, c] <- (decon_mtrx[r, c] / sum(decon_mtrx[r, ])) * 100
   }
 }
@@ -120,7 +120,7 @@ for(r in 1:16){
     if(c == 17) break
     cellCountCorelationList = append(cellCountCorelationList, cellCountCorrelation[cellTypes[r], cellTypes[c]])
     fractionCorrelationList = append(fractionCorrelationList, spotlight_correlation[cellTypes[r], cellTypes[c]])
-    singularValueCorrelationList = append(singularValueCorrelationList, singularValueCorrelation[cellTypes[r], cellTypes[c]])
+    # singularValueCorrelationList = append(singularValueCorrelationList, singularValueCorrelation[cellTypes[r], cellTypes[c]])
   }
 }
 
@@ -139,10 +139,55 @@ write.table(cellCountCorrelation, './data/merfish/Bregma/correlations/singularva
 
 #scatterplot
 #excitatory
-scatterDf <- data.frame(x= cellCount[,3], y = decon_mtrx[,7], check.names = FALSE)
+scatterDf <- data.frame(x= cellCount[,6], y = decon_mtrx[,7], check.names = FALSE)
+scatterPlotSpotlight(scatterDf)
 #ependymal
-scatterDf <- data.frame(x= cellCount[,14], y = decon_mtrx[,6], check.names = FALSE)
+scatterDf <- data.frame(x= cellCount[,16], y = decon_mtrx[,6], check.names = FALSE)
+scatterPlotSpotlight(scatterDf)
+
 #inihibitory
 scatterDf <- data.frame(x= cellCount[,2], y = decon_mtrx[,8], check.names = FALSE)
+scatterPlotSpotlight(scatterDf)
+
 #astrocyte
 scatterDf <- data.frame(x= cellCount[,5], y = decon_mtrx[,2], check.names = FALSE)
+
+
+#to see if 0 cel count has more thena 0 %
+positive = 0
+negative = 0
+for(r in 1: nrow(decon_mtrx)){
+  for(celltype in colnames(decon_mtrx)){
+    if(cellCount[r, celltype] == 0){
+      if(decon_mtrx[r, celltype] < 15)
+        positive = positive + 1
+      else negative = negative + 1
+    } 
+  }
+}
+
+#cell to percentage
+for (r in 1:nrow(cellCount)) {
+  for (c in 1:ncol(cellCount)) {
+    cellCount1[r, c] <- (cellCount[r, c] / sum(cellCount[r, ])) * 100
+  }
+}
+
+for(celltype in colnames(cellCount)){
+  templist = c()
+  for(spot in 1:nrow(cellCount)){
+    if(abs(cellCount1[spot, celltype] - decon_mtrx[spot, celltype]) > 5){
+      templist = c(templist, cellCount[spot, celltype])
+    }
+  }
+
+  # templist = cellCount[, celltype]
+  paths = "images/spotlight/mispredictions/"
+  ttemp = paste(paths, celltype, sep = "")
+  pngg = ".png"
+  ttemp = paste(ttemp, pngg, sep = "")
+  png(ttemp)
+  hist(templist, breaks = seq(from=0, to=15, by=1), xlabel=celltype)
+  dev.off()  
+}
+

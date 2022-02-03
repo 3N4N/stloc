@@ -45,7 +45,7 @@ minX <- min(dataset$Centroid_X)
 minY <- min(dataset$Centroid_Y)
 
 
-tileWidth <- 100.0
+tileWidth <- 50.0
 dataset$Centroid_X <- dataset$Centroid_X - minX
 dataset$Centroid_Y <- dataset$Centroid_Y - minY
 dataset$new_X <- (floor(dataset$Centroid_X / tileWidth) * tileWidth) + tileWidth / 2
