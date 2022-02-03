@@ -3,9 +3,9 @@ require(dplyr)
 library(ggplot2)
 
 
-bregmaAnalysis <- FALSE
+bregmaAnalysis <- TRUE
 if (isTRUE(bregmaAnalysis)) {
-    BregmaValue <- 0.06
+    BregmaValue <- -0.19
     inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
 } else {
     inputFile <- "./data/merfish/s7.xlsx"
@@ -45,7 +45,7 @@ minX <- min(dataset$Centroid_X)
 minY <- min(dataset$Centroid_Y)
 
 
-tileWidth <- 50.0
+tileWidth <- 50
 dataset$Centroid_X <- dataset$Centroid_X - minX
 dataset$Centroid_Y <- dataset$Centroid_Y - minY
 dataset$new_X <- (floor(dataset$Centroid_X / tileWidth) * tileWidth) + tileWidth / 2
