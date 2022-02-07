@@ -9,8 +9,10 @@ analyze <- function(clusters.name, clusters.pair, counts, cellCount, outdir) {
     data <- apply(data, c(1, 2), as.numeric)
     colnames(data) <- c("x", "y")
 
-    hpi <- Hscv(x = data)
-    kde <- kde(x = data, H = hpi, eval.points = coords)
+
+    # hpi <- Hscv(x = data)
+    # kde <- kde(x = data, H = hpi, eval.points = coords)
+
 
     d <- sort(as.numeric(dist(coords)))[1]
     W <- weightMatrix.gaussian(coords, l = d * 0.1)
@@ -27,8 +29,10 @@ analyze <- function(clusters.name, clusters.pair, counts, cellCount, outdir) {
     print(clusters.name)
 
     for (cluster in clusters.name) {
+
         # if (!(cluster == "Excitatory")) next
         genes <- unlist(c(clusters.pair[cluster]))
+        print(genes)
         genes <- sapply(genes, function(i) i <- toString(i))
         # if (length(genes) == 1) next
 
