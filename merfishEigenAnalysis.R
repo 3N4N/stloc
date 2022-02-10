@@ -24,11 +24,11 @@ if (!file.exists("output/merfish/Bregma/scatterPlot")) {
 }
 
 
-counts.raw <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ",", row.names = 1)
+# counts.raw <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ",", row.names = 1)
 # counts.raw <- select(counts.raw, -Fos) # Remove Fos column only for bregma
 
 
-# counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
+counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
 cellCount <- counts.raw[(length(counts.raw) - 1):length(counts.raw)] # cellCount of each cell type
 
 
@@ -52,9 +52,12 @@ for (row in 1:nrow(clusters.data)) {
     clusters.data[row, "cell_type"] <- gsub(" ", "", clusters.data[row, "cell_type"], fixed = TRUE)
 }
 write.table(clusters.data, "./data/merfish/markerGene_for_merfish_data.csv", sep = ",", row.names = FALSE, append = FALSE)
-clusters.name <- unique(clusters.data$cell_type)
-# clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
+
 clusters.name <- list("Inhibitory", "Excitatory")
+
+# clusters.name <- unique(clusters.name)
+
+# clusters.name <- unique(clusters.data$cell_type)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
 
 
@@ -63,7 +66,8 @@ if (length(clusters.name) == 1) {
     clusters.pair[[clusters.name[1]]] <- clusters.data[clusters.data[, 1] == clusters.name[1], 2]
 } else {
     clusters.pair <- sapply(clusters.name, function(i) {
-        clusters.pair[[i]] <- clusters.data[clusters.data[, 1] == i, 2]
+        print(clusters.data[clusters.data[, 1] == i, 2])
+        clusters.pair[[i]] <- list(clusters.data[clusters.data[, 1] == i, 2])
     })
 }
 
