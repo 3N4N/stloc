@@ -160,3 +160,18 @@ scatterPlot <- function(scatterdf) {
 
     do.call("grid.arrange", c(list(plotvar, plotbox), ncol = 2))
 }
+
+scatterPlotSpotlight<-function(scatterdf){
+
+    plotvar <-ggplot(scatterdf, aes(x=x, y=y)) +
+        geom_point(size=2, shape=23) +
+        scale_y_continuous(limits= c(0,1))+
+        labs(x="Cell Count " ,y= "Fraction")
+
+    plotbox <-ggplot(scatterdf, aes(x=x, y=y, group=x)) +
+        geom_boxplot() +
+        scale_y_continuous(limits= c(0,1))+
+        labs(x="Cell Count " ,y= "Fraction")
+
+    do.call("grid.arrange", c(list(plotvar, plotbox), ncol=2))
+}
