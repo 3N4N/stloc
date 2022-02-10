@@ -3,7 +3,7 @@ require(dplyr)
 library(ggplot2)
 
 
-bregmaAnalysis <- TRUE
+bregmaAnalysis <- FALSE
 if (isTRUE(bregmaAnalysis)) {
     BregmaValue <- -0.19
     inputFile <- paste("./data/merfish/Bregma/BregmaExtracted/Bregma_", as.character(BregmaValue), ".xlsx", sep = "")
@@ -67,7 +67,7 @@ tempDataFrame <- dataset[0, ]
 tempRow <- dataset[1, ]
 tempRow[dataset[1, ]$Cell_class] <- 1
 checkOutside <- function(dataRow) {
-    if (sqrt((dataRow$Centroid_X - dataRow$new_X)^2 + (dataRow$Centroid_Y - dataRow$new_Y)^2) >= tileWidth * 0.4) {
+    if (sqrt((dataRow$Centroid_X - dataRow$new_X)^2 + (dataRow$Centroid_Y - dataRow$new_Y)^2) >= tileWidth * 20) {
         return(TRUE)
     }
     return(FALSE)
