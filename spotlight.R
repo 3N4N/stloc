@@ -9,12 +9,12 @@ library(igraph)
 library(RColorBrewer)
 
 
-counts.raw <- read.table("./data/merfish/merfishVisium.csv", header = TRUE, sep = ",")
+counts.raw <- read.table("./data/FaultSingleCell.csv", header = TRUE, sep = ",")
 
 # counts.raw <- read.table("./data/merfish/s7.csv", header = TRUE, sep = ",")
 data <- subset(counts.raw, select = -c(1, 2, 3, 4, 5, 6, 7, 8, 9))
 #remove NA
-data = subset(data, select = -c(Fos))
+# data = subset(data, select = -c(Fos))
 
 cortex_sc <- CreateSeuratObject(counts = t(data))
 
@@ -38,9 +38,10 @@ data <- do.call(data.frame, lapply(DT, function(x) replace(x, is.infinite(x), NA
 
 
 #spatial data
-rawSpatial <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, sep = ' ')
-spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
-spatialData = subset(spatialData, select = -c(Fos))
+rawSpatial <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ',')
+# spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
+spatialData <- rawSpatial[1:(length(rawSpatial)-2)]
+# spatialData = subset(spatialData, select = -c(Fos))
 anterior = subset(spatialData, select = -c(1))
 anterior <- CreateSeuratObject(counts = t(anterior))
 
@@ -139,7 +140,7 @@ write.table(cellCountCorrelation, './data/merfish/Bregma/correlations/singularva
 
 #scatterplot
 #excitatory
-scatterDf <- data.frame(x= cellCount[,6], y = decon_mtrx[,7], check.names = FALSE)
+scatterDf <- data.frame(x= cellCount[,1], y = decon_mtrx[,1], check.names = FALSE)
 scatterPlotSpotlight(scatterDf)
 #ependymal
 scatterDf <- data.frame(x= cellCount[,16], y = decon_mtrx[,6], check.names = FALSE)
