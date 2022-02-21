@@ -24,11 +24,16 @@ if (!file.exists("output/merfish/Bregma/scatterPlot")) {
 }
 
 
-# counts.raw <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ",", row.names = 1)
+if (!file.exists("output/merfish/Fault/scatterPlot")) {
+    system("mkdir -p output/merfish/Fault/scatterPlot")
+}
+
+
+counts.raw <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ",", row.names = 1)
 # counts.raw <- select(counts.raw, -Fos) # Remove Fos column only for bregma
 
 
-counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
+# counts.raw <- read.table("./data/merfish/merfishSpatial.csv", header = TRUE, row.names = 1)
 cellCount <- counts.raw[(length(counts.raw) - 1):length(counts.raw)] # cellCount of each cell type
 
 
@@ -74,8 +79,9 @@ if (length(clusters.name) == 1) {
 
 source("Celltype_Analysis.R")
 
-bregmaOutputDirectory <- "output/merfish/Bregma/scatterPlot/"
-resultFrame <- analyze(clusters.name, clusters.pair, counts, cellCount, bregmaOutputDirectory)
-corOutput <- cor(resultFrame)
-write.table(corOutput, "svdCor.txt")
+# bregmaOutputDirectory <- "output/merfish/Bregma/scatterPlot/"
+faultOutputDirectory <- "output/merfish/Fault/scatterPlot/"
+resultFrame <- analyze(clusters.name, clusters.pair, counts, cellCount, faultOutputDirectory)
+# corOutput <- cor(resultFrame)
+# write.table(corOutput, "svdCor.txt")
 CV <- sapply(resultFrame, function(x) sd(x) / mean(x) * 100)

@@ -105,7 +105,44 @@ maxSingVal <- function(x, w = 1) {
 
     return(max(svd(t(x))$d))
 }
+minSingVal <- function(x, w = 1) {
+    if (!inherits(x, "matrix")) {
+        stop("Input must be inherit ’matrix’ class.")
+    }
 
+    if (length(w) == 1) {
+        w <- rep(1, ncol(x))
+    }
+
+    x <- apply(x, 1, function(i) w * i)
+
+    return(min(svd(t(x))$d))
+}
+
+maxByMinSingVal <- function(x, w = 1) {
+    if (!inherits(x, "matrix")) {
+        stop("Input must be inherit ’matrix’ class.")
+    }
+
+    if (length(w) == 1) {
+        w <- rep(1, ncol(x))
+    }
+
+    x <- apply(x, 1, function(i) w * i)
+    maxVal <- max(svd(t(x))$d)
+    minVal <- min(svd(t(x))$d)
+    if (minVal == 0) {
+        minVal <- 1^(-120)
+    }
+    maxByMin <- maxVal / minVal
+    if (maxByMin < 0) {
+        message("negative value ")
+    }
+    # message("min val is", min(svd(t(x))$d))
+    return(log10(maxVal / minVal))
+
+    # return(max(svd(t(x))$d) / min(svd(t(x))$d)))
+}
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
         ggplot(df, aes(x = x, y = y)) +
@@ -161,17 +198,16 @@ scatterPlot <- function(scatterdf) {
     do.call("grid.arrange", c(list(plotvar, plotbox), ncol = 2))
 }
 
-scatterPlotSpotlight<-function(scatterdf){
+scatterPlotSpotlight <- function(scatterdf) {
+    plotvar <- ggplot(scatterdf, aes(x = x, y = y)) +
+        geom_point(size = 2, shape = 23) +
+        scale_y_continuous(limits = c(0, 1)) +
+        labs(x = "Cell Count ", y = "Fraction")
 
-    plotvar <-ggplot(scatterdf, aes(x=x, y=y)) +
-        geom_point(size=2, shape=23) +
-        scale_y_continuous(limits= c(0,1))+
-        labs(x="Cell Count " ,y= "Fraction")
-
-    plotbox <-ggplot(scatterdf, aes(x=x, y=y, group=x)) +
+    plotbox <- ggplot(scatterdf, aes(x = x, y = y, group = x)) +
         geom_boxplot() +
-        scale_y_continuous(limits= c(0,1))+
-        labs(x="Cell Count " ,y= "Fraction")
+        scale_y_continuous(limits = c(0, 1)) +
+        labs(x = "Cell Count ", y = "Fraction")
 
-    do.call("grid.arrange", c(list(plotvar, plotbox), ncol=2))
+    do.call("grid.arrange", c(list(plotvar, plotbox), ncol = 2))
 }
