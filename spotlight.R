@@ -11,39 +11,60 @@ library(RColorBrewer)
 
 counts.raw <- read.table("./data/FaultSingleCell.csv", header = TRUE, sep = ",")
 
-# counts.raw <- read.table("./data/merfish/s7.csv", header = TRUE, sep = ",")
+# counts.raw <- read.table("./data/merfish/Bregma/visiumData/BregmaVisium_29.csv", header = TRUE, sep = ",")
 data <- subset(counts.raw, select = -c(1, 2, 3, 4, 5, 6, 7, 8, 9))
 #remove NA
 # data = subset(data, select = -c(Fos))
+# data = subset(data, select = -c(Blank_1, Blank_2, Blank_3, Blank_4, Blank_5))
 
 cortex_sc <- CreateSeuratObject(counts = t(data))
 
 cortex_sc[["subclass"]] <- counts.raw[[8]]
+cortex_sc <- NormalizeData(cortex_sc)
+#variable gene finding
+cortex_sc <- FindVariableFeatures(cortex_sc, selection.method = "vst", nfeatures = 2000)
 
 
-for (i in 1:ncol(data)) {
-  print(i)
-  data[is.infinite(data[, i]), i] <- mean(data[, i], na.rm = TRUE)
-}
+# for (i in 1:ncol(data)) {
+#   # print(i)
+#   data[is.na(data[, i]), i] <- mean(data[, i], na.rm = TRUE)
+# }
 
-for (i in 1:ncol(data)) {
-  if (!is.finite(data[, i])) {
-    print(data[, i])
+for(i in 1: nrow(spatialData)){
+  for(j in 1: ncol(spatialData)){
+    if(is.na(spatialData[i, j])){
+      print(j)
+      # data[i, j] <- mean(data[, j], na.rm = TRUE)
+      # print('yea bits')
+    }
   }
 }
 
+# for (i in 1:ncol(data)) {
+#   if (!is.finite(data[, i])) {
+#     print(data[, i])
+#   }
+# }
 
-data <- do.call(data.frame, lapply(DT, function(x) replace(x, is.infinite(x), NA)))
+
+# data <- do.call(data.frame, lapply(DT, function(x) replace(x, is.infinite(x), NA)))
 
 
 
 #spatial data
-rawSpatial <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ',')
-# spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
-spatialData <- rawSpatial[1:(length(rawSpatial)-2)]
-# spatialData = subset(spatialData, select = -c(Fos))
+# rawSpatial <- read.table("./data/merfish/Bregma/spatialData/BregmaSpatial_19.csv", header = TRUE, sep = ' ')
+rawSpatial <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ' ')
+spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
+# spatialData = subset(spatialData, select = -c(Blank_1, Blank_2, Blank_3, Blank_4, Blank_5))
+# spatialData = subset(spatialData, select = -c(141))
+
+# spatialData <- rawSpatial[1:(length(rawSpatial)-2)]
+
 anterior = subset(spatialData, select = -c(1))
 anterior <- CreateSeuratObject(counts = t(anterior))
+anterior <- NormalizeData(anterior)
+#variable gene finding
+anterior <- FindVariableFeatures(anterior, selection.method = "vst", nfeatures = 2000)
 
 #preprocessing
 
@@ -91,6 +112,8 @@ spotlight_ls <- readRDS(file = here::here("inst/spotlight_ls.rds"))
 
 nmf_mod <- spotlight_ls[[1]]
 decon_mtrx <- spotlight_ls[[2]]
+cellCount = rawSpatial[(length(rawSpatial)-15):length(rawSpatial)]
+
 spotlight_correlation = cor(decon_mtrx)
 
 
@@ -104,7 +127,7 @@ for (r in 1:nrow(decon_mtrx)) {
 }
 
 #cellCount
-cellCount = rawSpatial[(length(rawSpatial)-15):length(rawSpatial)]
+# cellCount = rawSpatial[(length(rawSpatial)-15):length(rawSpatial)]
 cellCountCorrelation = cor(cellCount)
 
 cellTypes = colnames(cellCount)
@@ -140,7 +163,7 @@ write.table(cellCountCorrelation, './data/merfish/Bregma/correlations/singularva
 
 #scatterplot
 #excitatory
-scatterDf <- data.frame(x= cellCount[,1], y = decon_mtrx[,1], check.names = FALSE)
+scatterDf <- data.frame(x= cellCount[,6], y = decon_mtrx[,7], check.names = FALSE)
 scatterPlotSpotlight(scatterDf)
 #ependymal
 scatterDf <- data.frame(x= cellCount[,16], y = decon_mtrx[,6], check.names = FALSE)
@@ -151,8 +174,8 @@ scatterDf <- data.frame(x= cellCount[,2], y = decon_mtrx[,8], check.names = FALS
 scatterPlotSpotlight(scatterDf)
 
 #astrocyte
-scatterDf <- data.frame(x= cellCount[,5], y = decon_mtrx[,2], check.names = FALSE)
-
+scatterDf <- data.frame(x= cellCount[,1], y = decon_mtrx[,2], check.names = FALSE)
+scatterPlotSpotlight(scatterDf)
 
 #to see if 0 cel count has more thena 0 %
 positive = 0
@@ -163,8 +186,55 @@ for(r in 1: nrow(decon_mtrx)){
       if(decon_mtrx[r, celltype] < 15)
         positive = positive + 1
       else negative = negative + 1
-    } 
+    }
   }
+}
+
+
+
+#hudai
+zeroCellCount = list()
+for(cellName in cellTypes){
+  #find the index of the rows with the cell name
+  # index = which(cellCount[, cellName] == 0 && decon_mtrx[, cellName] > 0)
+  index = c()
+  for(r in 1: nrow(cellCount)){
+    if(cellCount[r, cellName] == 0 && decon_mtrx[r, cellName] > 0){
+      index = c(index, r)
+    }
+  }
+  if(length(index) == 0){
+    # print('o ma-------------------------')
+    next
+  }
+  else{
+    # print(' yaaaaaaaaaaaaaaaaaaaa')
+  }
+  fraction = c()
+  totalCellCount = c()
+  for(cellName1 in cellTypes){
+    average = mean(decon_mtrx[index, cellName1])
+    cellCountSum = sum(cellCount[index, cellName1])
+    zeroCellCount[[cellName]][[cellName1]] = average
+    fraction = c(fraction, average)
+    totalCellCount = c(totalCellCount, cellCountSum)
+  }
+
+  totalCellCount = totalCellCount / sum(totalCellCount)
+  totalCellCount = totalCellCount * 100
+  fraction = fraction * 100
+
+  paths = "images/spotlight/mispredictions/"
+  ttemp = paste(paths, cellName, sep = "")
+  pngg = ".png"
+  ttemp = paste(ttemp, pngg, sep = "")
+  png(ttemp)
+  # hist(templist, breaks = seq(from=0, to=15, by=1), xlabel=celltype)
+  bp = barplot(fraction,names.arg=cellTypes,las=2)
+  abline(h=0)
+  text(bp, fraction / 2, labels = round(totalCellCount, digits = 2))
+  dev.off() 
+  
 }
 
 #cell to percentage
@@ -189,6 +259,17 @@ for(celltype in colnames(cellCount)){
   ttemp = paste(ttemp, pngg, sep = "")
   png(ttemp)
   hist(templist, breaks = seq(from=0, to=15, by=1), xlabel=celltype)
+  barplot(y,names.arg=x)
   dev.off()  
 }
 
+#create data frame
+df <- data.frame(
+                team = c('B', 'D', 'A', 'C', 'E'),
+                points = c(12, 28, 19, 22, 15),
+                )
+
+ggplot(df, aes(x = team, y = points)) +
+  geom_point(color = "red",
+             size=2) +
+  gghighlight(class == "midsize")

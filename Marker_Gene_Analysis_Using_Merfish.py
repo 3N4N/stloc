@@ -15,7 +15,7 @@
 import pandas as pd
 from scipy.stats import mannwhitneyu
 
-data = pd.read_csv("./data/merfish/s7.csv")
+data = pd.read_csv("./data/merfish/merfishVisium.csv")
 
 # datatop = data.head()
 # print(datatop)
@@ -67,8 +67,8 @@ for cell_type in cell_types:
     temp = pd.DataFrame(list(zip(cellTypeCSV, markerGeneCSV, pvalCSV)), columns=[
                         'cell_type', 'marker_gene', 'p_value'])
     temp = temp.sort_values('p_value')
-    if(len(temp.index) > 10):
-        temp = temp.iloc[0:10, :]
+    # if(len(temp.index) > 10):
+    #     temp = temp.iloc[0:10, :]
     cellTypeCSV.clear()
     markerGeneCSV.clear()
     pvalCSV.clear()
