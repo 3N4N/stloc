@@ -27,9 +27,14 @@ if (!file.exists("output/merfish/Bregma/scatterPlot")) {
 if (!file.exists("output/merfish/Fault/scatterPlot")) {
     system("mkdir -p output/merfish/Fault/scatterPlot")
 }
+if (!file.exists("output/merfish/combination/scatterPlot")) {
+    system("mkdir -p output/merfish/combination/scatterPlot")
+}
 
 
-counts.raw <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ",", row.names = 1)
+counts.raw <- read.table("./data/combinationSpatial.csv", header = TRUE, sep = ",", row.names = 1)
+# counts.raw <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ",", row.names = 1)
+
 # counts.raw <- select(counts.raw, -Fos) # Remove Fos column only for bregma
 
 
@@ -81,7 +86,9 @@ source("Celltype_Analysis.R")
 
 # bregmaOutputDirectory <- "output/merfish/Bregma/scatterPlot/"
 faultOutputDirectory <- "output/merfish/Fault/scatterPlot/"
+combinationOutputDirectory <- "output/merfish/combination/scatterPlot/"
+
 resultFrame <- analyze(clusters.name, clusters.pair, counts, cellCount, faultOutputDirectory)
 # corOutput <- cor(resultFrame)
 # write.table(corOutput, "svdCor.txt")
-CV <- sapply(resultFrame, function(x) sd(x) / mean(x) * 100)
+# CV <- sapply(resultFrame, function(x) sd(x) / mean(x) * 100)
