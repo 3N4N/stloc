@@ -12,3 +12,4 @@ data/common.tsv
 .Rhistory
 .Rproj.user
 *.Rproj
+.ipynb_checkpoints/

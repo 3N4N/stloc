@@ -54,8 +54,8 @@ analyze <- function(clusters.name, clusters.pair, counts, cellCount, outdir) {
         st <- Sys.time()
         meig.real <- as.matrix(sapply(
             1:nrow(coords),
-            function(i) (maxByMinSingVal(pairCount, W[i, ]))
-            # function(i) (maxSingVal(pairCount, W[i, ]))
+            # function(i) (maxByMinSingVal(pairCount, W[i, ]))
+            function(i) (maxSingVal(pairCount, W[i, ]))
         ))
         resultFrame[cluster] <- meig.real
         # resultFrame[cluster] <- meig.real
