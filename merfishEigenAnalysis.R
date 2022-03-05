@@ -1,3 +1,9 @@
+#  ----------------------------------------------------------------------
+#  Preprocesses the MERFISH dataset
+#  and uses `Celltype_Analysis.R` for eigenvalue analysis
+#  ----------------------------------------------------------------------
+
+
 library(SingleCellExperiment)
 library(scran)
 library(ks)

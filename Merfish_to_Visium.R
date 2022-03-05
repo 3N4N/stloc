@@ -1,3 +1,8 @@
+#  ----------------------------------------------------------------------
+#  This file contains the code to generate Visium from the MERFISH data.
+#  ----------------------------------------------------------------------
+
+
 library("readxl")
 require(dplyr)
 library(ggplot2)
