@@ -8,8 +8,12 @@ library(SPOTlight)
 library(igraph)
 library(RColorBrewer)
 
+#read all file names from data/twoType/singleCell/
+singleCellNames <- list.files(path = "data/twoType/singleCell/", pattern = "*.csv")
+#read all file names from data/twoType/spatialData/
+spatialNames <- list.files(path = "data/twoType/spatialData/", pattern = "*.csv")
 
-counts.raw <- read.table("./data/FaultSingleCell.csv", header = TRUE, sep = ",")
+counts.raw <- read.table("./data/merfish/twoType/singleCell/AmbiguousEndothelial1Single.csv", header = TRUE, sep = ",")
 
 # counts.raw <- read.table("./data/merfish/Bregma/visiumData/BregmaVisium_29.csv", header = TRUE, sep = ",")
 data <- subset(counts.raw, select = -c(1, 2, 3, 4, 5, 6, 7, 8, 9))
@@ -53,12 +57,12 @@ for(i in 1: nrow(spatialData)){
 
 #spatial data
 # rawSpatial <- read.table("./data/merfish/Bregma/spatialData/BregmaSpatial_19.csv", header = TRUE, sep = ' ')
-rawSpatial <- read.table("./data/FaultSpatial.csv", header = TRUE, sep = ' ')
-spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
+rawSpatial <- read.table("./data/CombinationSpatial.csv", header = TRUE, sep = ',')
+# spatialData <- rawSpatial[1:(length(rawSpatial)-16)]
 # spatialData = subset(spatialData, select = -c(Blank_1, Blank_2, Blank_3, Blank_4, Blank_5))
 # spatialData = subset(spatialData, select = -c(141))
 
-# spatialData <- rawSpatial[1:(length(rawSpatial)-2)]
+spatialData <- rawSpatial[1:(length(rawSpatial)-2)]
 
 anterior = subset(spatialData, select = -c(1))
 anterior <- CreateSeuratObject(counts = t(anterior))
@@ -73,9 +77,9 @@ cortex_sc <- Seurat::SCTransform(cortex_sc, verbose = FALSE) %>%
   Seurat::RunPCA(., verbose = FALSE) %>%
   Seurat::RunUMAP(., dims = 1:30, verbose = FALSE)
 
-Seurat::DimPlot(cortex_sc,
-                group.by = "subclass",
-                label = TRUE) + Seurat::NoLegend()
+# Seurat::DimPlot(cortex_sc,
+#                 group.by = "subclass",
+#                 label = TRUE) + Seurat::NoLegend()
 
 #marker gene
 Seurat::Idents(object = cortex_sc) <- cortex_sc@meta.data$subclass
@@ -112,7 +116,9 @@ spotlight_ls <- readRDS(file = here::here("inst/spotlight_ls.rds"))
 
 nmf_mod <- spotlight_ls[[1]]
 decon_mtrx <- spotlight_ls[[2]]
-cellCount = rawSpatial[(length(rawSpatial)-15):length(rawSpatial)]
+# cellCount = rawSpatial[(length(rawSpatial)-15):length(rawSpatial)]
+cellCount = rawSpatial[(length(rawSpatial)-1):length(rawSpatial)]
+
 
 spotlight_correlation = cor(decon_mtrx)
 
@@ -174,7 +180,7 @@ scatterDf <- data.frame(x= cellCount[,2], y = decon_mtrx[,8], check.names = FALS
 scatterPlotSpotlight(scatterDf)
 
 #astrocyte
-scatterDf <- data.frame(x= cellCount[,1], y = decon_mtrx[,2], check.names = FALSE)
+scatterDf <- data.frame(x= cellCount[,2], y = decon_mtrx[,1], check.names = FALSE)
 scatterPlotSpotlight(scatterDf)
 
 #to see if 0 cel count has more thena 0 %
@@ -273,3 +279,9 @@ ggplot(df, aes(x = team, y = points)) +
   geom_point(color = "red",
              size=2) +
   gghighlight(class == "midsize")
+
+
+#notes
+# cells that are far from mid avg, study
+# mayb delete and study again
+# which one is problemetic
