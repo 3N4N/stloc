@@ -1,3 +1,10 @@
+#  ----------------------------------------------------------------------
+#  This file contains the code for eigenvalue analysis. Other files can
+#  preprocess the dataset and call the `analyze` function here.
+#  ----------------------------------------------------------------------
+
+
+
 source("./functions.R")
 
 
@@ -58,7 +65,6 @@ analyze <- function(clusters.name, clusters.pair, counts, cellCount, outdir) {
             function(i) (maxSingVal(pairCount, W[i, ]))
         ))
         resultFrame[cluster] <- meig.real
-        # resultFrame[cluster] <- meig.real
         # function(i) (maxEigenVal(pairCount, W[i,]) * kde$estimate[i])))
         # tmp <- colSums(pairCount) #/ kde$estimate
         # for (i in 1:length(meig.real)) meig.real[i] <- sum(tmp * W[i,])

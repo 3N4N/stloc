@@ -1,3 +1,7 @@
+#  ----------------------------------------------------------------------
+#  Contains simple helper functions that are used in other scripts.
+#  ----------------------------------------------------------------------
+
 library(ggplot2)
 library(gridExtra)
 library(grid)
@@ -143,6 +147,7 @@ maxByMinSingVal <- function(x, w = 1) {
 
     # return(max(svd(t(x))$d) / min(svd(t(x))$d)))
 }
+
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
         ggplot(df, aes(x = x, y = y)) +

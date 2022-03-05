@@ -1,3 +1,7 @@
+#  ----------------------------------------------------------------------
+#  Generates Visium data from splatter-generated single-cell data.
+#  ----------------------------------------------------------------------
+
 library("splatter")
 library("scater")
 library("ggplot2")

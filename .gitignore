@@ -3,6 +3,7 @@
 
 output/
 scratch.R
+tangramDeconvolved.csv
 
 *.RData
 data/mmc2-1.tsv
