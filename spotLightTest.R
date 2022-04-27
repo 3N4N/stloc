@@ -1,7 +1,7 @@
 library(ggplot2)
 library(SPOTlight)
 library(SingleCellExperiment)
-library(SpatialExperiment)
+# library(SpatialExperiment)
 library(scater)
 library(scran)
 library(NMF)
@@ -16,7 +16,7 @@ sce <- mockSC(ng = 200, nc = 10, nt = 3)
 spe <- mockSP(sce)
 mgs <- getMGS(sce)
 
-singleCellFile <- read.table("./data/twoType/allSingleCell/AmbiguousEndothelial1Single.csv", sep = ",", header = TRUE, check.names = FALSE)
+singleCellFile <- read.table("./data/twoType/allSingleCell/InhibitoryExcitatorySingle.csv", sep = ",", header = TRUE, check.names = FALSE)
 coldata <- DataFrame(
     type = singleCellFile[, "type"]
 )
@@ -26,7 +26,7 @@ singleCellData <- SingleCellExperiment(list(counts = singleCellFile))
 colData(singleCellData) <- coldata
 
 markers <- getMGS(singleCellData)
-spatialCellFile <- read.table("./data/twoType/spatialData/AmbiguousEndothelial1Spatial.csv", sep = ",", header = TRUE, check.names = FALSE)
+spatialCellFile <- read.table("./data/twoType/spatialData/InhibitoryExcitatorySpatial.csv", sep = ",", header = TRUE, check.names = FALSE)
 
 coord <- spatialCellFile[, "coord"]
 
@@ -37,12 +37,20 @@ spatialCellFile <- t(spatialCellFile)
 spatialData <- SingleCellExperiment((list(counts = spatialCellFile)))
 colnames(spatialData) <- coord
 
+
+singleCellData <- logNormCounts(singleCellData)
+dec <- modelGeneVar(singleCellData)
+hvg <- getTopHVGs(dec, n = 145)
+
+
+spatialData <- logNormCounts(spatialData)
+
 res <- SPOTlight(
     x = counts(singleCellData),
     y = counts(spatialData),
     groups = as.character(singleCellData$type),
     mgs = markers,
-    hvg = NULL,
+    hvg = hvg,
     weight_id = "weight",
     group_id = "type",
     gene_id = "gene"
