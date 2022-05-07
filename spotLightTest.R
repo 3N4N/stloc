@@ -55,3 +55,11 @@ res <- SPOTlight(
     group_id = "type",
     gene_id = "gene"
 )
+result <- res$mat
+faultVector <- c()
+for (i in 1:nrow(result)) {
+    if (abs(result[i, 1] - 0.5) > 0.1) {
+        faultVector <- append(faultVector, i)
+    }
+}
+rownames <- row.names(result)

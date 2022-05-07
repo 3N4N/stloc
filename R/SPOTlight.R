@@ -57,13 +57,13 @@
 #' @examples
 #' library(scater)
 #' library(scran)
-#' 
+#'
 #' # Use Mock data
 #' # Refer to the vignette for a full workflow
 #' sce <- mockSC(ng = 200, nc = 10, nt = 3)
 #' spe <- mockSP(sce)
 #' mgs <- getMGS(sce)
-#' 
+#'
 #' res <- SPOTlight(
 #'     x = counts(sce),
 #'     y = counts(spe),
@@ -72,44 +72,49 @@
 #'     hvg = NULL,
 #'     weight_id = "weight",
 #'     group_id = "type",
-#'     gene_id = "gene")
+#'     gene_id = "gene"
+#' )
 NULL
 
 #' @rdname SPOTlight
 #' @export
-SPOTlight <- function(
-    x,
-    y,
-    groups = NULL,
-    # markers
-    mgs,
-    n_top = NULL,
-    gene_id = "gene",
-    group_id = "cluster",
-    weight_id = "weight",
-    hvg = NULL,
-    # NMF
-    scale = TRUE,
-    model = c("ns", "std"),
-    # deconvolution
-    min_prop = 0.01,
-    # other
-    verbose = TRUE,
-    assay = "RNA",
-    slot = "counts",
-    ...) {
-    
+SPOTlight <- function(x,
+                      y,
+                      groups = NULL,
+                      # markers
+                      mgs,
+                      n_top = NULL,
+                      gene_id = "gene",
+                      group_id = "cluster",
+                      weight_id = "weight",
+                      hvg = NULL,
+                      # NMF
+                      scale = TRUE,
+                      model = c("ns", "std"),
+                      # deconvolution
+                      min_prop = 0.01,
+                      # other
+                      verbose = TRUE,
+                      assay = "RNA",
+                      slot = "counts",
+                      ...) {
+
     # train NMF model
-    mod_ls <- trainNMF(x, y, groups, mgs, n_top, gene_id, group_id,
-        weight_id, hvg, model, scale, verbose, ...)
+    mod_ls <- trainNMF(
+        x, y, groups, mgs, n_top, gene_id, group_id,
+        weight_id, hvg, model, scale, verbose, ...
+    )
 
     # perform deconvolution
-    res <- runDeconvolution(y, mod_ls[["mod"]], mod_ls[["topic"]],
-        scale, min_prop, verbose)
+    res <- runDeconvolution(
+        y, mod_ls[["mod"]], mod_ls[["topic"]],
+        scale, min_prop, verbose
+    )
 
     # return list of NMF model & deconvolution matrix
     list(
         "mat" = res[["mat"]],
         "res_ss" = res[["res_ss"]],
-        "NMF" = mod_ls[["mod"]])
-    }
+        "NMF" = mod_ls[["mod"]]
+    )
+}

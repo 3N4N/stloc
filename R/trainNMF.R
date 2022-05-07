@@ -91,8 +91,8 @@ trainNMF <- function(x,
     model <- match.arg(model)
 
     if (is.null(n_top)) {
-          n_top <- max(table(mgs[[group_id]]))
-      }
+        n_top <- max(table(mgs[[group_id]]))
+    }
     ids <- c(gene_id, group_id, weight_id)
 
     stopifnot(
@@ -104,8 +104,8 @@ trainNMF <- function(x,
 
     # Set groups if x is SCE or SE and groups is NULL
     if (is.null(groups)) {
-          groups <- .set_groups_if_null(x)
-      }
+        groups <- .set_groups_if_null(x)
+    }
 
     groups <- as.character(groups)
 
@@ -114,12 +114,12 @@ trainNMF <- function(x,
 
     # Extract expression matrices for x and y
     if (!is.matrix(x)) {
-          x <- .extract_counts(x, assay, slot)
-      }
+        x <- .extract_counts(x, assay, slot)
+    }
 
     if (!is.matrix(y)) {
-          y <- .extract_counts(y, assay, slot)
-      }
+        y <- .extract_counts(y, assay, slot)
+    }
 
     # select genes in mgs or hvg
     if (!is.null(hvg)) {
@@ -160,7 +160,6 @@ trainNMF <- function(x,
     # train NMF model
     if (verbose) message("Training NMF model")
     mod <- nmf(x, rank, paste0(model, "NMF"), seed, ...)
-
     # capture stop time
     t1 <- Sys.time()
 
