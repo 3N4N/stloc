@@ -72,7 +72,7 @@ clusters.data <- clusters.data[clusters.data$gene %in% clusters.genes,]
 clusters.name <- unique(clusters.data$cluster)
 clusters.name <- sapply(clusters.name, function(i) i <- toString(i))
 
-clusters.name <- list("Epithelial", "Fibroblast", "EpithelialFibroblast")
+clusters.name <- list("Epithelial", "Fibroblast", "Myeloid")
 names(clusters.name) <- clusters.name
 
 ## get a list of cluster-gene pairs
@@ -88,12 +88,11 @@ if (length(clusters.name) == 1) {
 # clusters.name <- append(clusters.name,"EpithelialFibroblast" ,length(clusters.name))
 # clusters.name <- append(clusters.name,"MyeloidFibroblast" ,length(clusters.name))
 # clusters.name <- append(clusters.name,"MyeloidEpithelial" ,length(clusters.name))
-clusters.pair[["EpithelialFibroblast"]] <- unique(unlist((list(clusters.pair[["Epithelial"]], clusters.pair[["Fibroblast"]])) ))
+# clusters.pair[["EpithelialFibroblast"]] <- unique(unlist((list(clusters.pair[["Epithelial"]], clusters.pair[["Fibroblast"]])) ))
 # clusters.pair[["MyeloidFibroblast"]] <- unique(unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Fibroblast"]])) ))
 # clusters.pair[["MyeloidEpithelial"]] <- unique(unlist((list(clusters.pair[["Myeloid"]], clusters.pair[["Epithelial"]])) ))
 
 
 
 source("Celltype_Analysis.R")
-
-analyze(clusters.name, clusters.pair, counts, "output/skin_cancer/plots/")
+rf <- analyze(clusters.name, clusters.pair, counts, "output/skin_cancer/plots/")
