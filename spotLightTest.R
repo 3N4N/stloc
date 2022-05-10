@@ -1,5 +1,5 @@
 library(ggplot2)
-library(SPOTlight)
+# library(SPOTlight)
 library(SingleCellExperiment)
 # library(SpatialExperiment)
 library(scater)
@@ -8,8 +8,8 @@ library(NMF)
 library(nnls)
 
 
-for (f in list.files("R/")) {
-    source(paste0("R/", f))
+for (f in list.files("SPOTlight/")) {
+    source(paste0("SPOTlight/", f))
 }
 
 sce <- mockSC(ng = 200, nc = 10, nt = 3)
