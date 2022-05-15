@@ -5,6 +5,7 @@
 library(ggplot2)
 library(gridExtra)
 library(grid)
+library(scico)
 
 minmax <- function(x) {
     if (max(x) != min(x)) {
@@ -148,6 +149,39 @@ maxByMinSingVal <- function(x, w = 1) {
     # return(max(svd(t(x))$d) / min(svd(t(x))$d)))
 }
 
+plotmeigs <- function(df, meigs) {
+    n <- length(meigs)
+    i <- 1
+    plot.vals <- lapply(1:n, function(i) {
+        ggplot(df, aes(x = x, y = y)) +
+            geom_point(aes(colour = meigs[[i]]), size = 3) +
+            theme_minimal() +
+            theme(panel.grid = element_blank()) +
+            theme(axis.text = element_blank()) +
+            xlab("") +
+            ylab("") +
+            labs(colour = "") +
+            theme(legend.position = "bottom") +
+            theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
+            # scale_color_gradient(low = "#ffffd2", high = "#7c1824") +
+            # scale_color_viridis_c(option = "lajolla", na.value="red", direction=-1) +
+            scale_color_scico(palette = "lajolla") +
+            coord_fixed() +
+            guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5)) +
+            theme(legend.key.width = unit(0.5, "inches")) +
+            theme(legend.text = element_text(size = 12)) +
+            theme(plot.margin = margin(-10, 0, -10, 0)) +
+            theme(plot.title = element_text(size = 20)) +
+            theme(axis.title = element_text(size = 15)) +
+            theme(legend.title = element_text(size = 20)) +
+            labs(colour = colnames(meigs)[i]) +
+            NULL
+    })
+
+    grid.arrange(grobs = plot.vals, nrow = 1, ncol = n)
+
+}
+
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
         ggplot(df, aes(x = x, y = y)) +
@@ -160,8 +194,8 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
             labs(colour = "") +
             theme(legend.position = "bottom") +
             theme(plot.title = element_text(hjust = 0.5, face = "italic")) +
-            # scale_color_viridis_c(option = "plasma", na.value="red") +
-            scale_color_binned() +
+            scale_color_viridis_c(option = "plasma", na.value="red", direction=-1) +
+            # scale_color_binned() +
             # scale_color_binned(n.breaks=4, nice.breaks=F, labels=function(x) {
             #                        if (x >= 10) round(x)
             #                        else sprintf("%.2f", x)
