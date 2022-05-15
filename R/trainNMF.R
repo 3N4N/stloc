@@ -116,7 +116,6 @@ trainNMF <- function(x,
     if (!is.matrix(x)) {
         x <- .extract_counts(x, assay, slot)
     }
-
     if (!is.matrix(y)) {
         y <- .extract_counts(y, assay, slot)
     }

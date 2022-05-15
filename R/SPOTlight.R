@@ -115,6 +115,8 @@ SPOTlight <- function(x,
     list(
         "mat" = res[["mat"]],
         "res_ss" = res[["res_ss"]],
-        "NMF" = mod_ls[["mod"]]
+        "NMF" = mod_ls[["mod"]],
+        "nmfFull" = mod_ls,
+        "deconvFull" = res
     )
 }

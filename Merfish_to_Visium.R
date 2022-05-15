@@ -32,10 +32,15 @@ cellType <- unique(dataset["Cell_class"])
 
 
 # Merfish plot regenerate
-# sp<-ggplot(dataset, aes(Centroid_X, Centroid_Y, colour = Cell_class)) +
-#   geom_point(size=0.8)
-# sp<-sp + scale_color_manual(values=c("grey", "brown", "yellow","purple","#2398cf","red","pink","black","green","#2d7d85"))
-# sp
+df <- dataset[dataset$Cell_class == "Excitatory", ]
+jpeg(file = "saving_plot1.jpeg")
+
+sp <- ggplot(df, aes(Centroid_X, Centroid_Y, colour = Cell_class)) +
+    geom_point(size = 0.8) +
+    xlim(-3500, -2000)
+sp <- sp + scale_color_manual(values = c("grey", "brown", "yellow", "purple", "#2398cf", "red", "pink", "black", "green", "#2d7d85"))
+sp
+dev.off()
 
 for (cell in cellType)
 {
