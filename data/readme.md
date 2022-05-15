@@ -1,4 +1,4 @@
-- ## Merfish
+## Merfish
 -   ### Bregma
     -   Different bregma extracted from the merfish 1gb size dataset.
     The ipynb file is used for extracting the bregmas.
@@ -7,10 +7,10 @@
 -   merfishVisium.csv   -> basically the s7.xlsx file with some adjustments.   
 
 
--  ## Skin Cancer
+## Skin Cancer
     -   Count matrix extracted for different patients. We've focused  mainly on p2s1
 
--  ## twoType
+## twoType
     -  ### allSingleCell
         -   AllSingleCells for particular 2 type combinations
 
