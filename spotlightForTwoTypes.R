@@ -59,7 +59,7 @@ for(i in 1:length(singleCellNames)){
     {
       # print(e)
     }
-   
+
   )
 
   #check if error
@@ -69,7 +69,7 @@ for(i in 1:length(singleCellNames)){
     next
   }
 
- 
+
 
   # set.seed(123)
   # cortex_sc <- Seurat::SCTransform(cortex_sc, verbose = FALSE) %>%
@@ -82,10 +82,10 @@ for(i in 1:length(singleCellNames)){
 
   #marker gene
   Seurat::Idents(object = cortex_sc) <- cortex_sc@meta.data$subclass
-  cluster_markers_all <- Seurat::FindAllMarkers(object = cortex_sc, 
+  cluster_markers_all <- Seurat::FindAllMarkers(object = cortex_sc,
                                                 assay = "SCT",
                                                 slot = "data",
-                                                verbose = TRUE, 
+                                                verbose = TRUE,
                                                 only.pos = TRUE)
 
   saveRDS(object = cluster_markers_all,
@@ -130,15 +130,15 @@ for(i in 1:length(singleCellNames)){
       if(abs(decon_mtrx[row, cellTypes[1]] - .5) > max1){
         max1 = abs(decon_mtrx[row, cellTypes[1]] - .5)
         index1 = row
-      } 
+      }
       if(abs(decon_mtrx[row, cellTypes[2]] - .5) > max1){
         max2 = abs(decon_mtrx[row, cellTypes[2]] - .5)
         index2 = row
-      } 
+      }
     }
   }
 
-  
+
   #create a folder named singleCellNames[i] in "images/spotlight/twoTypes"
   # mkdir(paste0("images/spotlight/twoTypes/", singleCellNames[i]))
   dir.create(paste0("images/spotlight/twoTypes/", singleCellNames[i]))
@@ -154,7 +154,7 @@ for(i in 1:length(singleCellNames)){
     sp = scatterPlotSpotlight(scatterDf)
     #save this plot to  "images/spotlight/twoTypes/singleCellNames[i]/cellType.png"
     # savePlot(sp, file = paste0("images/spotlight/twoTypes/", singleCellNames[i], "/", cellType, ".png"))
-    dev.off() 
+    dev.off()
   }
 
 

@@ -12,16 +12,19 @@ source("./functions.R")
 analyze <- function(clusters.name, clusters.pair, counts, outdir) {
     counts.flat <- colSums(counts)
 
+    # replicate the data to reflect the number of cells according to the genexp
     data <- rep(names(counts.flat), counts.flat)
     data <- do.call(rbind, strsplit(data, "x"))
     data <- apply(data, c(1, 2), as.numeric)
     colnames(data) <- c("x", "y")
 
 
+    # Calculate the KDE
     hpi <- Hscv(x = data)
     kde <- kde(x = data, H = hpi, eval.points = coords)
 
 
+    # create weight matrix
     d <- sort(as.numeric(dist(coords)))[1]
     W <- weightMatrix.gaussian(coords, l = d * 0.1)
 

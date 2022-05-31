@@ -7,6 +7,10 @@ library(gridExtra)
 library(grid)
 library(scico)
 
+
+
+
+# minmax normalization
 minmax <- function(x) {
     if (max(x) != min(x)) {
         return((x - min(x)) / (max(x) - min(x)))
@@ -15,6 +19,8 @@ minmax <- function(x) {
     }
 }
 
+
+# Create weight matrix for the spots (Not gaussian)
 weightMatrix.nD <- function(x, span = 0.5) {
     ncells <- nrow(x)
     coords <- as.matrix(x)
@@ -35,6 +41,7 @@ weightMatrix.nD <- function(x, span = 0.5) {
     return(W)
 }
 
+# Create weight matrix for the spots (Gaussian)
 weightMatrix.gaussian <- function(coords, l = 20, cell = 0) {
     ncells <- nrow(coords)
     coords <- as.matrix(coords)
@@ -56,6 +63,7 @@ weightMatrix.gaussian <- function(coords, l = 20, cell = 0) {
 }
 
 
+# Taylor's multiway correlation
 corTaylor <- function(x, w = 1) {
     if (!inherits(x, "matrix")) {
         stop("Input must be inherit ’matrix’ class.")
@@ -72,23 +80,13 @@ corTaylor <- function(x, w = 1) {
 }
 
 
-tmaxEigenVal <- function(x, w = 1) {
-    if (length(w) == 1) {
-        w <- rep(1, ncol(x))
-    }
-
-    x <- apply(x, 1, function(i) w * i)
-
-    covmat <- cov(x)
-
-    return((sum(colSums(covmat))) / ncol(x))
-}
-
+# Calculate the max eigenvalue of the weighted count matrix
 maxEigenVal <- function(x, w = 1) {
     if (length(w) == 1) {
         w <- rep(1, ncol(x))
     }
 
+    # multiply the count matrix with weight matrix
     x <- apply(x, 1, function(i) w * i)
 
     eigvals <- eigen(t(x) %*% x, only.values = TRUE)$values
@@ -97,6 +95,8 @@ maxEigenVal <- function(x, w = 1) {
     return(max(eigvals))
 }
 
+
+# Calculate the max singular value of the weighted count matrix
 maxSingVal <- function(x, w = 1) {
     if (!inherits(x, "matrix")) {
         stop("Input must be inherit ’matrix’ class.")
@@ -106,10 +106,13 @@ maxSingVal <- function(x, w = 1) {
         w <- rep(1, ncol(x))
     }
 
+    # multiply the count matrix with weight matrix
     x <- apply(x, 1, function(i) w * i)
 
     return(max(svd(t(x))$d))
 }
+
+# Calculate the min singular value of the weighted count matrix
 minSingVal <- function(x, w = 1) {
     if (!inherits(x, "matrix")) {
         stop("Input must be inherit ’matrix’ class.")
@@ -123,6 +126,8 @@ minSingVal <- function(x, w = 1) {
 
     return(min(svd(t(x))$d))
 }
+
+
 
 maxByMinSingVal <- function(x, w = 1) {
     if (!inherits(x, "matrix")) {
@@ -149,6 +154,10 @@ maxByMinSingVal <- function(x, w = 1) {
     # return(max(svd(t(x))$d) / min(svd(t(x))$d)))
 }
 
+
+# Plot the eigenvalues of multiple celltypes in one page.
+# This function was used for creating figures for the thesis book.
+# It wasn't used while actively working on the project.
 plotmeigs <- function(df, meigs) {
     n <- length(meigs)
     i <- 1
@@ -182,6 +191,8 @@ plotmeigs <- function(df, meigs) {
 
 }
 
+
+# Plot the eigenvalues, pvalues, and fdr values
 plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
     plot.vals <- lapply(1:n, function(i) {
         ggplot(df, aes(x = x, y = y)) +
@@ -224,6 +235,8 @@ plotvals <- function(n, df, title, vals, labels, size, nrow, ncol) {
 
     grid.arrange(grobs = plot.vals, nrow = nrow, ncol = ncol, top = title)
 }
+
+
 
 scatterPlot <- function(scatterdf) {
     plotvar <- ggplot(scatterdf, aes(x = x, y = y)) +

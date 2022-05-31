@@ -10,13 +10,8 @@
 | Celltype_Analysis.R        | Contains the eigenvalue analysis                   |
 | merfishEigenAnalysis.R     | Eigenvalue analysis with MERFISH-simulated data    |
 | Skin_Cancer_Analysis.R     | Eigenvalue analysis with skin cancer data          |
-| splatterSimulation.R       | Generate Visium data from splatter-generated data   |
+| splatterSimulation.R       | Generate Visium data from splatter-generated data  |
 | Merfish_Marker_Analysis.py | Determine the marker genes of the MERFISH data     |
 | Merfish_to_Visium.R        | Create the Visium data from MERFISH data           |
 | MERFISH_Tangram.ipynb      | Deconvolution of MERFISH-simulated data by TANGRAM |
-| spotLightTest.R            | Deconvolution using  SpotLight  . Uses the  codes of Spotlight folder                      |
-
-                      
-
-
-
+| spotLightTest.R            | Deconvolution using SpotLight.                     |

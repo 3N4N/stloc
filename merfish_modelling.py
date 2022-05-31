@@ -1,5 +1,8 @@
 # REGRESSION MODELLING ON MERFISH DATASET
 #
+# The objective is to predict the gene expressions of a marker gene.
+# It will let us know if the expressions of a cluster are modellable.
+#
 # NOTE: use spearman
 
 import pandas as pd
